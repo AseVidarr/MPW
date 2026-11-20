@@ -114,6 +114,13 @@ button.danger:hover:not(:disabled) { background: #7f3a3a; }
 @media (max-width: 1100px) { .mr-columns { grid-template-columns: 1fr; } #view-media { grid-template-columns: 240px 1fr; } }
 #view-conn { grid-template-columns: 1fr; }
 #view-backup { grid-template-columns: 1fr; }
+#view-config { grid-template-columns: 1fr; }
+#cf-body { display: flex; flex-direction: column; gap: 12px; max-width: 980px; }
+.cf-row { display: grid; grid-template-columns: 170px 1fr auto; gap: 10px; align-items: center; margin: 4px 0; }
+.cf-row .path { font-family: Consolas, "Cascadia Mono", monospace; font-size: 12px; word-break: break-all; }
+.cf-row .label { color: var(--muted); }
+.cf-folders { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 8px; margin: 8px 0; }
+@media (max-width: 800px) { .cf-row { grid-template-columns: 1fr; } }
 #view-albums { grid-template-columns: 300px 1fr; }
 #al-body { display: flex; flex-direction: column; gap: 10px; }
 .al-head { display: flex; gap: 20px; align-items: flex-start; }

@@ -275,6 +275,48 @@ class WebServerTests(unittest.TestCase):
         self.assertEqual(self.json_call('POST', '/api/songs/1/prompt-versions', {**body, 'lyrics': ' '})[1]['error'], 'empty_field')
         self.assertEqual(self.json_call('POST', '/api/songs/99/prompt-versions', body)[0], 404)
 
+    # --- stage 10: Konfiguration ---
+    def test_config_language_and_locations(self):
+        root = Path(self.tmp.name)
+        self.ws.save_app_configuration(root, startup_tab='Bands', color_theme={'accent': '#123456'})
+        info = self.json_call('GET', '/api/config')[1]
+        self.assertEqual(info['languages'], ['auto', 'de', 'en', 'fr', 'es', 'it'])
+        self.assertEqual(info['locations']['database'], str(self.db))
+        self.assertEqual(info['locations']['bands'], str(root / 'Bands'))
+        self.assertEqual(info['folders'], ['Cover', 'Audio', 'Dokumente', 'Video', 'OLD'])
+        self.assertEqual(self.json_call('POST', '/api/config/language', {'language': 'klingonisch'})[0], 400)
+        self.assertEqual(self.json_call('POST', '/api/config/language', {'language': 'it'})[0], 200)
+        self.assertEqual(self.json_call('GET', '/api/info')[1]['language'], 'it')  # the browser uses it at once
+        config = self.ws.app_configuration(root)  # desktop settings are kept
+        self.assertEqual((config['ui_language'], config['startup_tab'], config['color_theme']),
+                         ('it', 'Bands', {'accent': '#123456'}))
+
+    def test_config_project_folder_template(self):
+        call = lambda extras: self.json_call('POST', '/api/config/folders', {'extras': extras})
+        self.assertEqual(call(['Stems', 'a/b'])[1], {'error': 'invalid_folder_name', 'name': 'a/b'})
+        self.assertEqual(call(['audio'])[1], {'error': 'duplicate_folder', 'name': 'audio'})  # fixed folders included
+        self.assertEqual(call(['Stems', 'stems'])[1]['error'], 'duplicate_folder')
+        self.assertEqual(call([f'X{i}' for i in range(7)])[1]['error'], 'too_many_folders')
+        self.assertEqual(call('Stems')[0], 400)
+        status, result = call([' Stems ', '', 'Lyrics'])
+        self.assertEqual((status, result['folders']), (200, ['Cover', 'Audio', 'Dokumente', 'Video', 'Stems', 'Lyrics']))
+        self.assertEqual(self.ws.app_configuration(Path(self.tmp.name))['project_folder_template'],
+                         ['Cover', 'Audio', 'Dokumente', 'Video', 'Stems', 'Lyrics'])
+        self.assertEqual(self.json_call('GET', '/api/config')[1]['folders'][4:], ['Stems', 'Lyrics'])
+
+    def test_config_open_folder_only_mpw_folders(self):
+        opened = []
+        self.patch_ws(open_in_file_manager=lambda path: opened.append(Path(path)))
+        self.assertEqual(self.json_call('POST', '/api/config/open-folder', {'folder': 'data'})[0], 200)
+        self.assertEqual(opened, [Path(self.tmp.name)])
+        self.assertEqual(self.json_call('POST', '/api/config/open-folder', {'folder': 'C:\\Windows'})[0], 400)
+
+        def missing(path):
+            raise OSError('Ordner nicht gefunden')
+        self.patch_ws(open_in_file_manager=missing)
+        self.assertEqual(self.json_call('POST', '/api/config/open-folder', {'folder': 'backups'})[1]['error'],
+                         'folder_unavailable')
+
     # --- stage 9: Plattensammlung ---
     def album_setup(self):
         with closing(sqlite3.connect(self.db)) as con, con:

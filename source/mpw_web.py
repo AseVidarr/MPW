@@ -57,11 +57,11 @@ def web_directory():
     return base / 'web'
 
 
-def ui_language():
+def ui_language(root=None):
     """Language chosen in MPW › Konfiguration ('auto' lets the browser decide)."""
     try:
         # utf-8-sig: tolerate a BOM if the file was edited with another tool
-        data = json.loads((ws.ROOT / 'app_configuration.json').read_text(encoding='utf-8-sig'))
+        data = json.loads((Path(root or ws.ROOT) / 'app_configuration.json').read_text(encoding='utf-8-sig'))
         value = data.get('ui_language', 'auto') if isinstance(data, dict) else 'auto'
     except (OSError, ValueError):
         value = 'auto'
@@ -77,7 +77,7 @@ class ApiError(Exception):
 # --------------------------------------------------------------------------- API handlers
 
 def api_info(server, query, body):
-    return {'version': ws.APP_VERSION, 'language': ui_language(), 'database': str(server.db_path),
+    return {'version': ws.APP_VERSION, 'language': ui_language(server.db_path.parent), 'database': str(server.db_path),
             'statuses': list(ws.SONG_STATUS_KEYS), 'limits': TEXT_LIMITS}
 
 
@@ -1071,7 +1071,69 @@ def api_album_tracklist(server, query, body, aid):
 RAW_BODY_LIMITS = {api_album_cover: ws.ALBUM_COVER_LIMIT}  # routes that receive raw bytes instead of JSON
 
 
+# --------------------------------------------------------------------------- Konfiguration (stage 10)
+
+def _config_folders(server):
+    root = _root(server)
+    return {'data': root, 'bands': ws.band_root_directory(root), 'backups': ws.backup_directory(root)}
+
+
+def api_config(server, query, body):
+    """Settings shared with the desktop app plus where MPW keeps its data (read-only)."""
+    import platform
+    root = _root(server)
+    folders = _config_folders(server)
+    return {'language': ui_language(root), 'languages': list(ws.UI_LANGUAGES), 'version': ws.APP_VERSION,
+            'system': f'{platform.system()} {platform.release()} · Python {platform.python_version()}',
+            'locations': {'data': str(root), 'database': str(server.db_path), 'media': str(root / 'media'),
+                          'config': str(root / 'app_configuration.json'), 'bands': str(folders['bands']),
+                          'backups': str(folders['backups'])},
+            'exists': {key: Path(path).is_dir() for key, path in folders.items()},
+            'folders': list(ws.configured_project_folders(root)), 'fixed_folders': list(ws.SONG_MEDIA_FOLDERS)}
+
+
+def api_config_language(server, query, body):
+    language = _body_text(body, 'language')
+    if language not in ws.UI_LANGUAGES:
+        raise ApiError(400, 'invalid_field', {'field': 'language'})
+    try:
+        ws.save_app_configuration(_root(server), ui_language=language)
+    except OSError as exc:
+        raise ApiError(500, 'config_failed', {'detail': str(exc)[:300]}) from exc
+    return {'language': language}
+
+
+def api_config_folders(server, query, body):
+    """Template for future shared project folders (existing folders are never renamed or moved)."""
+    extras = body.get('extras') if isinstance(body, dict) else None
+    try:
+        names = ws.clean_project_folder_template(extras)
+        ws.save_app_configuration(_root(server), project_folder_template=names)
+    except ws.BandDataError as exc:
+        raise ApiError(400, exc.code, exc.values) from exc
+    except OSError as exc:
+        raise ApiError(500, 'config_failed', {'detail': str(exc)[:300]}) from exc
+    return {'folders': list(ws.configured_project_folders(_root(server)))}
+
+
+def api_config_open_folder(server, query, body):
+    """Open one of MPW's own folders (data, bands, backups) in the system's file manager."""
+    which = _body_text(body, 'folder')
+    folders = _config_folders(server)
+    if which not in folders:
+        raise ApiError(400, 'invalid_field', {'field': 'folder'})
+    try:
+        ws.open_in_file_manager(folders[which])
+    except OSError as exc:
+        raise ApiError(400, 'folder_unavailable', {'detail': str(exc)[:300]}) from exc
+    return {'opened': str(folders[which])}
+
+
 ROUTES = [
+    ('GET', re.compile(r'^/api/config$'), api_config),
+    ('POST', re.compile(r'^/api/config/language$'), api_config_language),
+    ('POST', re.compile(r'^/api/config/folders$'), api_config_folders),
+    ('POST', re.compile(r'^/api/config/open-folder$'), api_config_open_folder),
     ('GET', re.compile(r'^/api/albums$'), api_albums),
     ('POST', re.compile(r'^/api/albums$'), api_create_album),
     ('GET', re.compile(r'^/api/albums/(\d+)$'), api_album),

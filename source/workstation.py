@@ -9063,14 +9063,8 @@ class Workstation(QMainWindow):
         return mpw_core.app_configuration(ROOT)
 
     def save_app_configuration(self, **changes):
-        data = self.app_configuration()
-        data.update(changes)
-        path = ROOT / 'app_configuration.json'
-        try:
-            ROOT.mkdir(parents=True, exist_ok=True)
-            temp = path.with_suffix('.json.tmp')
-            temp.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding='utf-8')
-            temp.replace(path)
+        try:  # same file and rules as the browser GUI (mpw_core)
+            mpw_core.save_app_configuration(ROOT, **changes)
         except OSError as exc:
             self.error(f'Konfiguration konnte nicht gespeichert werden: {exc}')
 
@@ -11917,20 +11911,7 @@ class Workstation(QMainWindow):
 
     def configured_project_folders(self):
         """Read the template for future project folders; never alter existing folders."""
-        configured = self.app_configuration().get('project_folder_template')
-        if not isinstance(configured, list) or not 1 <= len(configured) <= 10:
-            return self.DEFAULT_PROJECT_FOLDERS
-        try:
-            names = [str(name).strip() for name in configured]
-            for name in names:
-                self.validate_folder_name(name)
-            if len({name.casefold() for name in names}) != len(names):
-                raise ValueError('Doppelte Namen')
-        except (ValueError, TypeError):
-            return self.DEFAULT_PROJECT_FOLDERS
-        # The first four folders are fixed; legacy names become optional extras.
-        extras = [n for n in names if n.casefold() not in {v.casefold() for v in SONG_MEDIA_FOLDERS}]
-        return tuple(SONG_MEDIA_FOLDERS) + tuple(extras[:6])
+        return mpw_core.configured_project_folders(ROOT)  # same rules as the browser GUI
 
     def create_project_cover_icons(self):
         """Bulk-install missing Explorer icons without touching existing customizations."""

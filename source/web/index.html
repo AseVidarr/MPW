@@ -17,6 +17,7 @@
     <button class="tab" data-view="ai" role="tab" data-i18n="tab_ai">AI Prompt Launcher</button>
     <button class="tab" data-view="conn" role="tab" data-i18n="tab_conn">KI-Verbindungen</button>
     <button class="tab" data-view="backup" role="tab" data-i18n="tab_backup">Backup</button>
+    <button class="tab" data-view="config" role="tab" data-i18n="tab_config">Konfiguration</button>
   </nav>
   <div class="meta" id="meta"></div>
 </header>
@@ -182,6 +183,40 @@
             <div class="actions"><button id="btn-al-meta" class="primary" data-i18n="al_meta_save">Album-Metadaten speichern</button></div>
           </div>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Konfiguration -->
+  <section id="view-config" class="view" hidden>
+    <div class="editor">
+      <div id="cf-body">
+        <p class="hint" data-i18n="cf_intro">Allgemeine Einstellungen – gemeinsam mit der installierten MPW. Backup-Einstellungen stehen im Reiter „Backup“, KI-Zugänge unter „KI-Verbindungen“.</p>
+        <div id="cf-message" class="message" hidden></div>
+        <fieldset class="conn-group">
+          <legend data-i18n="cf_language">Sprache / Language</legend>
+          <div class="hw-form">
+            <select id="cf-language"></select>
+            <button id="btn-cf-language" class="primary" data-i18n="cf_language_save">Sprache übernehmen</button>
+          </div>
+          <div class="hint" data-i18n="cf_language_hint">„Automatisch“ folgt der Sprache des Browsers bzw. des Systems. Gilt auch für die Desktop-App (ab dem nächsten Start).</div>
+        </fieldset>
+        <fieldset class="conn-group">
+          <legend data-i18n="cf_locations">Speicherorte</legend>
+          <div id="cf-locations"></div>
+          <div class="hint" data-i18n="cf_locations_hint">Den Band-Speicherort ändert die Desktop-App (dabei werden alle MPW-Daten übertragen – das geschieht nicht, während MPW im Browser läuft).</div>
+        </fieldset>
+        <fieldset class="conn-group">
+          <legend data-i18n="cf_folders">Song/Projekt-Unterordner</legend>
+          <div class="hint" data-i18n="cf_folders_hint">Vorlage für neue gemeinsame Projektordner. Die vier Medienordner sind fest; bis zu sechs weitere sind möglich. Vorhandene Ordner werden nicht umbenannt, verschoben oder gelöscht.</div>
+          <div id="cf-folders" class="cf-folders"></div>
+          <div class="actions"><button id="btn-cf-folders" class="primary" data-i18n="cf_folders_save">Vorlage speichern</button></div>
+        </fieldset>
+        <fieldset class="conn-group">
+          <legend data-i18n="cf_about">Programm</legend>
+          <div class="conn-line" id="cf-about"></div>
+          <div class="hint" data-i18n="cf_desktop_only">Nur in der Desktop-App: Erscheinungsbild und Hintergrundbild, alte Musikordner übernehmen, Projektdateien sortieren, Ordnersymbole aus Covern.</div>
+        </fieldset>
       </div>
     </div>
   </section>

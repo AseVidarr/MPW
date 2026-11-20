@@ -63,6 +63,35 @@ const I18N = {
     band_created: "Band „{name}“ angelegt. Verzeichnis: {folder}",
     band_imported: "Band „{name}“ übernommen. Vorhandenes Verzeichnis: {folder} (nichts verändert).",
     band_prompt_warning: "Der Prompt-Ordner konnte nicht angelegt werden: {detail}",
+    tab_config: "Konfiguration",
+    cf_intro: "Allgemeine Einstellungen – gemeinsam mit der installierten MPW. Backup-Einstellungen stehen im Reiter „Backup“, KI-Zugänge unter „KI-Verbindungen“.",
+    cf_language: "Sprache / Language",
+    cf_language_save: "Sprache übernehmen",
+    cf_language_hint: "„Automatisch“ folgt der Sprache des Browsers bzw. des Systems. Gilt auch für die Desktop-App (ab dem nächsten Start).",
+    cf_auto: "Automatisch",
+    cf_locations: "Speicherorte",
+    cf_locations_hint: "Den Band-Speicherort ändert die Desktop-App (dabei werden alle MPW-Daten übertragen – das geschieht nicht, während MPW im Browser läuft).",
+    cf_folders: "Song/Projekt-Unterordner",
+    cf_folders_hint: "Vorlage für neue gemeinsame Projektordner. Die vier Medienordner sind fest; bis zu sechs weitere sind möglich. Vorhandene Ordner werden nicht umbenannt, verschoben oder gelöscht.",
+    cf_folders_save: "Vorlage speichern",
+    cf_about: "Programm",
+    cf_desktop_only: "Nur in der Desktop-App: Erscheinungsbild und Hintergrundbild, alte Musikordner übernehmen, Projektdateien sortieren, Ordnersymbole aus Covern.",
+    cf_loc_data: "MPW-Datenordner",
+    cf_loc_db: "Datenbank",
+    cf_loc_media: "Mediendateien",
+    cf_loc_config: "Konfigurationsdatei",
+    cf_loc_bands: "Band-Speicherort",
+    cf_loc_backups: "Backup-Ordner",
+    cf_open: "Ordner öffnen",
+    cf_missing: "Ordner existiert noch nicht.",
+    cf_opened: "Geöffnet: {path}",
+    cf_folder_n: "Ordner {n} (optional)",
+    cf_folders_saved: "Vorlage gespeichert: {folders}\nBestehende Ordner und Dateien wurden nicht verändert.",
+    cf_err_name: "„{name}“ ist als Ordnername nicht zulässig.",
+    cf_err_duplicate: "Der Ordnername „{name}“ kommt doppelt vor.",
+    cf_err_many: "Höchstens sechs zusätzliche Ordner.",
+    cf_err_open: "Ordner konnte nicht geöffnet werden: {detail}",
+    cf_err_save: "Konfiguration konnte nicht gespeichert werden: {detail}",
     tab_albums: "Plattensammlung",
     al_title_ph: "Albumtitel",
     al_create: "Neue Platte anlegen",
@@ -314,6 +343,35 @@ const I18N = {
     band_created: "Band “{name}” created. Directory: {folder}",
     band_imported: "Band “{name}” imported. Existing directory: {folder} (nothing changed).",
     band_prompt_warning: "The prompt folder could not be created: {detail}",
+    tab_config: "Configuration",
+    cf_intro: "General settings – shared with the installed MPW. Backup settings are in the “Backup” tab, AI access under “AI connections”.",
+    cf_language: "Language / Sprache",
+    cf_language_save: "Apply language",
+    cf_language_hint: "“Automatic” follows the language of the browser or system. Also applies to the desktop app (from its next start).",
+    cf_auto: "Automatic",
+    cf_locations: "Storage locations",
+    cf_locations_hint: "The band storage location is changed in the desktop app (all MPW data is transferred then – this does not happen while MPW runs in the browser).",
+    cf_folders: "Song/project subfolders",
+    cf_folders_hint: "Template for new shared project folders. The four media folders are fixed; up to six more are possible. Existing folders are never renamed, moved or deleted.",
+    cf_folders_save: "Save template",
+    cf_about: "Program",
+    cf_desktop_only: "Desktop app only: appearance and background image, importing old music folders, sorting project files, folder icons from covers.",
+    cf_loc_data: "MPW data folder",
+    cf_loc_db: "Database",
+    cf_loc_media: "Media files",
+    cf_loc_config: "Configuration file",
+    cf_loc_bands: "Band storage location",
+    cf_loc_backups: "Backup folder",
+    cf_open: "Open folder",
+    cf_missing: "The folder does not exist yet.",
+    cf_opened: "Opened: {path}",
+    cf_folder_n: "Folder {n} (optional)",
+    cf_folders_saved: "Template saved: {folders}\nExisting folders and files were not changed.",
+    cf_err_name: "“{name}” is not allowed as a folder name.",
+    cf_err_duplicate: "The folder name “{name}” appears twice.",
+    cf_err_many: "At most six additional folders.",
+    cf_err_open: "The folder could not be opened: {detail}",
+    cf_err_save: "The configuration could not be saved: {detail}",
     tab_albums: "Record collection",
     al_title_ph: "Album title",
     al_create: "Create new record",
@@ -565,6 +623,35 @@ const I18N = {
     band_created: "Groupe « {name} » créé. Dossier : {folder}",
     band_imported: "Groupe « {name} » importé. Dossier existant : {folder} (rien modifié).",
     band_prompt_warning: "Le dossier des prompts n’a pas pu être créé : {detail}",
+    tab_config: "Configuration",
+    cf_intro: "Réglages généraux – partagés avec MPW installé. Les sauvegardes sont dans l’onglet « Backup », les accès IA dans « Connexions IA ».",
+    cf_language: "Langue / Language",
+    cf_language_save: "Appliquer la langue",
+    cf_language_hint: "« Automatique » suit la langue du navigateur ou du système. S’applique aussi à l’application de bureau (au prochain démarrage).",
+    cf_auto: "Automatique",
+    cf_locations: "Emplacements",
+    cf_locations_hint: "L’emplacement des groupes se change dans l’application de bureau (toutes les données MPW sont alors transférées – pas pendant que MPW tourne dans le navigateur).",
+    cf_folders: "Sous-dossiers des projets",
+    cf_folders_hint: "Modèle pour les nouveaux dossiers de projet partagés. Les quatre dossiers médias sont fixes ; jusqu’à six autres sont possibles. Les dossiers existants ne sont jamais renommés, déplacés ni supprimés.",
+    cf_folders_save: "Enregistrer le modèle",
+    cf_about: "Programme",
+    cf_desktop_only: "Uniquement dans l’application de bureau : apparence et image de fond, import d’anciens dossiers musicaux, tri des fichiers, icônes de dossier à partir des pochettes.",
+    cf_loc_data: "Dossier de données MPW",
+    cf_loc_db: "Base de données",
+    cf_loc_media: "Fichiers médias",
+    cf_loc_config: "Fichier de configuration",
+    cf_loc_bands: "Emplacement des groupes",
+    cf_loc_backups: "Dossier de sauvegarde",
+    cf_open: "Ouvrir le dossier",
+    cf_missing: "Le dossier n’existe pas encore.",
+    cf_opened: "Ouvert : {path}",
+    cf_folder_n: "Dossier {n} (facultatif)",
+    cf_folders_saved: "Modèle enregistré : {folders}\nLes dossiers et fichiers existants n’ont pas été modifiés.",
+    cf_err_name: "« {name} » n’est pas autorisé comme nom de dossier.",
+    cf_err_duplicate: "Le nom de dossier « {name} » apparaît deux fois.",
+    cf_err_many: "Six dossiers supplémentaires au maximum.",
+    cf_err_open: "Impossible d’ouvrir le dossier : {detail}",
+    cf_err_save: "Impossible d’enregistrer la configuration : {detail}",
     tab_albums: "Collection de disques",
     al_title_ph: "Titre de l’album",
     al_create: "Créer un disque",
@@ -816,6 +903,35 @@ const I18N = {
     band_created: "Banda «{name}» creada. Carpeta: {folder}",
     band_imported: "Banda «{name}» importada. Carpeta existente: {folder} (sin cambios).",
     band_prompt_warning: "No se pudo crear la carpeta de prompts: {detail}",
+    tab_config: "Configuración",
+    cf_intro: "Ajustes generales, compartidos con MPW instalado. Las copias están en la pestaña «Backup» y los accesos de IA en «Conexiones de IA».",
+    cf_language: "Idioma / Language",
+    cf_language_save: "Aplicar idioma",
+    cf_language_hint: "«Automático» sigue el idioma del navegador o del sistema. También se aplica a la aplicación de escritorio (en su próximo inicio).",
+    cf_auto: "Automático",
+    cf_locations: "Ubicaciones",
+    cf_locations_hint: "La ubicación de las bandas se cambia en la aplicación de escritorio (se transfieren todos los datos de MPW; no mientras MPW se ejecuta en el navegador).",
+    cf_folders: "Subcarpetas de proyectos",
+    cf_folders_hint: "Plantilla para nuevas carpetas de proyecto compartidas. Las cuatro carpetas multimedia son fijas; se pueden añadir hasta seis más. Las carpetas existentes nunca se renombran, mueven ni eliminan.",
+    cf_folders_save: "Guardar plantilla",
+    cf_about: "Programa",
+    cf_desktop_only: "Solo en la aplicación de escritorio: apariencia e imagen de fondo, importar carpetas de música antiguas, ordenar archivos de proyecto, iconos de carpeta a partir de portadas.",
+    cf_loc_data: "Carpeta de datos de MPW",
+    cf_loc_db: "Base de datos",
+    cf_loc_media: "Archivos multimedia",
+    cf_loc_config: "Archivo de configuración",
+    cf_loc_bands: "Ubicación de las bandas",
+    cf_loc_backups: "Carpeta de copias",
+    cf_open: "Abrir carpeta",
+    cf_missing: "La carpeta aún no existe.",
+    cf_opened: "Abierta: {path}",
+    cf_folder_n: "Carpeta {n} (opcional)",
+    cf_folders_saved: "Plantilla guardada: {folders}\nNo se modificaron carpetas ni archivos existentes.",
+    cf_err_name: "«{name}» no se permite como nombre de carpeta.",
+    cf_err_duplicate: "El nombre de carpeta «{name}» aparece dos veces.",
+    cf_err_many: "Como máximo seis carpetas adicionales.",
+    cf_err_open: "No se pudo abrir la carpeta: {detail}",
+    cf_err_save: "No se pudo guardar la configuración: {detail}",
     tab_albums: "Colección de discos",
     al_title_ph: "Título del álbum",
     al_create: "Crear disco nuevo",
@@ -1067,6 +1183,35 @@ const I18N = {
     band_created: "Gruppo «{name}» creato. Cartella: {folder}",
     band_imported: "Gruppo «{name}» importato. Cartella esistente: {folder} (nessuna modifica).",
     band_prompt_warning: "Impossibile creare la cartella dei prompt: {detail}",
+    tab_config: "Configurazione",
+    cf_intro: "Impostazioni generali, condivise con MPW installato. I backup sono nella scheda «Backup», gli accessi IA in «Connessioni IA».",
+    cf_language: "Lingua / Language",
+    cf_language_save: "Applica lingua",
+    cf_language_hint: "«Automatico» segue la lingua del browser o del sistema. Vale anche per l’app desktop (dal prossimo avvio).",
+    cf_auto: "Automatico",
+    cf_locations: "Percorsi",
+    cf_locations_hint: "Il percorso delle band si cambia nell’app desktop (vengono trasferiti tutti i dati MPW; non mentre MPW è in esecuzione nel browser).",
+    cf_folders: "Sottocartelle dei progetti",
+    cf_folders_hint: "Modello per le nuove cartelle di progetto condivise. Le quattro cartelle multimediali sono fisse; se ne possono aggiungere fino a sei. Le cartelle esistenti non vengono mai rinominate, spostate o eliminate.",
+    cf_folders_save: "Salva modello",
+    cf_about: "Programma",
+    cf_desktop_only: "Solo nell’app desktop: aspetto e immagine di sfondo, importazione di vecchie cartelle musicali, ordinamento dei file di progetto, icone delle cartelle dalle copertine.",
+    cf_loc_data: "Cartella dati MPW",
+    cf_loc_db: "Database",
+    cf_loc_media: "File multimediali",
+    cf_loc_config: "File di configurazione",
+    cf_loc_bands: "Percorso delle band",
+    cf_loc_backups: "Cartella backup",
+    cf_open: "Apri cartella",
+    cf_missing: "La cartella non esiste ancora.",
+    cf_opened: "Aperta: {path}",
+    cf_folder_n: "Cartella {n} (facoltativa)",
+    cf_folders_saved: "Modello salvato: {folders}\nCartelle e file esistenti non sono stati modificati.",
+    cf_err_name: "«{name}» non è consentito come nome di cartella.",
+    cf_err_duplicate: "Il nome di cartella «{name}» compare due volte.",
+    cf_err_many: "Al massimo sei cartelle aggiuntive.",
+    cf_err_open: "Impossibile aprire la cartella: {detail}",
+    cf_err_save: "Impossibile salvare la configurazione: {detail}",
     tab_albums: "Collezione dischi",
     al_title_ph: "Titolo dell’album",
     al_create: "Crea nuovo disco",
@@ -1765,6 +1910,81 @@ $('btn-band-new').addEventListener('click', () => bandAction(showNewBandForm).ca
 $('btn-band-new-cancel').addEventListener('click', hideNewBandForm);
 $('btn-band-create').addEventListener('click', () => bandAction(createBand).catch((error) => newBandMessage(error.message, 'error')));
 $('n-name').addEventListener('keydown', (event) => { if (event.key === 'Enter') $('btn-band-create').click(); });
+
+/* ------------------------------------------------------------------ Konfiguration (stage 10) */
+
+const cfState = { info: null, busy: false };
+const LANGUAGE_NAMES = { auto: null, de: 'Deutsch', en: 'English', fr: 'Français', es: 'Español', it: 'Italiano' };
+
+function cfMessage(text, kind) {
+  const box = $('cf-message');
+  box.textContent = text;
+  box.className = 'message' + (kind ? ' ' + kind : '');
+  box.hidden = !text;
+}
+
+async function cfAction(fn) {
+  if (cfState.busy) return;
+  cfState.busy = true;
+  try { await fn(); } catch (error) {
+    const data = error.data || {};
+    const map = { invalid_folder_name: 'cf_err_name', duplicate_folder: 'cf_err_duplicate', too_many_folders: 'cf_err_many',
+                  folder_unavailable: 'cf_err_open', config_failed: 'cf_err_save' };
+    cfMessage(map[data.error] ? t(map[data.error], { name: data.name || '', detail: data.detail || '' })
+      : (error.kind === 'connection' ? error.message : t('error', { detail: error.message })), 'error');
+  } finally { cfState.busy = false; }
+}
+
+async function cfLoad() {
+  const info = await api('/api/config');
+  cfState.info = info;
+  $('cf-language').replaceChildren(...info.languages.map((code) => {
+    const o = el('option', LANGUAGE_NAMES[code] || t('cf_auto')); o.value = code; return o;
+  }));
+  $('cf-language').value = info.language;
+  const rows = [['data', 'cf_loc_data', true], ['database', 'cf_loc_db'], ['media', 'cf_loc_media'],
+                ['config', 'cf_loc_config'], ['bands', 'cf_loc_bands', true], ['backups', 'cf_loc_backups', true]];
+  $('cf-locations').replaceChildren(...rows.map(([key, label, openable]) => {
+    const row = el('div', null, 'cf-row');
+    row.append(el('span', t(label), 'label'), el('span', info.locations[key], 'path'));
+    if (openable) {
+      const open = el('button', t('cf_open'));
+      open.disabled = info.exists[key] === false;
+      if (open.disabled) open.title = t('cf_missing');
+      open.addEventListener('click', () => cfAction(async () => {
+        await api('/api/config/open-folder', { method: 'POST', body: { folder: key } });
+        cfMessage(t('cf_opened', { path: info.locations[key] }));
+      }));
+      row.append(open);
+    } else row.append(el('span'));
+    return row;
+  }));
+  const extras = info.folders.slice(info.fixed_folders.length);
+  const fields = info.fixed_folders.map((name) => { const i = el('input'); i.value = name; i.disabled = true; return i; });
+  for (let n = 0; n < 6; n++) {
+    const i = el('input'); i.maxLength = 100; i.value = extras[n] || ''; i.placeholder = t('cf_folder_n', { n: n + 5 });
+    i.className = 'cf-extra'; fields.push(i);
+  }
+  $('cf-folders').replaceChildren(...fields);
+  $('cf-about').textContent = 'MPW ' + info.version + '\n' + info.system;
+}
+
+async function cfSaveLanguage() {
+  const language = $('cf-language').value;
+  await api('/api/config/language', { method: 'POST', body: { language } });
+  // Reload to show the whole page in the new language (the browser warns about unsaved changes).
+  location.reload();
+}
+
+async function cfSaveFolders() {
+  const extras = [...document.querySelectorAll('#cf-folders .cf-extra')].map((i) => i.value);
+  const result = await api('/api/config/folders', { method: 'POST', body: { extras } });
+  cfMessage(t('cf_folders_saved', { folders: result.folders.join(' · ') }));
+  await cfLoad();
+}
+
+$('btn-cf-language').addEventListener('click', () => cfAction(cfSaveLanguage));
+$('btn-cf-folders').addEventListener('click', () => cfAction(cfSaveFolders));
 
 /* ------------------------------------------------------------------ Plattensammlung (stage 9) */
 
@@ -3015,6 +3235,7 @@ $('btn-ai-load').addEventListener('click', loadAiVersion);
 /* ------------------------------------------------------------------ start */
 
 function switchView(name) {
+  try { sessionStorage.setItem('mpw-view', name); } catch (e) { /* storage blocked */ }
   document.querySelectorAll('.tab').forEach((tab) => tab.classList.toggle('active', tab.dataset.view === name));
   $('view-songs').hidden = name !== 'songs';
   $('view-bands').hidden = name !== 'bands';
@@ -3023,6 +3244,8 @@ function switchView(name) {
   $('view-media').hidden = name !== 'media';
   $('view-backup').hidden = name !== 'backup';
   $('view-albums').hidden = name !== 'albums';
+  $('view-config').hidden = name !== 'config';
+  if (name === 'config' && !cfState.info) cfAction(cfLoad);
   if (name === 'albums' && !alState.list) alAction(() => alLoadList());
   if (name === 'backup' && !bkState.info) bkAction(bkLoad);
   if (name === 'media' && !$('mr-band').options.length) mrInit().catch((error) => mrMessage('rl-message', mrErrorText(error), 'error'));
@@ -3042,10 +3265,15 @@ async function start() {
   try {
     state.info = await api('/api/info');
     const browser = (navigator.language || 'en').slice(0, 2);
-    state.lang = state.info.language !== 'auto' ? state.info.language : (I18N[browser] ? browser : 'en');
+    const chosen = state.info.language;  // a known language, else the browser's (never left empty)
+    state.lang = I18N[chosen] ? chosen : (I18N[browser] ? browser : 'en');
     applyLanguage();
     await loadBandsFilter();
     await loadSongs();
+    // back to the tab shown before a reload (e.g. after switching the language)
+    let view = null;
+    try { view = sessionStorage.getItem('mpw-view'); } catch (e) { view = null; }
+    if (view && view !== 'songs' && $('view-' + view)) switchView(view);
   } catch (error) {
     applyLanguage();
     fatal(error);

@@ -23,11 +23,14 @@ def extract(*names, root):
     # app_configuration delegates to the Qt-free core (mpw_core.app_configuration)
     core_tree = ast.parse((SOURCE.parent / 'mpw_core.py').read_text(encoding='utf-8'))
     core_ns = {'ROOT': root, 'json': json, 'Path': Path}
-    core_fn = [n for n in core_tree.body if isinstance(n, ast.FunctionDef) and n.name == 'app_configuration']
+    # save_app_configuration also lives in the core now (shared with the browser GUI)
+    core_fn = [n for n in core_tree.body if isinstance(n, ast.FunctionDef)
+               and n.name in ('app_configuration', 'save_app_configuration')]
     exec(compile(ast.Module(body=core_fn, type_ignores=[]), 'mpw_core.py', 'exec'), core_ns)
     import types
     ns = {'ROOT': root, 'json': json, 'QLocale': Locale,
-          'mpw_core': types.SimpleNamespace(app_configuration=core_ns['app_configuration'])}
+          'mpw_core': types.SimpleNamespace(app_configuration=core_ns['app_configuration'],
+                                            save_app_configuration=core_ns['save_app_configuration'])}
     exec(compile(ast.fix_missing_locations(ast.Module(body=nodes, type_ignores=[])), str(SOURCE), 'exec'), ns)
     return ns
 

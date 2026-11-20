@@ -2471,6 +2471,79 @@ def app_configuration(root=None):
         return {}
 
 
+# ---------------------------------------------------------------------------
+# Konfiguration: settings shared by the desktop tab and the browser GUI.
+# ---------------------------------------------------------------------------
+UI_LANGUAGES = ('auto', 'de', 'en', 'fr', 'es', 'it')
+DEFAULT_PROJECT_FOLDERS = ('Cover', 'Audio', 'Dokumente', 'Video', 'OLD')
+
+
+def save_app_configuration(root=None, **changes):
+    """Update app_configuration.json atomically (other keys stay); raises OSError on failure."""
+    root = Path(root or ROOT)
+    data = app_configuration(root)
+    data.update(changes)
+    root.mkdir(parents=True, exist_ok=True)
+    path = root / 'app_configuration.json'
+    temp = path.with_suffix('.json.tmp')
+    temp.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding='utf-8')
+    temp.replace(path)
+
+
+def configured_project_folders(root=None):
+    """Template for future shared project folders: the four media folders first, then up to six extras."""
+    configured = app_configuration(root).get('project_folder_template')
+    if not isinstance(configured, list) or not 1 <= len(configured) <= 10:
+        return DEFAULT_PROJECT_FOLDERS
+    try:
+        names = [str(name).strip() for name in configured]
+        for name in names:
+            validate_folder_name(name)
+        if len({name.casefold() for name in names}) != len(names):
+            raise ValueError('Doppelte Namen')
+    except (ValueError, TypeError):
+        return DEFAULT_PROJECT_FOLDERS
+    extras = [n for n in names if n.casefold() not in {v.casefold() for v in SONG_MEDIA_FOLDERS}]
+    return tuple(SONG_MEDIA_FOLDERS) + tuple(extras[:6])
+
+
+def clean_project_folder_template(extras):
+    """Validate the extra folder names (0–6) of the template; the four media folders are fixed.
+
+    Returns the full list to store. Raises BandDataError('invalid_folder_name', name=…),
+    ('duplicate_folder', name=…) or ('too_many_folders').
+    """
+    if not isinstance(extras, list) or not all(isinstance(n, str) for n in extras):
+        raise BandDataError('invalid_field', field='folders')
+    names = [n.strip() for n in extras if n.strip()]
+    if len(names) > 6:
+        raise BandDataError('too_many_folders')
+    full = list(SONG_MEDIA_FOLDERS) + names
+    seen = set()
+    for name in full:
+        try:
+            validate_folder_name(name)
+        except ValueError as exc:
+            raise BandDataError('invalid_folder_name', name=name) from exc
+        if name.casefold() in seen:
+            raise BandDataError('duplicate_folder', name=name)
+        seen.add(name.casefold())
+    return full
+
+
+def open_in_file_manager(path):
+    """Open a folder in Explorer / Finder / the Linux file manager (no shell, fixed command)."""
+    path = Path(path)
+    if not path.is_dir():
+        raise OSError(f'Ordner nicht gefunden: {path}')
+    if sys.platform.startswith('win'):
+        os.startfile(str(path))  # noqa: S606 – a folder, opened by Explorer
+    elif sys.platform == 'darwin':
+        subprocess.Popen(['open', str(path)])
+    else:
+        subprocess.Popen(['xdg-open', str(path)])
+
+
 def band_root_directory(root=None):
     root = Path(root or ROOT)
     return Path(app_configuration(root).get('band_root_directory') or (root / 'Bands'))
