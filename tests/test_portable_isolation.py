@@ -5,7 +5,9 @@ nodes=[n for n in module.body if (isinstance(n,(ast.FunctionDef,ast.ClassDef)) a
 namespace={'Path':pathlib.Path,'sys':sys,'os':os,'json':__import__('json'),'LEGACY_ROOT':pathlib.Path(tempfile.gettempdir())/'MPW_legacy_dummy'}
 exec(compile(ast.Module(body=nodes,type_ignores=[]),str(source),'exec'),namespace)
 with tempfile.TemporaryDirectory() as temp:
- root=pathlib.Path(temp)/'Portable'; (root/'App').mkdir(parents=True); (root/'.mpw-portable-v2').write_text('test'); exe=root/'App'/'MPW.exe';exe.touch()
+ # resolve(): MPW resolves the program path; temp folders may be links or short names
+ # (/var -> /private/var on macOS, RUNNER~1 on Windows build servers).
+ root=pathlib.Path(temp).resolve()/'Portable'; (root/'App').mkdir(parents=True); (root/'.mpw-portable-v2').write_text('test'); exe=root/'App'/'MPW.exe';exe.touch()
  original_exe=sys.executable; original_frozen=getattr(sys,'frozen',None)
  try:
   sys.executable=str(exe);sys.frozen=True
