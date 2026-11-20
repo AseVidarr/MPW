@@ -15,6 +15,7 @@ DNS-Rebinding), keine CORS-Freigaben. Nur Standardbibliothek.
 import argparse
 import hmac
 import json
+import os
 import re
 import secrets
 import sqlite3
@@ -257,7 +258,226 @@ def api_transfer_preset(server, query, body, preset_id):
     return _write(server, ws.transfer_preset_to_band, int(preset_id), band_id, mode)
 
 
+# --------------------------------------------------------------------------- AI Prompt Launcher (stage 4)
+
+AI_JOBS_KEPT = 20
+AI_PARSE_LIMIT = 60000  # pasted/imported AI answers
+
+
+class AiJobs:
+    """Background AI requests (API: up to 3 min, CLI: up to 5 min); the browser polls the result.
+
+    One request at a time, like the desktop tab. API keys are used for the request only and
+    never stored, logged or returned.
+    """
+
+    def __init__(self):
+        self.lock = threading.Lock()
+        self.jobs = {}
+
+    def start(self, provider, func, secret=''):
+        with self.lock:
+            if any(job['status'] == 'running' for job in self.jobs.values()):
+                raise ApiError(409, 'ai_busy')
+            job_id = secrets.token_hex(8)
+            self.jobs[job_id] = {'status': 'running', 'provider': provider}
+            finished = [k for k, job in self.jobs.items() if job['status'] != 'running']
+            for old in finished[:max(0, len(self.jobs) - AI_JOBS_KEPT)]:
+                del self.jobs[old]
+        threading.Thread(target=self._run, args=(job_id, provider, func, secret), daemon=True).start()
+        return job_id
+
+    def _run(self, job_id, provider, func, secret):
+        try:
+            answer = func()
+            try:
+                style, lyrics = ws.extract_prompt(answer)
+                result = {'status': 'done', 'style': style, 'lyrics': lyrics}
+            except ValueError:
+                result = {'status': 'failed', 'error': {'kind': 'split', 'code': '', 'detail': ''}}
+        except ws.ProviderError as exc:
+            result = {'status': 'failed', 'error': {'kind': exc.kind, 'code': exc.code, 'detail': exc.detail}}
+        except Exception as exc:  # never let a worker thread take the server down
+            ws.LOGGER.exception('MPW-Web: unerwarteter Fehler bei der KI-Anfrage')
+            detail = str(exc).replace(secret, '***') if secret else str(exc)
+            result = {'status': 'failed', 'error': {'kind': 'unexpected', 'code': '', 'detail': detail[:300]}}
+        with self.lock:
+            self.jobs[job_id].update(result)
+
+    def get(self, job_id):
+        with self.lock:
+            job = self.jobs.get(job_id)
+            return dict(job) if job else None
+
+
+def _ai_provider(body):
+    provider = _body_text(body, 'provider')
+    if provider not in ws.AI_PROVIDERS:
+        raise ApiError(400, 'invalid_provider')
+    return provider
+
+
+def _optional_int(body, key):
+    value = body.get(key) if isinstance(body, dict) else None
+    if value in (None, ''):
+        return None
+    if not isinstance(value, int) or isinstance(value, bool):
+        raise ApiError(400, 'invalid_field', {'field': key})
+    return value
+
+
+def _ai_request_prompt(server, body):
+    """The same Suno request the desktop tab builds (band, genres, persona, hardware, song idea)."""
+    song_id = _optional_int(body, 'song_id')
+    if song_id is None:
+        raise ApiError(400, 'no_song')
+    brief = _body_text(body, 'brief')
+    if not isinstance(brief, str) or len(brief) > ws.BRIEF_LIMIT:
+        raise ApiError(400, 'too_long' if isinstance(brief, str) else 'invalid_field', {'field': 'brief'})
+    preset_id = _optional_int(body, 'preset_id')
+
+    def build(con, _args):
+        try:
+            return ws.suno_prompt_request(con, song_id, preset_id, brief.strip())
+        except ValueError as exc:
+            if str(exc) == 'Song nicht gefunden.':
+                raise ApiError(404, 'song_missing') from exc
+            raise ApiError(400, 'prompt_error', {'detail': str(exc)}) from exc
+    return _read(server, build, {})
+
+
+def _provider_error(exc):
+    return ApiError(400, 'provider', {'kind': exc.kind, 'code': exc.code, 'detail': exc.detail})
+
+
+def api_ai_options(server, query, body):
+    """Everything the launcher form needs; for API keys only *whether* the environment has one."""
+    presets = _read(server, core.tool_list_hardware_presets, {})
+    return {'providers': list(ws.AI_PROVIDERS), 'models': ws.AI_DEFAULT_MODELS,
+            'cli_commands': ws.CLI_DEFAULT_COMMANDS, 'key_env': ws.API_KEY_ENV,
+            'key_in_env': {p: bool(os.environ.get(env, '').strip()) for p, env in ws.API_KEY_ENV.items()},
+            'platform_urls': ws.AI_PLATFORM_URLS,
+            'error_texts': ws.AI_ERROR_TEXTS,  # same provider/CLI messages as the desktop tab
+            'limits': {'style': ws.STYLE_LIMIT, 'lyrics': ws.LYRICS_LIMIT, 'brief': ws.BRIEF_LIMIT},
+            'presets': [{'id': p['id'], 'name': p['name'], 'count': len(p['items'])}
+                        for p in presets if isinstance(p, dict)]}
+
+
+def api_ai_targets(server, query, body):
+    """Projects of a band with their song entry (the AI target), like the desktop tab."""
+    band = query.get('band_id', [''])[0]
+    if not band.isdigit():
+        raise ApiError(400, 'invalid_field', {'field': 'band_id'})
+    return _read(server, lambda con, _args: [
+        {'project_id': r[0], 'name': r[1], 'song_id': r[2]} for r in con.execute(
+            'SELECT p.id, p.name, (SELECT s.id FROM songs s WHERE s.project_id=p.id ORDER BY s.id LIMIT 1) '
+            'FROM projects p WHERE p.band_id=? ORDER BY p.name COLLATE NOCASE', (int(band),))], {})
+
+
+def api_project_song(server, query, body, project_id):
+    if not (isinstance(body, dict) and body.get('confirm') is True):  # creating a song entry needs a yes
+        raise ApiError(400, 'confirm_required')
+    song_id, created = _write(server, ws.ensure_project_song, int(project_id))
+    return {'song_id': song_id, 'created': created}
+
+
+def api_ai_generate(server, query, body):
+    provider = _ai_provider(body)
+    mode = _body_text(body, 'mode')
+    prompt = _ai_request_prompt(server, body)
+    if mode == 'api':
+        model = _body_text(body, 'model')
+        if not isinstance(model, str) or not ws.API_MODEL_PATTERN.fullmatch(model.strip()):
+            raise ApiError(400, 'invalid_model')
+        key = _body_text(body, 'api_key')
+        if not isinstance(key, str) or len(key) > 500:
+            raise ApiError(400, 'invalid_field', {'field': 'api_key'})
+        key = key.strip() or os.environ.get(ws.API_KEY_ENV[provider], '').strip()
+        if not key:
+            raise ApiError(400, 'key_missing', {'env': ws.API_KEY_ENV[provider]})
+        model = model.strip()
+        job = server.ai_jobs.start(provider, lambda: ws.call_provider(provider, model, key, prompt), secret=key)
+    elif mode == 'cli':
+        command, model = _body_text(body, 'cli_command'), _body_text(body, 'model')
+        if not isinstance(command, str) or not isinstance(model, str):
+            raise ApiError(400, 'invalid_field', {'field': 'cli_command'})
+        command = command.strip() or ws.CLI_DEFAULT_COMMANDS[provider]
+        try:  # report a missing CLI at once instead of after a background run
+            ws.resolve_cli_executable(provider, command)
+        except ws.ProviderError as exc:
+            raise _provider_error(exc) from exc
+        cli_prompt = ws.ai_cli_prompt(prompt)
+        job = server.ai_jobs.start(provider, lambda: ws.call_cli(provider, command, model.strip(), cli_prompt))
+    else:
+        raise ApiError(400, 'invalid_field', {'field': 'mode'})
+    return {'job': job}
+
+
+def api_ai_job(server, query, body, job_id):
+    job = server.ai_jobs.get(job_id)
+    if job is None:
+        raise ApiError(404, 'job_missing')
+    return job
+
+
+def api_ai_check_cli(server, query, body):
+    provider = _ai_provider(body)
+    command = _body_text(body, 'cli_command')
+    if not isinstance(command, str):
+        raise ApiError(400, 'invalid_field', {'field': 'cli_command'})
+    try:
+        return {'path': ws.resolve_cli_executable(provider, command.strip() or ws.CLI_DEFAULT_COMMANDS[provider])}
+    except ws.ProviderError as exc:
+        raise _provider_error(exc) from exc
+
+
+def api_ai_request_text(server, query, body):
+    """Request text for the chat website (copy & paste); nothing is sent anywhere."""
+    provider = _ai_provider(body)
+    return {'text': ws.ai_browser_prompt(_ai_request_prompt(server, body)), 'url': ws.AI_PLATFORM_URLS[provider]}
+
+
+def api_ai_parse(server, query, body):
+    """Split an imported/pasted AI answer into Style and Lyrics (JSON or [STYLE]/[LYRICS])."""
+    text = _body_text(body, 'text')
+    if not isinstance(text, str) or len(text) > AI_PARSE_LIMIT:
+        raise ApiError(400, 'too_long' if isinstance(text, str) else 'invalid_field', {'field': 'text'})
+    try:
+        style, lyrics = ws.extract_prompt(text)
+    except ValueError as exc:
+        raise ApiError(400, 'no_structure') from exc
+    return {'style': style, 'lyrics': lyrics}
+
+
+def api_save_prompt_version(server, query, body, song_id):
+    """„Als neue Version speichern“: database version + TXT archive in the band's prompt folder."""
+    if not isinstance(body, dict):
+        raise ApiError(400, 'invalid_body')
+    provider = _ai_provider(body)
+    band_root = ws.band_root_directory(server.db_path.parent)
+
+    def save(con, sid):
+        version_id = ws.save_prompt_version(con, sid, provider, body.get('model', ''), body.get('style', ''),
+                                            body.get('lyrics', ''), body.get('brief', ''))
+        row = con.execute('SELECT style,lyrics FROM prompt_versions WHERE id=?', (version_id,)).fetchone()
+        try:
+            path = ws.save_prompt_text_file(con, sid, version_id, row[0], row[1], band_root)
+            return {'id': version_id, 'file': str(path), 'file_error': None}
+        except (OSError, ValueError) as exc:  # the version itself stays saved
+            return {'id': version_id, 'file': None, 'file_error': str(exc)}
+    return _write(server, save, int(song_id))
+
+
 ROUTES = [
+    ('GET', re.compile(r'^/api/ai/options$'), api_ai_options),
+    ('GET', re.compile(r'^/api/ai/targets$'), api_ai_targets),
+    ('GET', re.compile(r'^/api/ai/jobs/([0-9a-f]{16})$'), api_ai_job),
+    ('POST', re.compile(r'^/api/projects/(\d+)/song$'), api_project_song),
+    ('POST', re.compile(r'^/api/ai/generate$'), api_ai_generate),
+    ('POST', re.compile(r'^/api/ai/check-cli$'), api_ai_check_cli),
+    ('POST', re.compile(r'^/api/ai/request-text$'), api_ai_request_text),
+    ('POST', re.compile(r'^/api/ai/parse$'), api_ai_parse),
+    ('POST', re.compile(r'^/api/songs/(\d+)/prompt-versions$'), api_save_prompt_version),
     ('GET', re.compile(r'^/api/bands/(\d+)/full$'), api_band_full),
     ('GET', re.compile(r'^/api/hardware/choices$'), api_hardware_choices),
     ('GET', re.compile(r'^/api/band-options$'), api_band_options),
@@ -291,6 +511,7 @@ class MPWWebServer(ThreadingHTTPServer):
         self.db_path = Path(db_path)
         self.token = token or secrets.token_urlsafe(24)
         self.static_dir = Path(static_dir or web_directory())
+        self.ai_jobs = AiJobs()
 
     @property
     def port(self):

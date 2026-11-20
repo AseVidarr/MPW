@@ -12,6 +12,7 @@
   <nav class="tabs" role="tablist">
     <button class="tab active" data-view="songs" role="tab" data-i18n="tab_songs">Songs &amp; Suno</button>
     <button class="tab" data-view="bands" role="tab" data-i18n="tab_bands">Bands</button>
+    <button class="tab" data-view="ai" role="tab" data-i18n="tab_ai">AI Prompt Launcher</button>
   </nav>
   <div class="meta" id="meta"></div>
 </header>
@@ -122,6 +123,63 @@
       </div>
       <datalist id="genre-options"></datalist>
     </div>
+  </section>
+
+  <!-- AI Prompt Launcher -->
+  <section id="view-ai" class="view" hidden>
+    <div class="editor">
+      <div id="ai-body">
+        <div class="ai-grid">
+          <label><span data-i18n="band">Band</span><select id="ai-band"></select></label>
+          <label><span data-i18n="ai_target">Ziel-Song / Projekt</span><select id="ai-project"></select></label>
+          <div><button id="btn-ai-song" data-i18n="ai_create_song">Song-Eintrag anlegen</button></div>
+          <label><span data-i18n="ai_platform">KI-Plattform</span><select id="ai-provider"></select></label>
+          <label><span data-i18n="ai_hardware">Hardware für diesen Prompt</span><select id="ai-preset"></select></label>
+          <span></span>
+          <label><span data-i18n="ai_model">API-Modell</span><input id="ai-model" maxlength="120" spellcheck="false" autocomplete="off"></label>
+          <label><span data-i18n="ai_key">API-Schlüssel (optional)</span><input id="ai-key" type="password" maxlength="500" autocomplete="off" spellcheck="false"></label>
+          <span class="hint" id="ai-key-hint"></span>
+          <label><span data-i18n="ai_cli_command">CLI-Befehl</span><input id="ai-cli" maxlength="300" spellcheck="false" autocomplete="off"></label>
+          <label><span data-i18n="ai_cli_model">CLI-Modell</span><input id="ai-cli-model" maxlength="120" spellcheck="false" autocomplete="off" data-i18n-placeholder="ai_cli_model_hint"></label>
+          <button id="btn-ai-check" data-i18n="ai_cli_check">CLI prüfen</button>
+        </div>
+        <label class="textbox"><span data-i18n="ai_brief">Songidee / Anweisung</span>
+          <textarea id="ai-brief" rows="3" maxlength="4000" data-i18n-placeholder="ai_brief_hint"></textarea></label>
+        <div class="actions wrap">
+          <button id="btn-ai-api" class="primary" data-i18n="ai_generate_api">Prompt erstellen (API)</button>
+          <button id="btn-ai-cli" class="primary" data-i18n="ai_generate_cli">Prompt erstellen (CLI)</button>
+          <button id="btn-ai-copy" data-i18n="ai_copy_open">Anfrage kopieren &amp; Plattform öffnen</button>
+          <button id="btn-ai-file" data-i18n="ai_import_file">Antwort aus Datei</button>
+          <input id="ai-file" type="file" accept=".txt,.md,.json,text/plain,application/json" hidden>
+        </div>
+        <details id="ai-paste-box">
+          <summary data-i18n="ai_paste">Antwort aus dem Chat einfügen</summary>
+          <textarea id="ai-paste" rows="5" spellcheck="false" data-i18n-placeholder="ai_paste_hint"></textarea>
+          <button id="btn-ai-paste" data-i18n="ai_paste_apply">In Style und Lyrics aufteilen</button>
+        </details>
+        <div id="ai-message" class="message" hidden></div>
+        <div class="texts">
+          <label class="textbox"><span><span data-i18n="style">Style</span> <em id="ai-c-style"></em></span>
+            <textarea id="ai-style" spellcheck="false" data-i18n-placeholder="ai_style_hint"></textarea></label>
+          <label class="textbox"><span><span data-i18n="lyrics">Lyrics</span> <em id="ai-c-lyrics"></em></span>
+            <textarea id="ai-lyrics" spellcheck="false" data-i18n-placeholder="ai_lyrics_hint"></textarea></label>
+        </div>
+        <div class="actions">
+          <button id="btn-ai-save" class="primary" data-i18n="ai_save">Als neue Version speichern</button>
+          <span class="hint" data-i18n="ai_save_hint">Der aktive Song-Prompt bleibt unverändert; zusätzlich wird eine Textdatei im Prompt-Ordner der Band abgelegt.</span>
+        </div>
+      </div>
+    </div>
+    <aside class="versions">
+      <h2 data-i18n="versions">Gespeicherte Prompt-Versionen</h2>
+      <ul id="ai-version-list" class="list"></ul>
+      <div id="ai-version-preview" class="preview" hidden>
+        <div class="preview-head" id="ai-version-head"></div>
+        <h3 data-i18n="style">Style</h3><pre id="ai-v-style"></pre>
+        <h3 data-i18n="lyrics">Lyrics</h3><pre id="ai-v-lyrics"></pre>
+        <button id="btn-ai-load" data-i18n="ai_load_version">In Style und Lyrics laden</button>
+      </div>
+    </aside>
   </section>
 </main>
 

@@ -9,7 +9,9 @@ import sqlite3
 import sys
 import tempfile
 import threading
+import time
 import unittest
+from unittest import mock
 import urllib.error
 import urllib.request
 
@@ -150,6 +152,128 @@ class WebServerTests(unittest.TestCase):
         self.assertEqual(self.json_call('POST', '/api/songs/1', self.payload(), token=False)[0], 403)
         self.assertEqual(self.json_call('POST', '/api/songs/99', self.payload())[0], 404)
         self.assertEqual(self.json_call('POST', '/api/info', {})[0], 405)
+
+    # --- stage 4: AI Prompt Launcher (no network: the provider call is replaced) ---
+    def wait_job(self, job_id):
+        for _ in range(100):
+            status, job = self.json_call('GET', f'/api/ai/jobs/{job_id}')
+            self.assertEqual(status, 200)
+            if job['status'] != 'running':
+                return job
+            time.sleep(0.05)
+        self.fail('AI job did not finish')
+
+    def fake_provider(self, answer=None, error=None):
+        calls = []
+        original = self.ws.call_provider
+
+        def fake(provider, model, key, prompt):
+            calls.append((provider, model, key, prompt))
+            if error:
+                raise error
+            return answer
+        self.ws.call_provider = fake
+        self.addCleanup(setattr, self.ws, 'call_provider', original)
+        return calls
+
+    def test_ai_options_targets_and_song_entry(self):
+        with mock.patch.dict(os.environ, {'ANTHROPIC_API_KEY': 'sk-env-secret'}, clear=False):
+            options = self.json_call('GET', '/api/ai/options')[1]
+        self.assertEqual(options['providers'], ['ChatGPT', 'Gemini', 'Claude'])
+        self.assertIs(options['key_in_env']['Claude'], True)
+        self.assertNotIn('sk-env-secret', json.dumps(options))  # only whether a key exists, never the key
+        self.assertEqual(set(options['error_texts']), {'de', 'en', 'fr', 'es', 'it'})
+        with closing(sqlite3.connect(self.db)) as con, con:
+            con.execute("INSERT INTO projects(band_id,name) VALUES (1,'Neues Lied')")
+        targets = self.json_call('GET', '/api/ai/targets?band_id=1')[1]
+        self.assertEqual([(t['name'], t['song_id']) for t in targets], [('Neues Lied', None), ('Rain Song', 1)])
+        project = targets[0]['project_id']
+        self.assertEqual(self.json_call('POST', f'/api/projects/{project}/song', {})[1]['error'], 'confirm_required')
+        status, result = self.json_call('POST', f'/api/projects/{project}/song', {'confirm': True})
+        self.assertEqual((status, result['created']), (200, True))
+        self.assertIs(self.json_call('POST', f'/api/projects/{project}/song', {'confirm': True})[1]['created'], False)
+        self.assertEqual(self.json_call('POST', '/api/projects/99/song', {'confirm': True})[0], 404)
+
+    def test_ai_generate_via_api_splits_answer_and_never_returns_the_key(self):
+        calls = self.fake_provider(answer='{"style": "Delta Blues, slide", "lyrics": "[Verse 1]\\nRain"}')
+        body = {'song_id': 1, 'provider': 'Claude', 'mode': 'api', 'model': 'claude-sonnet-5-5',
+                'api_key': ' sk-typed-secret ', 'brief': 'Regen im Delta', 'preset_id': None}
+        status, started = self.json_call('POST', '/api/ai/generate', body)
+        self.assertEqual(status, 200)
+        job = self.wait_job(started['job'])
+        self.assertEqual((job['status'], job['style'], job['lyrics']), ('done', 'Delta Blues, slide', '[Verse 1]\nRain'))
+        self.assertNotIn('sk-typed-secret', json.dumps(job))
+        provider, model, key, prompt = calls[0]
+        self.assertEqual((provider, model, key), ('Claude', 'claude-sonnet-5-5', 'sk-typed-secret'))
+        self.assertIn('Band: Iron Delta', prompt)
+        self.assertIn('Gitarre: Les Paul', prompt)
+        self.assertIn('Songidee: Regen im Delta', prompt)
+
+    def test_ai_generate_errors(self):
+        body = {'song_id': 1, 'provider': 'Claude', 'mode': 'api', 'model': 'claude-sonnet-5-5', 'brief': ''}
+        with mock.patch.dict(os.environ, {'ANTHROPIC_API_KEY': ''}, clear=False):
+            status, result = self.json_call('POST', '/api/ai/generate', body)
+        self.assertEqual((status, result['error'], result['env']), (400, 'key_missing', 'ANTHROPIC_API_KEY'))
+        self.assertEqual(self.json_call('POST', '/api/ai/generate', {**body, 'model': 'x; rm'})[1]['error'], 'invalid_model')
+        self.assertEqual(self.json_call('POST', '/api/ai/generate', {**body, 'provider': 'Other'})[1]['error'], 'invalid_provider')
+        self.assertEqual(self.json_call('POST', '/api/ai/generate', {**body, 'song_id': 99, 'api_key': 'k'})[0], 404)
+        self.assertEqual(self.json_call('POST', '/api/ai/generate', {**body, 'song_id': None})[1]['error'], 'no_song')
+        status, result = self.json_call('POST', '/api/ai/generate', {**body, 'mode': 'cli', 'cli_command': 'mpw-no-such-cli-xyz'})
+        self.assertEqual((status, result['error'], result['kind']), (400, 'provider', 'cli_missing'))
+        self.assertEqual(self.json_call('POST', '/api/ai/generate', {**body, 'mode': 'cli', 'cli_command': 'claude & calc'})[1]['kind'],
+                         'cli_invalid')
+        # provider failure -> stable kind for the translated message; the key never leaks
+        self.fake_provider(error=self.ws.ProviderError('auth', 'Claude', 401, 'invalid x-api-key'))
+        job = self.wait_job(self.json_call('POST', '/api/ai/generate', {**body, 'api_key': 'sk-bad'})[1]['job'])
+        self.assertEqual((job['status'], job['error']['kind'], job['error']['code']), ('failed', 'auth', '401'))
+        self.fake_provider(answer='Hier ist dein Song, viel Spaß!')
+        job = self.wait_job(self.json_call('POST', '/api/ai/generate', {**body, 'api_key': 'k'})[1]['job'])
+        self.assertEqual(job['error']['kind'], 'split')
+        self.assertEqual(self.json_call('GET', '/api/ai/jobs/0123456789abcdef')[0], 404)
+
+    def test_ai_only_one_request_at_a_time(self):
+        release = threading.Event()
+        original = self.ws.call_provider
+        self.ws.call_provider = lambda *args: (release.wait(5), '{"style":"s","lyrics":"l"}')[1]
+        self.addCleanup(setattr, self.ws, 'call_provider', original)
+        self.addCleanup(release.set)
+        body = {'song_id': 1, 'provider': 'Gemini', 'mode': 'api', 'model': 'gemini-2.5-flash', 'api_key': 'k', 'brief': ''}
+        first = self.json_call('POST', '/api/ai/generate', body)[1]['job']
+        self.assertEqual(self.json_call('POST', '/api/ai/generate', body)[1]['error'], 'ai_busy')
+        release.set()
+        self.assertEqual(self.wait_job(first)['status'], 'done')
+
+    def test_ai_request_text_and_parse(self):
+        status, result = self.json_call('POST', '/api/ai/request-text', {'song_id': 1, 'provider': 'Gemini', 'brief': 'Idee'})
+        self.assertEqual(status, 200)
+        self.assertEqual(result['url'], 'https://gemini.google.com/')
+        self.assertIn('Copy-Box', result['text'])
+        self.assertNotIn('ausschließlich als JSON-Objekt', result['text'])
+        parsed = self.json_call('POST', '/api/ai/parse', {'text': 'STYLE\n[STYLE]\nFolk\n[/STYLE]\n[LYRICS]\nText\n[/LYRICS]'})[1]
+        self.assertEqual((parsed['style'], parsed['lyrics']), ('Folk', 'Text'))
+        self.assertEqual(self.json_call('POST', '/api/ai/parse', {'text': 'nur Plauderei'})[1]['error'], 'no_structure')
+
+    def test_ai_save_version_with_text_archive(self):
+        band_folder = Path(self.tmp.name) / 'Bands' / 'Iron Delta'
+        body = {'provider': 'Claude', 'model': 'claude-sonnet-5-5', 'style': ' Blues ', 'lyrics': '[Verse]\nneu', 'brief': 'Idee'}
+        # without band folder: version is saved, the text file is reported as not possible
+        status, result = self.json_call('POST', '/api/songs/1/prompt-versions', body)
+        self.assertEqual(status, 200)
+        self.assertIsNone(result['file'])
+        self.assertTrue(result['file_error'])
+        band_folder.mkdir(parents=True)
+        result = self.json_call('POST', '/api/songs/1/prompt-versions', body)[1]
+        self.assertIsNone(result['file_error'])
+        archived = Path(result['file'])
+        self.assertEqual(archived.parent, band_folder / self.ws.BAND_PROMPT_FOLDER)
+        self.assertIn('[STYLE]\nBlues\n[/STYLE]', archived.read_text(encoding='utf-8'))
+        with closing(sqlite3.connect(self.db)) as con:
+            self.assertEqual(con.execute('SELECT provider,model,style,brief FROM prompt_versions ORDER BY id').fetchall(),
+                             [('Claude', 'claude-sonnet-5-5', 'Blues', 'Idee')] * 2)
+            self.assertEqual(con.execute('SELECT style FROM songs WHERE id=1').fetchone()[0], 'alt')  # active prompt unchanged
+        self.assertEqual(self.json_call('POST', '/api/songs/1/prompt-versions', {**body, 'style': 'x' * 1001})[1]['error'], 'too_long')
+        self.assertEqual(self.json_call('POST', '/api/songs/1/prompt-versions', {**body, 'lyrics': ' '})[1]['error'], 'empty_field')
+        self.assertEqual(self.json_call('POST', '/api/songs/99/prompt-versions', body)[0], 404)
 
     # --- stage 3: create bands (folder logic like the desktop app) ---
     def test_create_band_makes_folder_prompt_folder_and_row(self):

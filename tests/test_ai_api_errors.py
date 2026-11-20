@@ -101,17 +101,23 @@ class AIApiErrors(unittest.TestCase):
         # Thinking counts against max_tokens on current models; 6000 truncated answers.
         self.assertGreaterEqual(sent['body']['max_tokens'], 16000)
         self.assertGreaterEqual(sent['timeout'], 180)
-        self.assertIn("'Claude':'claude-sonnet-5-5'", SOURCE.read_text(encoding='utf-8'))
+        # default model now lives in the shared core (desktop tab and browser GUI)
+        self.assertIn("'Claude': 'claude-sonnet-5-5'", CORE.read_text(encoding='utf-8'))
+        self.assertIn('mpw_core.AI_DEFAULT_MODELS', SOURCE.read_text(encoding='utf-8'))
 
     def test_all_languages_have_all_messages(self):
-        cls = next(n for n in TREE.body if isinstance(n, ast.ClassDef) and n.name == 'Workstation')
-        node = next(n for n in cls.body if isinstance(n, ast.Assign) and getattr(n.targets[0], 'id', '') == 'AI_API_ERRORS')
-        texts = ast.literal_eval(node.value)
-        self.assertEqual(set(texts), {'de', 'en', 'fr', 'es', 'it'})
-        for lang, items in texts.items():
-            self.assertEqual(set(items), set(texts['de']), lang)
-            for value in items.values():
-                value.format(provider='P', code='1', model='M')
+        # The texts live in the shared core; desktop tab and browser GUI use the same messages.
+        def literal(name):
+            node = next(n for n in TREE.body if isinstance(n, ast.Assign) and getattr(n.targets[0], 'id', '') == name)
+            return ast.literal_eval(node.value)
+        api, cli = literal('AI_API_ERROR_TEXTS'), literal('AI_CLI_ERROR_TEXTS')
+        for texts in (api, cli):
+            self.assertEqual(set(texts), {'de', 'en', 'fr', 'es', 'it'})
+            for lang, items in texts.items():
+                self.assertEqual(set(items), set(texts['de']), lang)
+                for value in items.values():
+                    value.format(provider='P', code='1', model='M')
+        self.assertIn('AI_API_ERRORS = mpw_core.AI_ERROR_TEXTS', SOURCE.read_text(encoding='utf-8'))
 
 
 if __name__ == '__main__':

@@ -63,6 +63,62 @@ const I18N = {
     band_created: "Band „{name}“ angelegt. Verzeichnis: {folder}",
     band_imported: "Band „{name}“ übernommen. Vorhandenes Verzeichnis: {folder} (nichts verändert).",
     band_prompt_warning: "Der Prompt-Ordner konnte nicht angelegt werden: {detail}",
+    tab_ai: "AI Prompt Launcher",
+    band: "Band",
+    ai_target: "Ziel-Song / Projekt",
+    ai_create_song: "Song-Eintrag anlegen",
+    ai_platform: "KI-Plattform",
+    ai_hardware: "Hardware für diesen Prompt",
+    ai_hw_band: "Hardware des Bandprofils",
+    ai_model: "API-Modell",
+    ai_key: "API-Schlüssel (optional)",
+    ai_cli_command: "CLI-Befehl",
+    ai_cli_model: "CLI-Modell",
+    ai_cli_model_hint: "leer = Standard der CLI",
+    ai_cli_check: "CLI prüfen",
+    ai_brief: "Songidee / Anweisung",
+    ai_brief_hint: "Beispiel: British Blues trifft Industrial Folk Metal, Geschichte über …",
+    ai_generate_api: "Prompt erstellen (API)",
+    ai_generate_cli: "Prompt erstellen (CLI)",
+    ai_copy_open: "Anfrage kopieren & Plattform öffnen",
+    ai_import_file: "Antwort aus Datei",
+    ai_paste: "Antwort aus dem Chat einfügen",
+    ai_paste_hint: "Antwort der KI hier einfügen (STYLE- und LYRICS-Abschnitt oder JSON) …",
+    ai_paste_apply: "In Style und Lyrics aufteilen",
+    ai_style_hint: "Nur den Musikstil – ohne [STYLE]-Markierungen.",
+    ai_lyrics_hint: "Songtext und Produktionsanweisungen – ohne [LYRICS]-Markierungen.",
+    ai_save: "Als neue Version speichern",
+    ai_save_hint: "Der aktive Song-Prompt bleibt unverändert; zusätzlich wird eine Textdatei im Prompt-Ordner der Band abgelegt.",
+    ai_load_version: "In Style und Lyrics laden",
+    ai_no_bands: "Noch keine Band vorhanden. Bitte zuerst im Reiter „Bands“ eine Band anlegen.",
+    ai_no_projects: "Diese Band hat noch kein Song-Projekt. Projekte werden in der Desktop-App angelegt.",
+    ai_no_song_entry: "kein Song-Eintrag",
+    ai_key_env_found: "Leer lassen: Schlüssel aus {env} wird verwendet.",
+    ai_key_env_missing: "Kein Schlüssel in {env} gefunden – Schlüssel eingeben (wird nur für diese Anfrage verwendet, nicht gespeichert).",
+    ai_err_split: "Die KI-Antwort konnte nicht in Style und Lyrics aufgeteilt werden. Bitte eine Antwort mit STYLE- und LYRICS-Abschnitt (oder JSON) verwenden.",
+    ai_err_key: "API-Schlüssel fehlt. Schlüssel eingeben oder die Umgebungsvariable {env} setzen.",
+    ai_err_model: "Ungültiger Modellname.",
+    ai_err_busy: "Es läuft bereits eine KI-Anfrage. Bitte warten, bis sie fertig ist.",
+    ai_err_no_song: "Bitte einen Ziel-Song auswählen oder über „Song-Eintrag anlegen“ zuerst einen Song zum Projekt erstellen.",
+    ai_err_job: "Die KI-Anfrage ist nicht mehr bekannt (wurde MPW im Browser neu gestartet?). Bitte erneut starten.",
+    ai_err_empty: "Style und Lyrics dürfen nicht leer sein.",
+    ai_err_prompt: "Die Anfrage konnte nicht erstellt werden: {detail}",
+    ai_err_file_size: "Die Importdatei darf maximal 2 MB groß sein.",
+    ai_running_api: "API-Anfrage läuft … {s} s",
+    ai_running_cli: "CLI-Anfrage läuft … {s} s (kann einige Minuten dauern)",
+    ai_received: "Antwort empfangen. Bitte prüfen; gespeichert wird erst mit „Als neue Version speichern“.",
+    ai_cli_found: "{provider}-CLI gefunden: {path}\nFalls noch nicht geschehen, die CLI einmal in einem Terminal starten und anmelden.",
+    ai_copy_failed: "Die Anfrage konnte nicht in die Zwischenablage kopiert werden.",
+    ai_copied: "Anfrage kopiert und {url} geöffnet. Dort mit Strg+V einfügen; die Antwort anschließend unten einfügen oder als Datei importieren.",
+    ai_copied_no_window: "Anfrage kopiert. Der Browser hat das neue Fenster blockiert – bitte {url} selbst öffnen und mit Strg+V einfügen.",
+    ai_imported: "Antwort übernommen (Quelle: {source}). Bitte prüfen und dann als Version speichern.",
+    ai_source_paste: "eingefügter Text",
+    ai_confirm_replace: "Style und Lyrics enthalten bereits Text. Durch den neuen Inhalt ersetzen?",
+    ai_saved: "Version #{id} gespeichert und als Textdatei archiviert:\n{file}\nDer aktive Song-Prompt bleibt unverändert.",
+    ai_saved_no_file: "Version #{id} wurde gespeichert, aber die Textdatei konnte nicht erstellt werden: {detail}",
+    ai_confirm_song: "Für das Projekt „{project}“ einen Song-Eintrag anlegen?\n\nEs werden keine Dateien verändert.",
+    ai_song_created: "Der Ziel-Song „{project}“ wurde dem Projekt zugeordnet.",
+    ai_version_loaded: "Version #{id} in Style und Lyrics geladen. Noch nicht gespeichert.",
   },
   en: {
     app_sub: 'in the browser', tab_songs: 'Songs & Suno', tab_bands: 'Bands', all_bands: 'All Bands',
@@ -124,6 +180,62 @@ const I18N = {
     band_created: "Band “{name}” created. Directory: {folder}",
     band_imported: "Band “{name}” imported. Existing directory: {folder} (nothing changed).",
     band_prompt_warning: "The prompt folder could not be created: {detail}",
+    tab_ai: "AI Prompt Launcher",
+    band: "Band",
+    ai_target: "Target song / project",
+    ai_create_song: "Create song entry",
+    ai_platform: "AI platform",
+    ai_hardware: "Hardware for this prompt",
+    ai_hw_band: "Band profile hardware",
+    ai_model: "API model",
+    ai_key: "API key (optional)",
+    ai_cli_command: "CLI command",
+    ai_cli_model: "CLI model",
+    ai_cli_model_hint: "empty = CLI default",
+    ai_cli_check: "Check CLI",
+    ai_brief: "Song idea / instruction",
+    ai_brief_hint: "Example: British blues meets industrial folk metal, a story about …",
+    ai_generate_api: "Create prompt (API)",
+    ai_generate_cli: "Create prompt (CLI)",
+    ai_copy_open: "Copy request & open platform",
+    ai_import_file: "Answer from file",
+    ai_paste: "Paste answer from the chat",
+    ai_paste_hint: "Paste the AI answer here (STYLE and LYRICS sections or JSON) …",
+    ai_paste_apply: "Split into style and lyrics",
+    ai_style_hint: "Music style only – without [STYLE] markers.",
+    ai_lyrics_hint: "Lyrics and production notes – without [LYRICS] markers.",
+    ai_save: "Save as new version",
+    ai_save_hint: "The active song prompt stays unchanged; a text file is also stored in the band’s prompt folder.",
+    ai_load_version: "Load into style and lyrics",
+    ai_no_bands: "No band yet. Please create a band in the “Bands” tab first.",
+    ai_no_projects: "This band has no song project yet. Projects are created in the desktop app.",
+    ai_no_song_entry: "no song entry",
+    ai_key_env_found: "Leave empty: the key from {env} is used.",
+    ai_key_env_missing: "No key found in {env} – enter a key (used for this request only, never stored).",
+    ai_err_split: "The AI answer could not be split into style and lyrics. Please use an answer with STYLE and LYRICS sections (or JSON).",
+    ai_err_key: "API key missing. Enter a key or set the environment variable {env}.",
+    ai_err_model: "Invalid model name.",
+    ai_err_busy: "An AI request is already running. Please wait until it has finished.",
+    ai_err_no_song: "Please choose a target song, or first create a song for the project with “Create song entry”.",
+    ai_err_job: "The AI request is no longer known (was MPW in the browser restarted?). Please start it again.",
+    ai_err_empty: "Style and lyrics must not be empty.",
+    ai_err_prompt: "The request could not be created: {detail}",
+    ai_err_file_size: "The import file must not be larger than 2 MB.",
+    ai_running_api: "API request running … {s} s",
+    ai_running_cli: "CLI request running … {s} s (may take a few minutes)",
+    ai_received: "Answer received. Please review; it is saved only with “Save as new version”.",
+    ai_cli_found: "{provider} CLI found: {path}\nIf not done yet, start the CLI once in a terminal and sign in.",
+    ai_copy_failed: "The request could not be copied to the clipboard.",
+    ai_copied: "Request copied and {url} opened. Paste it there with Ctrl+V; then paste the answer below or import it as a file.",
+    ai_copied_no_window: "Request copied. The browser blocked the new window – please open {url} yourself and paste with Ctrl+V.",
+    ai_imported: "Answer applied (source: {source}). Please review, then save it as a version.",
+    ai_source_paste: "pasted text",
+    ai_confirm_replace: "Style and lyrics already contain text. Replace it with the new content?",
+    ai_saved: "Version #{id} saved and archived as a text file:\n{file}\nThe active song prompt stays unchanged.",
+    ai_saved_no_file: "Version #{id} was saved, but the text file could not be created: {detail}",
+    ai_confirm_song: "Create a song entry for the project “{project}”?\n\nNo files are changed.",
+    ai_song_created: "The target song “{project}” was assigned to the project.",
+    ai_version_loaded: "Version #{id} loaded into style and lyrics. Not saved yet.",
   },
   fr: {
     app_sub: 'dans le navigateur', tab_songs: 'Songs & Suno', tab_bands: 'Groupes', all_bands: 'Tous les groupes',
@@ -185,6 +297,62 @@ const I18N = {
     band_created: "Groupe « {name} » créé. Dossier : {folder}",
     band_imported: "Groupe « {name} » importé. Dossier existant : {folder} (rien modifié).",
     band_prompt_warning: "Le dossier des prompts n’a pas pu être créé : {detail}",
+    tab_ai: "AI Prompt Launcher",
+    band: "Groupe",
+    ai_target: "Chanson / projet cible",
+    ai_create_song: "Créer l’entrée de chanson",
+    ai_platform: "Plateforme IA",
+    ai_hardware: "Matériel pour ce prompt",
+    ai_hw_band: "Matériel du profil du groupe",
+    ai_model: "Modèle API",
+    ai_key: "Clé API (facultative)",
+    ai_cli_command: "Commande CLI",
+    ai_cli_model: "Modèle CLI",
+    ai_cli_model_hint: "vide = valeur par défaut de la CLI",
+    ai_cli_check: "Vérifier la CLI",
+    ai_brief: "Idée de chanson / consigne",
+    ai_brief_hint: "Exemple : blues britannique et folk metal industriel, une histoire sur …",
+    ai_generate_api: "Créer le prompt (API)",
+    ai_generate_cli: "Créer le prompt (CLI)",
+    ai_copy_open: "Copier la demande et ouvrir la plateforme",
+    ai_import_file: "Réponse depuis un fichier",
+    ai_paste: "Coller la réponse du chat",
+    ai_paste_hint: "Collez ici la réponse de l’IA (sections STYLE et LYRICS ou JSON) …",
+    ai_paste_apply: "Répartir en style et paroles",
+    ai_style_hint: "Uniquement le style musical – sans balises [STYLE].",
+    ai_lyrics_hint: "Paroles et consignes de production – sans balises [LYRICS].",
+    ai_save: "Enregistrer comme nouvelle version",
+    ai_save_hint: "Le prompt actif de la chanson reste inchangé ; un fichier texte est aussi enregistré dans le dossier des prompts du groupe.",
+    ai_load_version: "Charger dans style et paroles",
+    ai_no_bands: "Aucun groupe. Créez d’abord un groupe dans l’onglet « Bands ».",
+    ai_no_projects: "Ce groupe n’a pas encore de projet de chanson. Les projets se créent dans l’application de bureau.",
+    ai_no_song_entry: "pas d’entrée de chanson",
+    ai_key_env_found: "Laisser vide : la clé de {env} est utilisée.",
+    ai_key_env_missing: "Aucune clé trouvée dans {env} – saisissez une clé (utilisée pour cette demande uniquement, jamais enregistrée).",
+    ai_err_split: "La réponse de l’IA n’a pas pu être répartie en style et paroles. Utilisez une réponse avec sections STYLE et LYRICS (ou JSON).",
+    ai_err_key: "Clé API manquante. Saisissez une clé ou définissez la variable d’environnement {env}.",
+    ai_err_model: "Nom de modèle non valide.",
+    ai_err_busy: "Une demande IA est déjà en cours. Veuillez attendre qu’elle se termine.",
+    ai_err_no_song: "Choisissez une chanson cible ou créez d’abord une chanson pour le projet avec « Créer l’entrée de chanson ».",
+    ai_err_job: "La demande IA n’est plus connue (MPW dans le navigateur a-t-il été redémarré ?). Veuillez la relancer.",
+    ai_err_empty: "Le style et les paroles ne doivent pas être vides.",
+    ai_err_prompt: "La demande n’a pas pu être créée : {detail}",
+    ai_err_file_size: "Le fichier d’import ne doit pas dépasser 2 Mo.",
+    ai_running_api: "Demande API en cours … {s} s",
+    ai_running_cli: "Demande CLI en cours … {s} s (peut prendre quelques minutes)",
+    ai_received: "Réponse reçue. Vérifiez-la ; elle n’est enregistrée qu’avec « Enregistrer comme nouvelle version ».",
+    ai_cli_found: "CLI {provider} trouvée : {path}\nSi ce n’est pas encore fait, lancez la CLI une fois dans un terminal et connectez-vous.",
+    ai_copy_failed: "La demande n’a pas pu être copiée dans le presse-papiers.",
+    ai_copied: "Demande copiée et {url} ouvert. Collez-la avec Ctrl+V ; collez ensuite la réponse ci-dessous ou importez-la comme fichier.",
+    ai_copied_no_window: "Demande copiée. Le navigateur a bloqué la nouvelle fenêtre – ouvrez {url} vous-même et collez avec Ctrl+V.",
+    ai_imported: "Réponse reprise (source : {source}). Vérifiez-la, puis enregistrez-la comme version.",
+    ai_source_paste: "texte collé",
+    ai_confirm_replace: "Le style et les paroles contiennent déjà du texte. Le remplacer par le nouveau contenu ?",
+    ai_saved: "Version #{id} enregistrée et archivée comme fichier texte :\n{file}\nLe prompt actif de la chanson reste inchangé.",
+    ai_saved_no_file: "La version #{id} a été enregistrée, mais le fichier texte n’a pas pu être créé : {detail}",
+    ai_confirm_song: "Créer une entrée de chanson pour le projet « {project} » ?\n\nAucun fichier n’est modifié.",
+    ai_song_created: "La chanson cible « {project} » a été associée au projet.",
+    ai_version_loaded: "Version #{id} chargée dans style et paroles. Pas encore enregistrée.",
   },
   es: {
     app_sub: 'en el navegador', tab_songs: 'Songs & Suno', tab_bands: 'Bandas', all_bands: 'Todas las bandas',
@@ -246,6 +414,62 @@ const I18N = {
     band_created: "Banda «{name}» creada. Carpeta: {folder}",
     band_imported: "Banda «{name}» importada. Carpeta existente: {folder} (sin cambios).",
     band_prompt_warning: "No se pudo crear la carpeta de prompts: {detail}",
+    tab_ai: "AI Prompt Launcher",
+    band: "Banda",
+    ai_target: "Canción / proyecto de destino",
+    ai_create_song: "Crear entrada de canción",
+    ai_platform: "Plataforma de IA",
+    ai_hardware: "Equipo para este prompt",
+    ai_hw_band: "Equipo del perfil de la banda",
+    ai_model: "Modelo API",
+    ai_key: "Clave API (opcional)",
+    ai_cli_command: "Comando CLI",
+    ai_cli_model: "Modelo CLI",
+    ai_cli_model_hint: "vacío = predeterminado de la CLI",
+    ai_cli_check: "Comprobar CLI",
+    ai_brief: "Idea de canción / instrucción",
+    ai_brief_hint: "Ejemplo: blues británico con folk metal industrial, una historia sobre …",
+    ai_generate_api: "Crear prompt (API)",
+    ai_generate_cli: "Crear prompt (CLI)",
+    ai_copy_open: "Copiar solicitud y abrir plataforma",
+    ai_import_file: "Respuesta desde archivo",
+    ai_paste: "Pegar respuesta del chat",
+    ai_paste_hint: "Pegue aquí la respuesta de la IA (secciones STYLE y LYRICS o JSON) …",
+    ai_paste_apply: "Dividir en estilo y letra",
+    ai_style_hint: "Solo el estilo musical, sin marcas [STYLE].",
+    ai_lyrics_hint: "Letra e indicaciones de producción, sin marcas [LYRICS].",
+    ai_save: "Guardar como nueva versión",
+    ai_save_hint: "El prompt activo de la canción no cambia; además se guarda un archivo de texto en la carpeta de prompts de la banda.",
+    ai_load_version: "Cargar en estilo y letra",
+    ai_no_bands: "Aún no hay ninguna banda. Cree primero una banda en la pestaña «Bands».",
+    ai_no_projects: "Esta banda aún no tiene proyectos de canción. Los proyectos se crean en la aplicación de escritorio.",
+    ai_no_song_entry: "sin entrada de canción",
+    ai_key_env_found: "Dejar vacío: se usa la clave de {env}.",
+    ai_key_env_missing: "No se encontró clave en {env}; introduzca una clave (solo para esta solicitud, no se guarda).",
+    ai_err_split: "La respuesta de la IA no se pudo dividir en estilo y letra. Use una respuesta con secciones STYLE y LYRICS (o JSON).",
+    ai_err_key: "Falta la clave API. Introduzca una clave o defina la variable de entorno {env}.",
+    ai_err_model: "Nombre de modelo no válido.",
+    ai_err_busy: "Ya hay una solicitud de IA en curso. Espere a que termine.",
+    ai_err_no_song: "Elija una canción de destino o cree primero una canción para el proyecto con «Crear entrada de canción».",
+    ai_err_job: "La solicitud de IA ya no se conoce (¿se reinició MPW en el navegador?). Iníciela de nuevo.",
+    ai_err_empty: "El estilo y la letra no pueden estar vacíos.",
+    ai_err_prompt: "No se pudo crear la solicitud: {detail}",
+    ai_err_file_size: "El archivo de importación no puede superar 2 MB.",
+    ai_running_api: "Solicitud API en curso … {s} s",
+    ai_running_cli: "Solicitud CLI en curso … {s} s (puede tardar unos minutos)",
+    ai_received: "Respuesta recibida. Revísela; solo se guarda con «Guardar como nueva versión».",
+    ai_cli_found: "CLI de {provider} encontrada: {path}\nSi aún no lo ha hecho, inicie la CLI una vez en un terminal e inicie sesión.",
+    ai_copy_failed: "No se pudo copiar la solicitud al portapapeles.",
+    ai_copied: "Solicitud copiada y {url} abierto. Péguela allí con Ctrl+V; después pegue la respuesta abajo o impórtela como archivo.",
+    ai_copied_no_window: "Solicitud copiada. El navegador bloqueó la nueva ventana; abra {url} usted mismo y pegue con Ctrl+V.",
+    ai_imported: "Respuesta aplicada (origen: {source}). Revísela y guárdela como versión.",
+    ai_source_paste: "texto pegado",
+    ai_confirm_replace: "El estilo y la letra ya contienen texto. ¿Reemplazarlo por el nuevo contenido?",
+    ai_saved: "Versión #{id} guardada y archivada como archivo de texto:\n{file}\nEl prompt activo de la canción no cambia.",
+    ai_saved_no_file: "La versión #{id} se guardó, pero no se pudo crear el archivo de texto: {detail}",
+    ai_confirm_song: "¿Crear una entrada de canción para el proyecto «{project}»?\n\nNo se modifica ningún archivo.",
+    ai_song_created: "La canción de destino «{project}» se asignó al proyecto.",
+    ai_version_loaded: "Versión #{id} cargada en estilo y letra. Aún no se ha guardado.",
   },
   it: {
     app_sub: 'nel browser', tab_songs: 'Songs & Suno', tab_bands: 'Band', all_bands: 'Tutte le band',
@@ -307,6 +531,62 @@ const I18N = {
     band_created: "Gruppo «{name}» creato. Cartella: {folder}",
     band_imported: "Gruppo «{name}» importato. Cartella esistente: {folder} (nessuna modifica).",
     band_prompt_warning: "Impossibile creare la cartella dei prompt: {detail}",
+    tab_ai: "AI Prompt Launcher",
+    band: "Gruppo",
+    ai_target: "Brano / progetto di destinazione",
+    ai_create_song: "Crea voce del brano",
+    ai_platform: "Piattaforma IA",
+    ai_hardware: "Hardware per questo prompt",
+    ai_hw_band: "Hardware del profilo del gruppo",
+    ai_model: "Modello API",
+    ai_key: "Chiave API (facoltativa)",
+    ai_cli_command: "Comando CLI",
+    ai_cli_model: "Modello CLI",
+    ai_cli_model_hint: "vuoto = predefinito della CLI",
+    ai_cli_check: "Verifica CLI",
+    ai_brief: "Idea del brano / istruzione",
+    ai_brief_hint: "Esempio: blues britannico incontra folk metal industriale, una storia su …",
+    ai_generate_api: "Crea prompt (API)",
+    ai_generate_cli: "Crea prompt (CLI)",
+    ai_copy_open: "Copia richiesta e apri piattaforma",
+    ai_import_file: "Risposta da file",
+    ai_paste: "Incolla la risposta della chat",
+    ai_paste_hint: "Incolla qui la risposta dell’IA (sezioni STYLE e LYRICS o JSON) …",
+    ai_paste_apply: "Dividi in stile e testo",
+    ai_style_hint: "Solo lo stile musicale, senza marcatori [STYLE].",
+    ai_lyrics_hint: "Testo e indicazioni di produzione, senza marcatori [LYRICS].",
+    ai_save: "Salva come nuova versione",
+    ai_save_hint: "Il prompt attivo del brano resta invariato; viene inoltre salvato un file di testo nella cartella dei prompt del gruppo.",
+    ai_load_version: "Carica in stile e testo",
+    ai_no_bands: "Nessun gruppo. Crea prima un gruppo nella scheda «Bands».",
+    ai_no_projects: "Questo gruppo non ha ancora progetti di brani. I progetti si creano nell’app desktop.",
+    ai_no_song_entry: "nessuna voce del brano",
+    ai_key_env_found: "Lascia vuoto: viene usata la chiave di {env}.",
+    ai_key_env_missing: "Nessuna chiave trovata in {env}: inserisci una chiave (usata solo per questa richiesta, non salvata).",
+    ai_err_split: "Impossibile dividere la risposta dell’IA in stile e testo. Usa una risposta con sezioni STYLE e LYRICS (o JSON).",
+    ai_err_key: "Chiave API mancante. Inserisci una chiave o imposta la variabile d’ambiente {env}.",
+    ai_err_model: "Nome del modello non valido.",
+    ai_err_busy: "Una richiesta IA è già in corso. Attendi che termini.",
+    ai_err_no_song: "Scegli un brano di destinazione o crea prima un brano per il progetto con «Crea voce del brano».",
+    ai_err_job: "La richiesta IA non è più nota (MPW nel browser è stato riavviato?). Avviala di nuovo.",
+    ai_err_empty: "Stile e testo non possono essere vuoti.",
+    ai_err_prompt: "Impossibile creare la richiesta: {detail}",
+    ai_err_file_size: "Il file da importare non può superare 2 MB.",
+    ai_running_api: "Richiesta API in corso … {s} s",
+    ai_running_cli: "Richiesta CLI in corso … {s} s (può richiedere alcuni minuti)",
+    ai_received: "Risposta ricevuta. Controllala; viene salvata solo con «Salva come nuova versione».",
+    ai_cli_found: "CLI di {provider} trovata: {path}\nSe non l’hai ancora fatto, avvia la CLI una volta in un terminale ed effettua l’accesso.",
+    ai_copy_failed: "Impossibile copiare la richiesta negli appunti.",
+    ai_copied: "Richiesta copiata e {url} aperto. Incollala lì con Ctrl+V; poi incolla la risposta qui sotto o importala come file.",
+    ai_copied_no_window: "Richiesta copiata. Il browser ha bloccato la nuova finestra: apri {url} e incolla con Ctrl+V.",
+    ai_imported: "Risposta acquisita (fonte: {source}). Controllala e salvala come versione.",
+    ai_source_paste: "testo incollato",
+    ai_confirm_replace: "Stile e testo contengono già del testo. Sostituirlo con il nuovo contenuto?",
+    ai_saved: "Versione #{id} salvata e archiviata come file di testo:\n{file}\nIl prompt attivo del brano resta invariato.",
+    ai_saved_no_file: "La versione #{id} è stata salvata, ma non è stato possibile creare il file di testo: {detail}",
+    ai_confirm_song: "Creare una voce del brano per il progetto «{project}»?\n\nNessun file viene modificato.",
+    ai_song_created: "Il brano di destinazione «{project}» è stato assegnato al progetto.",
+    ai_version_loaded: "Versione #{id} caricata in stile e testo. Non ancora salvata.",
   },
 };
 
@@ -816,13 +1096,301 @@ $('btn-band-new-cancel').addEventListener('click', hideNewBandForm);
 $('btn-band-create').addEventListener('click', () => bandAction(createBand).catch((error) => newBandMessage(error.message, 'error')));
 $('n-name').addEventListener('keydown', (event) => { if (event.key === 'Enter') $('btn-band-create').click(); });
 
+/* ------------------------------------------------------------------ AI Prompt Launcher (stage 4) */
+
+const IMPORT_MODEL = 'Import (manuell)';
+const aiState = { options: null, targets: [], songId: null, busy: false, originModel: null, version: null, unsaved: false };
+
+function aiMessage(text, kind) {
+  const box = $('ai-message');
+  box.textContent = text;
+  box.className = 'message' + (kind ? ' ' + kind : '');
+  box.hidden = !text;
+}
+
+function aiProvider() { return $('ai-provider').value; }
+
+// Same provider/CLI messages as the desktop tab (served by the core in all five languages).
+function providerErrorText(kind, code, detail) {
+  if (kind === 'split') return t('ai_err_split');
+  const all = aiState.options.error_texts;
+  const texts = all[state.lang] || all.en;
+  let text = (texts[kind] || texts.unexpected).split('{provider}').join(aiProvider())
+    .split('{code}').join(code || '?').split('{model}').join($('ai-model').value.trim());
+  if (detail && !['timeout', 'truncated', 'empty', 'cli_timeout'].includes(kind)) text += '\n\n' + texts.detail + ' ' + detail;
+  return text;
+}
+
+function aiErrorText(error) {
+  const data = error.data || {};
+  if (data.error === 'provider') return providerErrorText(data.kind, data.code, data.detail);
+  const map = { key_missing: 'ai_err_key', invalid_model: 'ai_err_model', ai_busy: 'ai_err_busy', no_song: 'ai_err_no_song',
+                song_missing: 'err_missing', project_missing: 'err_missing', job_missing: 'ai_err_job',
+                no_structure: 'ai_err_split', too_long: 'err_too_long', empty_field: 'ai_err_empty',
+                prompt_error: 'ai_err_prompt' };
+  if (map[data.error]) return t(map[data.error], { env: data.env || '', detail: data.detail || '' });
+  return error.kind === 'connection' ? error.message : t('error', { detail: error.message });
+}
+
+async function aiAction(fn) {
+  if (aiState.busy) return;
+  aiState.busy = true;
+  updateAiState();
+  try { await fn(); } catch (error) { aiMessage(aiErrorText(error), 'error'); } finally { aiState.busy = false; updateAiState(); }
+}
+
+async function aiInit() {
+  aiState.options = await api('/api/ai/options');
+  const o = aiState.options;
+  $('ai-provider').replaceChildren(...o.providers.map((p) => { const opt = el('option', p); opt.value = p; return opt; }));
+  const presets = [el('option', t('ai_hw_band'))];
+  presets[0].value = '';
+  for (const p of o.presets) { const opt = el('option', p.name + ' (' + p.count + ')'); opt.value = p.id; presets.push(opt); }
+  $('ai-preset').replaceChildren(...presets);
+  const bands = await api('/api/bands');
+  $('ai-band').replaceChildren(...bands.map((b) => { const opt = el('option', b.name); opt.value = b.id; return opt; }));
+  if (!bands.length) aiMessage(t('ai_no_bands'), 'warn');
+  aiProviderChanged();
+  await loadAiTargets();
+}
+
+function aiProviderChanged() {
+  const o = aiState.options;
+  const provider = aiProvider();
+  $('ai-model').value = o.models[provider] || '';
+  const cli = $('ai-cli').value.trim();
+  if (!cli || Object.values(o.cli_commands).includes(cli)) $('ai-cli').value = o.cli_commands[provider] || '';
+  const env = o.key_env[provider];
+  $('ai-key-hint').textContent = t(o.key_in_env[provider] ? 'ai_key_env_found' : 'ai_key_env_missing', { env });
+}
+
+async function loadAiTargets() {
+  const bandId = $('ai-band').value;
+  const previous = $('ai-project').value;
+  aiState.targets = bandId ? await api('/api/ai/targets?band_id=' + encodeURIComponent(bandId)) : [];
+  $('ai-project').replaceChildren(...aiState.targets.map((p) => {
+    const opt = el('option', p.song_id ? p.name : p.name + ' – ' + t('ai_no_song_entry'));
+    opt.value = p.project_id;
+    return opt;
+  }));
+  if (aiState.targets.some((p) => String(p.project_id) === previous)) $('ai-project').value = previous;
+  else {  // prefer a project that already has a song entry
+    const ready = aiState.targets.find((p) => p.song_id);
+    if (ready) $('ai-project').value = String(ready.project_id);
+  }
+  if (bandId && !aiState.targets.length) aiMessage(t('ai_no_projects'), 'warn');
+  await aiTargetChanged();
+}
+
+function aiTarget() {
+  return aiState.targets.find((p) => String(p.project_id) === $('ai-project').value) || null;
+}
+
+async function aiTargetChanged() {
+  const target = aiTarget();
+  aiState.songId = target ? target.song_id : null;
+  $('btn-ai-song').hidden = !target || !!target.song_id;
+  updateAiState();
+  await loadAiVersions();
+}
+
+function aiValues() { return { style: $('ai-style').value.trim(), lyrics: $('ai-lyrics').value.trim() }; }
+
+function updateAiState() {
+  const limits = aiState.options ? aiState.options.limits : { style: 1000, lyrics: 5000 };
+  let valid = true;
+  for (const field of ['style', 'lyrics']) {
+    const n = $('ai-' + field).value.trim().length;
+    const counter = $('ai-c-' + field);
+    counter.textContent = t('chars', { n, max: limits[field] });
+    counter.classList.toggle('over', n > limits[field]);
+    valid = valid && n > 0 && n <= limits[field];
+  }
+  const ready = !!aiState.songId && !aiState.busy;
+  for (const id of ['btn-ai-api', 'btn-ai-cli', 'btn-ai-copy']) $(id).disabled = !ready;
+  $('btn-ai-save').disabled = !(ready && valid);
+  $('btn-ai-song').disabled = aiState.busy;
+}
+
+function aiRequestBody() {
+  const preset = $('ai-preset').value;
+  return { song_id: aiState.songId, provider: aiProvider(), brief: $('ai-brief').value,
+           preset_id: preset ? Number(preset) : null };
+}
+
+function setAiEditors(style, lyrics, originModel) {
+  $('ai-style').value = style;
+  $('ai-lyrics').value = lyrics;
+  aiState.originModel = originModel;
+  aiState.unsaved = true;
+  updateAiState();
+}
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+async function generateAi(mode) {
+  if (!aiState.songId) { aiMessage(t('ai_err_no_song'), 'error'); return; }
+  const body = aiRequestBody();
+  body.mode = mode;
+  const model = mode === 'api' ? $('ai-model').value.trim() : $('ai-cli-model').value.trim();
+  body.model = model;
+  if (mode === 'api') body.api_key = $('ai-key').value;
+  else body.cli_command = $('ai-cli').value;
+  let started;
+  try {
+    started = await api('/api/ai/generate', { method: 'POST', body });
+  } finally {
+    $('ai-key').value = '';  // the key is only used for this one request
+  }
+  const began = Date.now();
+  let failures = 0;
+  for (;;) {
+    aiMessage(t(mode === 'api' ? 'ai_running_api' : 'ai_running_cli', { s: Math.round((Date.now() - began) / 1000) }), 'warn');
+    await sleep(1500);
+    let job;
+    try {
+      job = await api('/api/ai/jobs/' + started.job);
+      failures = 0;
+    } catch (error) {
+      if (error.kind !== 'connection' || ++failures > 5) throw error;
+      continue;
+    }
+    if (job.status === 'running') continue;
+    if (job.status === 'failed') {
+      aiMessage(providerErrorText(job.error.kind, job.error.code, job.error.detail), 'error');
+      return;
+    }
+    setAiEditors(job.style, job.lyrics, mode === 'api' ? model : (model || 'CLI'));
+    aiMessage(t('ai_received'));
+    return;
+  }
+}
+
+async function checkAiCli() {
+  const result = await api('/api/ai/check-cli', { method: 'POST', body: { provider: aiProvider(), cli_command: $('ai-cli').value } });
+  aiMessage(t('ai_cli_found', { provider: aiProvider(), path: result.path }));
+}
+
+async function copyAiRequest() {
+  if (!aiState.songId) { aiMessage(t('ai_err_no_song'), 'error'); return; }
+  const result = await api('/api/ai/request-text', { method: 'POST', body: aiRequestBody() });
+  try {
+    await navigator.clipboard.writeText(result.text);
+  } catch (e) {
+    aiMessage(t('ai_copy_failed'), 'error');
+    return;
+  }
+  const opened = window.open(result.url, '_blank', 'noopener');
+  aiMessage(t(opened === null ? 'ai_copied_no_window' : 'ai_copied', { url: result.url }));
+  $('ai-paste-box').open = true;
+}
+
+async function parseAiAnswer(text, source) {
+  const result = await api('/api/ai/parse', { method: 'POST', body: { text } });
+  if (!confirmReplaceAi(result.style, result.lyrics)) return false;
+  setAiEditors(result.style, result.lyrics, IMPORT_MODEL);
+  aiMessage(t('ai_imported', { source }));
+  return true;
+}
+
+function confirmReplaceAi(style, lyrics) {
+  const now = aiValues();
+  if (!now.style && !now.lyrics) return true;
+  if (now.style === style.trim() && now.lyrics === lyrics.trim()) return true;
+  return confirm(t('ai_confirm_replace'));
+}
+
+async function importAiFile(file) {
+  if (file.size > 2 * 1024 * 1024) { aiMessage(t('ai_err_file_size'), 'error'); return; }
+  const text = await file.text();
+  await parseAiAnswer(text, file.name);
+}
+
+async function saveAiVersion() {
+  const values = aiValues();
+  const body = { provider: aiProvider(), model: aiState.originModel || $('ai-model').value.trim(),
+                 style: values.style, lyrics: values.lyrics, brief: $('ai-brief').value };
+  const result = await api('/api/songs/' + aiState.songId + '/prompt-versions', { method: 'POST', body });
+  aiState.unsaved = false;
+  if (result.file_error) aiMessage(t('ai_saved_no_file', { id: result.id, detail: result.file_error }), 'warn');
+  else aiMessage(t('ai_saved', { id: result.id, file: result.file }));
+  await loadAiVersions();
+}
+
+async function createAiSong() {
+  const target = aiTarget();
+  if (!target || target.song_id) return;
+  if (!confirm(t('ai_confirm_song', { project: target.name }))) return;
+  await api('/api/projects/' + target.project_id + '/song', { method: 'POST', body: { confirm: true } });
+  await loadAiTargets();
+  aiMessage(t('ai_song_created', { project: target.name }));
+}
+
+async function loadAiVersions() {
+  const versions = aiState.songId ? await api('/api/songs/' + aiState.songId + '/versions') : [];
+  aiState.version = null;
+  $('ai-version-preview').hidden = true;
+  const list = $('ai-version-list');
+  if (!versions.length) { list.replaceChildren(el('li', t('no_versions'), 'hint')); return; }
+  list.replaceChildren(...versions.map((version) => {
+    const item = el('li');
+    item.append(el('span', '#' + version.id + ' · ' + version.provider));
+    item.append(el('span', version.model + ' · ' + version.created_at, 'sub'));
+    item.addEventListener('click', () => showAiVersion(version.id, item).catch((error) => aiMessage(aiErrorText(error), 'error')));
+    return item;
+  }));
+}
+
+async function showAiVersion(id, item) {
+  aiState.version = await api('/api/versions/' + id);
+  document.querySelectorAll('#ai-version-list li').forEach((li) => li.classList.toggle('active', li === item));
+  $('ai-version-head').textContent = '#' + aiState.version.id + ' · ' + aiState.version.provider + ' · ' + aiState.version.created_at;
+  $('ai-v-style').textContent = aiState.version.style;
+  $('ai-v-lyrics').textContent = aiState.version.lyrics;
+  $('ai-version-preview').hidden = false;
+}
+
+function loadAiVersion() {
+  const v = aiState.version;
+  if (!v || !confirmReplaceAi(v.style, v.lyrics)) return;
+  setAiEditors(v.style, v.lyrics, IMPORT_MODEL);
+  aiState.unsaved = false;  // identical to a saved version
+  aiMessage(t('ai_version_loaded', { id: v.id }), 'warn');
+}
+
+const aiRun = (fn) => () => aiAction(fn);
+$('ai-band').addEventListener('change', aiRun(loadAiTargets));
+$('ai-project').addEventListener('change', aiRun(aiTargetChanged));
+$('ai-provider').addEventListener('change', aiProviderChanged);
+$('btn-ai-song').addEventListener('click', aiRun(createAiSong));
+$('btn-ai-check').addEventListener('click', aiRun(checkAiCli));
+$('btn-ai-api').addEventListener('click', aiRun(() => generateAi('api')));
+$('btn-ai-cli').addEventListener('click', aiRun(() => generateAi('cli')));
+$('btn-ai-copy').addEventListener('click', aiRun(copyAiRequest));
+$('btn-ai-file').addEventListener('click', () => $('ai-file').click());
+$('ai-file').addEventListener('change', () => {
+  const file = $('ai-file').files[0];
+  $('ai-file').value = '';
+  if (file) aiAction(() => importAiFile(file));
+});
+$('btn-ai-paste').addEventListener('click', aiRun(async () => {
+  const text = $('ai-paste').value;
+  if (!text.trim()) return;
+  if (await parseAiAnswer(text, t('ai_source_paste'))) $('ai-paste').value = '';
+}));
+$('btn-ai-save').addEventListener('click', aiRun(saveAiVersion));
+$('btn-ai-load').addEventListener('click', loadAiVersion);
+['ai-style', 'ai-lyrics'].forEach((id) => $(id).addEventListener('input', () => { aiState.unsaved = true; updateAiState(); }));
+
 /* ------------------------------------------------------------------ start */
 
 function switchView(name) {
   document.querySelectorAll('.tab').forEach((tab) => tab.classList.toggle('active', tab.dataset.view === name));
   $('view-songs').hidden = name !== 'songs';
   $('view-bands').hidden = name !== 'bands';
+  $('view-ai').hidden = name !== 'ai';
   if (name === 'bands' && !$('band-list').children.length) loadBandList().catch(fatal);
+  if (name === 'ai' && !aiState.options) aiAction(aiInit);
 }
 
 function fatal(error) {
@@ -855,5 +1423,9 @@ $('f-status').addEventListener('change', updateCounters);
 $('btn-save').addEventListener('click', saveSong);
 $('btn-revert').addEventListener('click', revertSong);
 $('btn-load-version').addEventListener('click', loadVersionIntoEditor);
-window.addEventListener('beforeunload', (event) => { if (isDirty()) { event.preventDefault(); event.returnValue = ''; } });
+window.addEventListener('beforeunload', (event) => {
+  // unsaved song changes, or an AI result that was not saved as a version yet
+  const aiUnsaved = aiState.unsaved && (aiValues().style || aiValues().lyrics);
+  if (isDirty() || aiUnsaved) { event.preventDefault(); event.returnValue = ''; }
+});
 start();

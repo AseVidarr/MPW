@@ -78,6 +78,16 @@ h3 { font-size: 13px; margin: 8px 0 2px; color: var(--muted); }
 .table tr.editing td { background: #263c5a; }
 button.danger { background: #6b2f2f; border-color: #8a3c3c; }
 button.danger:hover:not(:disabled) { background: #7f3a3a; }
+#view-ai { grid-template-columns: 1fr 320px; }
+#ai-body { display: flex; flex-direction: column; gap: 10px; min-height: 0; flex: 1; }
+.ai-grid { display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; align-items: end; }
+.ai-grid label { display: flex; flex-direction: column; gap: 4px; color: var(--muted); font-size: 12px; }
+.ai-grid .hint { align-self: center; max-width: 260px; }
+.actions.wrap { flex-wrap: wrap; }
+#ai-brief { resize: vertical; font-size: 13px; color: var(--text); }
+#ai-paste-box { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 6px 10px; }
+#ai-paste-box summary { cursor: pointer; color: var(--muted); }
+#ai-paste-box textarea { width: 100%; margin: 8px 0; resize: vertical; font-family: Consolas, "Cascadia Mono", monospace; font-size: 12px; }
 .footer { padding: 4px 16px; color: var(--muted); font-size: 11px; background: var(--panel); border-top: 1px solid var(--border); }
 
 @media (max-width: 1100px) {
@@ -85,4 +95,6 @@ button.danger:hover:not(:disabled) { background: #7f3a3a; }
   .versions { grid-column: 1 / -1; border-left: 0; border-top: 1px solid var(--border); }
   .fields { grid-template-columns: 1fr; }
   .texts { grid-template-columns: 1fr; }
+  #view-ai { grid-template-columns: 1fr; }
+  .ai-grid { grid-template-columns: 1fr; }
 }

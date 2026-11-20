@@ -6345,11 +6345,9 @@ class Workstation(QMainWindow):
         self.message('Song angelegt', f'Der Ziel-Song „{row[0]}“ wurde dem Projekt zugeordnet.')
 
     def ai_provider_changed(self, *args):
-        models = {'ChatGPT':'gpt-4.1-mini','Gemini':'gemini-2.5-flash','Claude':'claude-sonnet-5-5'}
         provider = self.ai_provider.currentText()
-        self.ai_model.setText(models.get(provider,''))
-        envs = {'ChatGPT':'OPENAI_API_KEY','Gemini':'GEMINI_API_KEY','Claude':'ANTHROPIC_API_KEY'}
-        self.ai_key.setPlaceholderText('Alternativ: ' + envs.get(provider,''))
+        self.ai_model.setText(mpw_core.AI_DEFAULT_MODELS.get(provider, ''))
+        self.ai_key.setPlaceholderText('Alternativ: ' + mpw_core.API_KEY_ENV.get(provider, ''))
         # Only replace the CLI command if the user has not entered a custom name/path.
         current = self.ai_cli_command.text().strip()
         if not current or current in CLI_DEFAULT_COMMANDS.values():
@@ -6364,8 +6362,7 @@ class Workstation(QMainWindow):
         sid = self.ai_selected_song_id()
         if sid is None: return self.error('Bitte einen Ziel-Song auswählen oder über „Song-Eintrag anlegen“ zuerst einen Song zum Projekt erstellen.')
         provider = self.ai_provider.currentText()
-        envs = {'ChatGPT':'OPENAI_API_KEY','Gemini':'GEMINI_API_KEY','Claude':'ANTHROPIC_API_KEY'}
-        key = self.ai_key.text().strip() or os.environ.get(envs[provider],'')
+        key = self.ai_key.text().strip() or os.environ.get(mpw_core.API_KEY_ENV[provider], '')
         if not key: return self.error('API-Schlüssel fehlt. Schlüssel eingeben oder Umgebungsvariable setzen.')
         model = self.ai_model.text().strip()
         if not model or not re.fullmatch(r'[a-zA-Z0-9._-]+',model): return self.error('Ungültiger Modellname.')
@@ -6386,8 +6383,7 @@ class Workstation(QMainWindow):
 
     def ai_cli_prompt(self, sid):
         """Same request as the API mode, plus a note that no files or tools are needed."""
-        return (self.ai_prompt(sid) + '\nArbeite ohne Werkzeuge und ohne Dateizugriff; '
-                'gib nur das JSON-Objekt als Antwort aus.')
+        return mpw_core.ai_cli_prompt(self.ai_prompt(sid))
 
     def check_ai_cli(self):
         provider = self.ai_provider.currentText()
@@ -6436,129 +6432,8 @@ class Workstation(QMainWindow):
 
     # API error texts per ProviderError kind. {provider}, {code} and {model} are filled in;
     # the provider's own message (usually English) is appended separately as detail.
-    AI_API_ERRORS = {
-        'de': {
-            'auth': '{provider} hat den API-Schlüssel abgelehnt (HTTP {code}). Schlüssel prüfen und ob er für diese API freigeschaltet ist.',
-            'model': '{provider} kennt das Modell „{model}“ nicht oder es ist für dieses Konto nicht verfügbar (HTTP {code}). Modellnamen im Feld „API-Modell“ prüfen.',
-            'rate': '{provider} hat die Anfrage begrenzt (HTTP {code}): zu viele Anfragen oder kein Guthaben/Kontingent mehr. Später erneut versuchen oder Abrechnung prüfen.',
-            'bad_request': '{provider} hat die Anfrage als ungültig abgelehnt (HTTP {code}). Modellnamen und API-Schlüssel prüfen.',
-            'server': '{provider} ist gerade gestört oder überlastet (HTTP {code}). Bitte später erneut versuchen.',
-            'http': '{provider} hat mit HTTP {code} geantwortet.',
-            'network': '{provider} ist nicht erreichbar. Internetverbindung, Proxy oder Firewall prüfen.',
-            'timeout': '{provider} hat nicht innerhalb von 180 Sekunden geantwortet. Bitte erneut versuchen.',
-            'blocked': '{provider} hat die Antwort aus Sicherheitsgründen blockiert oder verweigert. Songidee umformulieren und erneut versuchen.',
-            'truncated': 'Die Antwort von {provider} wurde abgeschnitten (Längenlimit erreicht) und wurde nicht übernommen. Bitte erneut versuchen.',
-            'empty': '{provider} hat eine leere Antwort geliefert. Bitte erneut versuchen.',
-            'format': '{provider} hat eine Antwort in unerwartetem Format geliefert. Modellnamen prüfen.',
-            'unexpected': 'Unerwarteter Fehler bei der Anfrage an {provider}. Details stehen im Fehlerprotokoll.',
-            'detail': 'Meldung des Anbieters:', 'status': 'API-Anfrage fehlgeschlagen.',
-        },
-        'en': {
-            'auth': '{provider} rejected the API key (HTTP {code}). Check the key and that it is enabled for this API.',
-            'model': '{provider} does not know the model “{model}” or it is not available for this account (HTTP {code}). Check the name in “API model”.',
-            'rate': '{provider} rate-limited the request (HTTP {code}): too many requests or no credit/quota left. Try again later or check billing.',
-            'bad_request': '{provider} rejected the request as invalid (HTTP {code}). Check the model name and API key.',
-            'server': '{provider} is currently unavailable or overloaded (HTTP {code}). Please try again later.',
-            'http': '{provider} responded with HTTP {code}.',
-            'network': '{provider} cannot be reached. Check your internet connection, proxy or firewall.',
-            'timeout': '{provider} did not respond within 180 seconds. Please try again.',
-            'blocked': '{provider} blocked or refused the answer for safety reasons. Rephrase the song idea and try again.',
-            'truncated': 'The answer from {provider} was cut off (length limit reached) and was not applied. Please try again.',
-            'empty': '{provider} returned an empty answer. Please try again.',
-            'format': '{provider} returned an answer in an unexpected format. Check the model name.',
-            'unexpected': 'Unexpected error while contacting {provider}. Details are in the error log.',
-            'detail': 'Provider message:', 'status': 'API request failed.',
-        },
-        'fr': {
-            'auth': '{provider} a refusé la clé API (HTTP {code}). Vérifiez la clé et qu’elle est activée pour cette API.',
-            'model': '{provider} ne connaît pas le modèle « {model} » ou il n’est pas disponible pour ce compte (HTTP {code}). Vérifiez le nom dans « Modèle API ».',
-            'rate': '{provider} a limité la requête (HTTP {code}) : trop de requêtes ou plus de crédit/quota. Réessayez plus tard ou vérifiez la facturation.',
-            'bad_request': '{provider} a refusé la requête comme non valide (HTTP {code}). Vérifiez le nom du modèle et la clé API.',
-            'server': '{provider} est actuellement indisponible ou surchargé (HTTP {code}). Réessayez plus tard.',
-            'http': '{provider} a répondu avec HTTP {code}.',
-            'network': '{provider} est injoignable. Vérifiez la connexion Internet, le proxy ou le pare-feu.',
-            'timeout': '{provider} n’a pas répondu en 180 secondes. Veuillez réessayer.',
-            'blocked': '{provider} a bloqué ou refusé la réponse pour des raisons de sécurité. Reformulez l’idée et réessayez.',
-            'truncated': 'La réponse de {provider} a été tronquée (limite de longueur atteinte) et n’a pas été reprise. Veuillez réessayer.',
-            'empty': '{provider} a renvoyé une réponse vide. Veuillez réessayer.',
-            'format': '{provider} a renvoyé une réponse dans un format inattendu. Vérifiez le nom du modèle.',
-            'unexpected': 'Erreur inattendue lors de la requête à {provider}. Détails dans le journal des erreurs.',
-            'detail': 'Message du fournisseur :', 'status': 'La requête API a échoué.',
-        },
-        'es': {
-            'auth': '{provider} rechazó la clave API (HTTP {code}). Compruebe la clave y que esté habilitada para esta API.',
-            'model': '{provider} no conoce el modelo «{model}» o no está disponible para esta cuenta (HTTP {code}). Compruebe el nombre en «Modelo API».',
-            'rate': '{provider} limitó la solicitud (HTTP {code}): demasiadas solicitudes o sin saldo/cuota. Inténtelo más tarde o revise la facturación.',
-            'bad_request': '{provider} rechazó la solicitud por no válida (HTTP {code}). Compruebe el nombre del modelo y la clave API.',
-            'server': '{provider} no está disponible o está sobrecargado (HTTP {code}). Inténtelo más tarde.',
-            'http': '{provider} respondió con HTTP {code}.',
-            'network': 'No se puede conectar con {provider}. Compruebe la conexión a Internet, el proxy o el cortafuegos.',
-            'timeout': '{provider} no respondió en 180 segundos. Inténtelo de nuevo.',
-            'blocked': '{provider} bloqueó o rechazó la respuesta por motivos de seguridad. Reformule la idea e inténtelo de nuevo.',
-            'truncated': 'La respuesta de {provider} se cortó (límite de longitud alcanzado) y no se aplicó. Inténtelo de nuevo.',
-            'empty': '{provider} devolvió una respuesta vacía. Inténtelo de nuevo.',
-            'format': '{provider} devolvió una respuesta con un formato inesperado. Compruebe el nombre del modelo.',
-            'unexpected': 'Error inesperado al contactar con {provider}. Los detalles están en el registro de errores.',
-            'detail': 'Mensaje del proveedor:', 'status': 'La solicitud API ha fallado.',
-        },
-        'it': {
-            'auth': '{provider} ha rifiutato la chiave API (HTTP {code}). Controlla la chiave e che sia abilitata per questa API.',
-            'model': '{provider} non conosce il modello «{model}» o non è disponibile per questo account (HTTP {code}). Controlla il nome in «Modello API».',
-            'rate': '{provider} ha limitato la richiesta (HTTP {code}): troppe richieste o credito/quota esauriti. Riprova più tardi o controlla la fatturazione.',
-            'bad_request': '{provider} ha rifiutato la richiesta come non valida (HTTP {code}). Controlla il nome del modello e la chiave API.',
-            'server': '{provider} è momentaneamente non disponibile o sovraccarico (HTTP {code}). Riprova più tardi.',
-            'http': '{provider} ha risposto con HTTP {code}.',
-            'network': '{provider} non è raggiungibile. Controlla la connessione Internet, il proxy o il firewall.',
-            'timeout': '{provider} non ha risposto entro 180 secondi. Riprova.',
-            'blocked': '{provider} ha bloccato o rifiutato la risposta per motivi di sicurezza. Riformula l’idea e riprova.',
-            'truncated': 'La risposta di {provider} è stata troncata (limite di lunghezza raggiunto) e non è stata applicata. Riprova.',
-            'empty': '{provider} ha restituito una risposta vuota. Riprova.',
-            'format': '{provider} ha restituito una risposta in un formato inatteso. Controlla il nome del modello.',
-            'unexpected': 'Errore imprevisto nella richiesta a {provider}. I dettagli sono nel registro degli errori.',
-            'detail': 'Messaggio del fornitore:', 'status': 'Richiesta API non riuscita.',
-        },
-    }
-    # CLI access (local provider CLI); {code} is the process exit code.
-    _AI_CLI_ERRORS = {
-        'de': {
-            'cli_invalid': 'Ungültiger CLI-Befehl oder CLI-Modell. Nur Programmname bzw. Pfad ohne Sonderzeichen wie & | < > ^ % eintragen.',
-            'cli_missing': 'Die {provider}-CLI wurde nicht gefunden. CLI installieren (z. B. Claude Code, Gemini CLI oder Codex CLI) oder im Feld „CLI-Befehl“ den vollständigen Pfad angeben.',
-            'cli_start': 'Die {provider}-CLI konnte nicht gestartet werden.',
-            'cli_failed': 'Die {provider}-CLI wurde mit Fehlercode {code} beendet. Ist die CLI angemeldet? Einmal in einem Terminal starten und einloggen, dann erneut versuchen.',
-            'cli_timeout': 'Die {provider}-CLI hat nicht innerhalb von 5 Minuten geantwortet und wurde abgebrochen.',
-        },
-        'en': {
-            'cli_invalid': 'Invalid CLI command or CLI model. Enter only a program name or path without special characters such as & | < > ^ %.',
-            'cli_missing': 'The {provider} CLI was not found. Install the CLI (e.g. Claude Code, Gemini CLI or Codex CLI) or enter its full path in “CLI command”.',
-            'cli_start': 'The {provider} CLI could not be started.',
-            'cli_failed': 'The {provider} CLI exited with error code {code}. Is the CLI signed in? Start it once in a terminal, sign in, then try again.',
-            'cli_timeout': 'The {provider} CLI did not respond within 5 minutes and was stopped.',
-        },
-        'fr': {
-            'cli_invalid': 'Commande CLI ou modèle CLI non valide. Saisissez uniquement un nom de programme ou un chemin sans caractères spéciaux comme & | < > ^ %.',
-            'cli_missing': 'La CLI {provider} est introuvable. Installez la CLI (p. ex. Claude Code, Gemini CLI ou Codex CLI) ou indiquez son chemin complet dans « Commande CLI ».',
-            'cli_start': 'La CLI {provider} n’a pas pu être démarrée.',
-            'cli_failed': 'La CLI {provider} s’est terminée avec le code d’erreur {code}. La CLI est-elle connectée ? Lancez-la une fois dans un terminal, connectez-vous, puis réessayez.',
-            'cli_timeout': 'La CLI {provider} n’a pas répondu en 5 minutes et a été arrêtée.',
-        },
-        'es': {
-            'cli_invalid': 'Comando CLI o modelo CLI no válido. Introduzca solo un nombre de programa o una ruta sin caracteres especiales como & | < > ^ %.',
-            'cli_missing': 'No se encontró la CLI de {provider}. Instale la CLI (p. ej. Claude Code, Gemini CLI o Codex CLI) o indique su ruta completa en «Comando CLI».',
-            'cli_start': 'No se pudo iniciar la CLI de {provider}.',
-            'cli_failed': 'La CLI de {provider} terminó con el código de error {code}. ¿Ha iniciado sesión en la CLI? Iníciela una vez en un terminal, inicie sesión y vuelva a intentarlo.',
-            'cli_timeout': 'La CLI de {provider} no respondió en 5 minutos y se detuvo.',
-        },
-        'it': {
-            'cli_invalid': 'Comando CLI o modello CLI non valido. Inserisci solo il nome del programma o un percorso senza caratteri speciali come & | < > ^ %.',
-            'cli_missing': 'La CLI di {provider} non è stata trovata. Installa la CLI (ad es. Claude Code, Gemini CLI o Codex CLI) o indica il percorso completo in «Comando CLI».',
-            'cli_start': 'Impossibile avviare la CLI di {provider}.',
-            'cli_failed': 'La CLI di {provider} è terminata con il codice di errore {code}. La CLI ha effettuato l’accesso? Avviala una volta in un terminale, accedi e riprova.',
-            'cli_timeout': 'La CLI di {provider} non ha risposto entro 5 minuti ed è stata interrotta.',
-        },
-    }
-    for _lang, _items in _AI_CLI_ERRORS.items():
-        AI_API_ERRORS[_lang].update(_items)
-    del _lang, _items
+    # Texts live in the shared core (desktop tab and browser GUI use the same messages).
+    AI_API_ERRORS = mpw_core.AI_ERROR_TEXTS
 
     def ai_api_error_text(self, kind, provider, code='', detail=''):
         texts = self.AI_API_ERRORS.get(self.effective_language(), self.AI_API_ERRORS['en'])
@@ -6593,17 +6468,11 @@ class Workstation(QMainWindow):
 
     def open_ai_browser(self):
         import webbrowser
-        urls = {'ChatGPT':'https://chatgpt.com/','Gemini':'https://gemini.google.com/','Claude':'https://claude.ai/'}
+        urls = mpw_core.AI_PLATFORM_URLS
         sid = self.ai_selected_song_id()
         if sid is None: return self.error('Bitte zuerst einen Song-Eintrag zum ausgewählten Projekt anlegen.')
-        prompt_text = self.ai_prompt(sid)
         # Browser workflow: two copy-ready sections instead of API-only JSON.
-        prompt_text = prompt_text.replace(
-            'Antworte ausschließlich als JSON-Objekt mit den Schlüsseln "style" und "lyrics" (beide Strings). Keine Markdown-Codeblöcke.',
-            'Erstelle den Prompt in zwei separaten Copy-Boxen. '
-            'Die erste Copy-Box enthält ausschließlich den Style, die zweite ausschließlich die Lyrics. '
-            'Beschrifte sie mit STYLE und LYRICS.'
-        )
+        prompt_text = mpw_core.ai_browser_prompt(self.ai_prompt(sid))
         clipboard = QApplication.clipboard()
         clipboard.setText(prompt_text)
         if clipboard.text() != prompt_text:
