@@ -84,6 +84,8 @@ def _read(server, func, args):
             return func(con, args)
     except core.ToolError as exc:
         raise ApiError(404, str(exc)) from exc
+    except sqlite3.OperationalError as exc:  # e.g. the desktop app is writing right now
+        raise ApiError(503, 'database_busy', {'detail': str(exc)}) from exc
 
 
 def api_bands(server, query, body):
@@ -157,7 +159,95 @@ def api_save_song(server, query, body, song_id):
         raise ApiError(503, 'database_busy', {'detail': str(exc)}) from exc
 
 
+# --------------------------------------------------------------------------- Bands (stage 2)
+
+def _write(server, func, *args):
+    """Run a core write function; BandDataError -> 400/404/409 with a stable code."""
+    try:
+        with closing(core.open_write(server.db_path)) as con:
+            return func(con, *args)
+    except ws.BandDataError as exc:
+        status = 404 if exc.code.endswith('_missing') else 409 if exc.code == 'preset_exists' else 400
+        raise ApiError(status, exc.code, exc.values) from exc
+    except core.ToolError as exc:
+        raise ApiError(404, str(exc)) from exc
+    except sqlite3.OperationalError as exc:
+        raise ApiError(503, 'database_busy', {'detail': str(exc)}) from exc
+
+
+def api_band_full(server, query, body, band_id):
+    """Band detail plus instrument ids (for editing), genre catalog and personas."""
+    def read(con, args):
+        band = core.tool_get_band(con, args)
+        band['instruments'] = ws.band_instruments(con, band['id'])
+        band['genre_catalog'] = [r[0] for r in con.execute('SELECT name FROM genre_catalog ORDER BY name COLLATE NOCASE')]
+        band['personas'] = list(ws.PERSONAS)
+        return band
+    return _read(server, read, {'band_id': int(band_id)})
+
+
+def api_hardware_choices(server, query, body):
+    category = query.get('category', [''])[0][:200]
+    return _read(server, lambda con, _args: dict(zip(('groups', 'details'), ws.saved_hardware_choices(con, category))), {})
+
+
+def api_presets(server, query, body):
+    return _read(server, core.tool_list_hardware_presets, {})
+
+
+def _body_text(body, key):
+    if not isinstance(body, dict):
+        raise ApiError(400, 'invalid_body')
+    return body.get(key, '')
+
+
+def api_update_band(server, query, body, band_id):
+    _write(server, ws.update_band_profile, int(band_id), _body_text(body, 'genre'),
+           _body_text(body, 'second_genre'), _body_text(body, 'persona'))
+    return api_band_full(server, query, None, band_id)
+
+
+def api_add_instrument(server, query, body, band_id):
+    new_id = _write(server, ws.add_instrument, int(band_id), _body_text(body, 'category'), _body_text(body, 'details'))
+    return {'id': new_id}
+
+
+def api_update_instrument(server, query, body, instrument_id):
+    _write(server, ws.update_instrument, int(instrument_id), _body_text(body, 'category'), _body_text(body, 'details'))
+    return {'saved': True}
+
+
+def api_delete_instrument(server, query, body, instrument_id):
+    _write(server, ws.delete_instrument, int(instrument_id))
+    return {'deleted': True}
+
+
+def api_save_preset(server, query, body, band_id):
+    preset_id, count = _write(server, ws.save_band_hardware_as_preset, int(band_id), _body_text(body, 'name'),
+                              bool(isinstance(body, dict) and body.get('overwrite') is True))
+    return {'id': preset_id, 'count': count}
+
+
+def api_transfer_preset(server, query, body, preset_id):
+    mode = _body_text(body, 'mode')
+    band_id = body.get('band_id') if isinstance(body, dict) else None
+    if not isinstance(band_id, int):
+        raise ApiError(400, 'invalid_field', {'field': 'band_id'})
+    if mode == 'replace' and body.get('confirm') is not True:  # replacing hardware needs an explicit yes
+        raise ApiError(400, 'confirm_required')
+    return _write(server, ws.transfer_preset_to_band, int(preset_id), band_id, mode)
+
+
 ROUTES = [
+    ('GET', re.compile(r'^/api/bands/(\d+)/full$'), api_band_full),
+    ('GET', re.compile(r'^/api/hardware/choices$'), api_hardware_choices),
+    ('GET', re.compile(r'^/api/presets$'), api_presets),
+    ('POST', re.compile(r'^/api/bands/(\d+)$'), api_update_band),
+    ('POST', re.compile(r'^/api/bands/(\d+)/instruments$'), api_add_instrument),
+    ('POST', re.compile(r'^/api/instruments/(\d+)$'), api_update_instrument),
+    ('POST', re.compile(r'^/api/instruments/(\d+)/delete$'), api_delete_instrument),
+    ('POST', re.compile(r'^/api/bands/(\d+)/presets$'), api_save_preset),
+    ('POST', re.compile(r'^/api/presets/(\d+)/transfer$'), api_transfer_preset),
     ('GET', re.compile(r'^/api/info$'), api_info),
     ('GET', re.compile(r'^/api/bands$'), api_bands),
     ('GET', re.compile(r'^/api/bands/(\d+)$'), api_band),
@@ -224,11 +314,15 @@ class MPWRequestHandler(BaseHTTPRequestHandler):
     def _body(self):
         length = int(self.headers.get('Content-Length') or 0)
         if length > MAX_BODY:
+            self.close_connection = True  # do not read a huge body; drop the connection after answering
             raise ApiError(413, 'too_large')
+        # Always read the whole request first: answering early can make Windows reset the
+        # connection, and the browser would see a network error instead of the message.
+        raw = self.rfile.read(length)
         if not (self.headers.get('Content-Type') or '').startswith('application/json'):
             raise ApiError(415, 'json_required')
         try:
-            return json.loads(self.rfile.read(length).decode('utf-8') or '{}')
+            return json.loads(raw.decode('utf-8') or '{}')
         except (ValueError, UnicodeDecodeError) as exc:
             raise ApiError(400, 'invalid_json') from exc
 

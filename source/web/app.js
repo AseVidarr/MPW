@@ -21,6 +21,34 @@ const I18N = {
     none: '–', bands_readonly: 'Bands werden in dieser Stufe nur angezeigt; bearbeiten in der Desktop-App.',
     no_projects: 'Keine Song/Projekte.', footer: 'Lokal auf diesem PC · dieselben Daten wie die installierte MPW',
     chars: '{n}/{max}', st_0: 'In Bearbeitung', st_1: 'Fertig', st_2: 'Veröffentlicht',
+    genre_main: "Hauptgenre",
+    genre_second: "Zweitgenre",
+    band_save: "Bandprofil speichern",
+    band_name_hint: "Der Bandname wird in der Desktop-App geändert (daran hängt der Band-Ordner).",
+    band_saved: "Bandprofil gespeichert.",
+    hw_add: "Instrument hinzufügen",
+    hw_save: "Änderung speichern",
+    cancel: "Abbrechen",
+    edit: "Bearbeiten",
+    delete: "Löschen",
+    confirm_delete_hw: "Diesen Hardware-Eintrag löschen?\n{entry}",
+    no_hardware: "Noch keine Instrumente / Hardware.",
+    presets: "Hardware-Presets",
+    no_presets: "Keine Presets gespeichert.",
+    preset_add: "Preset zur Band hinzufügen",
+    preset_replace: "Preset auf Band anwenden (ersetzen)",
+    preset_save: "Band-Hardware als Preset speichern",
+    preset_name_prompt: "Name des Studio-Setups:",
+    preset_overwrite: "Das Preset „{name}“ existiert bereits. Überschreiben?",
+    preset_saved: "Preset mit {count} Einträgen gespeichert.",
+    preset_added: "{added} Einträge hinzugefügt, {skipped} waren schon vorhanden.",
+    confirm_replace: "Preset „{name}“ auf „{band}“ anwenden?\n\nDie vorhandene Hardware dieser Band wird ERSETZT.",
+    preset_replaced: "Hardware ersetzt: {added} Einträge aus dem Preset.",
+    err_empty_field: "Gruppe und Instrument / Hardware dürfen nicht leer sein.",
+    err_too_long: "Eingabe ist zu lang.",
+    err_no_hardware: "Diese Band hat noch keine Hardware-Einträge.",
+    err_preset_damaged: "Das Preset ist beschädigt und kann nicht verwendet werden.",
+    err_missing: "Der Eintrag existiert nicht mehr. Bitte neu laden.",
   },
   en: {
     app_sub: 'in the browser', tab_songs: 'Songs & Suno', tab_bands: 'Bands', all_bands: 'All Bands',
@@ -40,6 +68,34 @@ const I18N = {
     none: '–', bands_readonly: 'Bands are view-only in this stage; edit them in the desktop app.',
     no_projects: 'No songs/projects.', footer: 'Local on this PC · same data as the installed MPW',
     chars: '{n}/{max}', st_0: 'In Progress', st_1: 'Completed', st_2: 'Published',
+    genre_main: "Primary genre",
+    genre_second: "Secondary genre",
+    band_save: "Save band profile",
+    band_name_hint: "The band name is changed in the desktop app (the band folder depends on it).",
+    band_saved: "Band profile saved.",
+    hw_add: "Add instrument",
+    hw_save: "Save change",
+    cancel: "Cancel",
+    edit: "Edit",
+    delete: "Delete",
+    confirm_delete_hw: "Delete this hardware entry?\n{entry}",
+    no_hardware: "No instruments / hardware yet.",
+    presets: "Hardware presets",
+    no_presets: "No presets saved.",
+    preset_add: "Add preset to band",
+    preset_replace: "Apply preset to band (replace)",
+    preset_save: "Save band hardware as preset",
+    preset_name_prompt: "Name of the studio setup:",
+    preset_overwrite: "Preset “{name}” already exists. Overwrite it?",
+    preset_saved: "Preset with {count} entries saved.",
+    preset_added: "{added} entries added, {skipped} already existed.",
+    confirm_replace: "Apply preset “{name}” to “{band}”?\n\nThe band’s existing hardware will be REPLACED.",
+    preset_replaced: "Hardware replaced: {added} entries from the preset.",
+    err_empty_field: "Group and instrument / hardware must not be empty.",
+    err_too_long: "Input is too long.",
+    err_no_hardware: "This band has no hardware entries yet.",
+    err_preset_damaged: "The preset is damaged and cannot be used.",
+    err_missing: "The entry no longer exists. Please reload.",
   },
   fr: {
     app_sub: 'dans le navigateur', tab_songs: 'Songs & Suno', tab_bands: 'Groupes', all_bands: 'Tous les groupes',
@@ -59,6 +115,34 @@ const I18N = {
     none: '–', bands_readonly: 'Les groupes sont en lecture seule à cette étape ; modifiez-les dans l’application de bureau.',
     no_projects: 'Aucun titre/projet.', footer: 'En local sur ce PC · mêmes données que MPW installé',
     chars: '{n}/{max}', st_0: 'En cours', st_1: 'Terminé', st_2: 'Publié',
+    genre_main: "Genre principal",
+    genre_second: "Genre secondaire",
+    band_save: "Enregistrer le profil",
+    band_name_hint: "Le nom du groupe se modifie dans l’application de bureau (le dossier du groupe en dépend).",
+    band_saved: "Profil du groupe enregistré.",
+    hw_add: "Ajouter un instrument",
+    hw_save: "Enregistrer la modification",
+    cancel: "Annuler",
+    edit: "Modifier",
+    delete: "Supprimer",
+    confirm_delete_hw: "Supprimer cet équipement ?\n{entry}",
+    no_hardware: "Aucun instrument / matériel.",
+    presets: "Préréglages de matériel",
+    no_presets: "Aucun préréglage enregistré.",
+    preset_add: "Ajouter le préréglage au groupe",
+    preset_replace: "Appliquer au groupe (remplacer)",
+    preset_save: "Enregistrer le matériel comme préréglage",
+    preset_name_prompt: "Nom de la configuration studio :",
+    preset_overwrite: "Le préréglage « {name} » existe déjà. Le remplacer ?",
+    preset_saved: "Préréglage de {count} éléments enregistré.",
+    preset_added: "{added} éléments ajoutés, {skipped} existaient déjà.",
+    confirm_replace: "Appliquer le préréglage « {name} » à « {band} » ?\n\nLe matériel existant du groupe sera REMPLACÉ.",
+    preset_replaced: "Matériel remplacé : {added} éléments du préréglage.",
+    err_empty_field: "Catégorie et instrument / matériel ne doivent pas être vides.",
+    err_too_long: "Saisie trop longue.",
+    err_no_hardware: "Ce groupe n’a pas encore de matériel.",
+    err_preset_damaged: "Le préréglage est endommagé et inutilisable.",
+    err_missing: "L’élément n’existe plus. Veuillez recharger.",
   },
   es: {
     app_sub: 'en el navegador', tab_songs: 'Songs & Suno', tab_bands: 'Bandas', all_bands: 'Todas las bandas',
@@ -78,6 +162,34 @@ const I18N = {
     none: '–', bands_readonly: 'En esta etapa las bandas solo se muestran; edítelas en la aplicación de escritorio.',
     no_projects: 'Sin canciones/proyectos.', footer: 'Local en este PC · los mismos datos que MPW instalado',
     chars: '{n}/{max}', st_0: 'En progreso', st_1: 'Terminado', st_2: 'Publicado',
+    genre_main: "Género principal",
+    genre_second: "Género secundario",
+    band_save: "Guardar perfil",
+    band_name_hint: "El nombre de la banda se cambia en la aplicación de escritorio (de él depende la carpeta).",
+    band_saved: "Perfil de la banda guardado.",
+    hw_add: "Añadir instrumento",
+    hw_save: "Guardar cambio",
+    cancel: "Cancelar",
+    edit: "Editar",
+    delete: "Eliminar",
+    confirm_delete_hw: "¿Eliminar este equipo?\n{entry}",
+    no_hardware: "Aún no hay instrumentos / equipo.",
+    presets: "Ajustes de equipo",
+    no_presets: "No hay ajustes guardados.",
+    preset_add: "Añadir ajuste a la banda",
+    preset_replace: "Aplicar ajuste a la banda (reemplazar)",
+    preset_save: "Guardar equipo como ajuste",
+    preset_name_prompt: "Nombre de la configuración de estudio:",
+    preset_overwrite: "El ajuste «{name}» ya existe. ¿Sobrescribirlo?",
+    preset_saved: "Ajuste con {count} elementos guardado.",
+    preset_added: "{added} elementos añadidos, {skipped} ya existían.",
+    confirm_replace: "¿Aplicar el ajuste «{name}» a «{band}»?\n\nSe REEMPLAZARÁ el equipo existente de la banda.",
+    preset_replaced: "Equipo reemplazado: {added} elementos del ajuste.",
+    err_empty_field: "Grupo e instrumento / equipo no pueden estar vacíos.",
+    err_too_long: "La entrada es demasiado larga.",
+    err_no_hardware: "Esta banda aún no tiene equipo.",
+    err_preset_damaged: "El ajuste está dañado y no se puede usar.",
+    err_missing: "La entrada ya no existe. Vuelva a cargar.",
   },
   it: {
     app_sub: 'nel browser', tab_songs: 'Songs & Suno', tab_bands: 'Band', all_bands: 'Tutte le band',
@@ -97,6 +209,34 @@ const I18N = {
     none: '–', bands_readonly: 'In questa fase le band sono solo visualizzate; modificale nell’app desktop.',
     no_projects: 'Nessun brano/progetto.', footer: 'In locale su questo PC · stessi dati di MPW installato',
     chars: '{n}/{max}', st_0: 'In corso', st_1: 'Completato', st_2: 'Pubblicato',
+    genre_main: "Genere principale",
+    genre_second: "Genere secondario",
+    band_save: "Salva profilo",
+    band_name_hint: "Il nome del gruppo si cambia nell’app desktop (da esso dipende la cartella).",
+    band_saved: "Profilo del gruppo salvato.",
+    hw_add: "Aggiungi strumento",
+    hw_save: "Salva modifica",
+    cancel: "Annulla",
+    edit: "Modifica",
+    delete: "Elimina",
+    confirm_delete_hw: "Eliminare questo elemento hardware?\n{entry}",
+    no_hardware: "Nessuno strumento / hardware.",
+    presets: "Preset hardware",
+    no_presets: "Nessun preset salvato.",
+    preset_add: "Aggiungi preset al gruppo",
+    preset_replace: "Applica preset al gruppo (sostituisci)",
+    preset_save: "Salva hardware come preset",
+    preset_name_prompt: "Nome della configurazione studio:",
+    preset_overwrite: "Il preset «{name}» esiste già. Sovrascriverlo?",
+    preset_saved: "Preset con {count} elementi salvato.",
+    preset_added: "{added} elementi aggiunti, {skipped} esistevano già.",
+    confirm_replace: "Applicare il preset «{name}» a «{band}»?\n\nL’hardware esistente del gruppo verrà SOSTITUITO.",
+    preset_replaced: "Hardware sostituito: {added} elementi dal preset.",
+    err_empty_field: "Gruppo e strumento / hardware non possono essere vuoti.",
+    err_too_long: "Testo troppo lungo.",
+    err_no_hardware: "Questo gruppo non ha ancora hardware.",
+    err_preset_damaged: "Il preset è danneggiato e non può essere usato.",
+    err_missing: "L’elemento non esiste più. Ricarica.",
   },
 };
 
@@ -318,7 +458,35 @@ function loadVersionIntoEditor() {
   showMessage(t('version_loaded', { id: state.version.id }), 'warn');
 }
 
-/* ------------------------------------------------------------------ Bands (read-only) */
+/* ------------------------------------------------------------------ Bands (stage 2: edit) */
+
+const bandState = { band: null, item: null, editing: null, presets: [], busy: false };
+
+// One band action at a time: further clicks are ignored until the running one has finished.
+async function bandAction(fn) {
+  if (bandState.busy) return;
+  bandState.busy = true;
+  try { await fn(); } finally { bandState.busy = false; }
+}
+
+function bandMessage(text, kind) {
+  const box = $('band-message');
+  box.textContent = text;
+  box.className = 'message' + (kind ? ' ' + kind : '');
+  box.hidden = !text;
+}
+
+function bandError(error) {
+  const code = error.data && error.data.error;
+  const map = { empty_field: 'err_empty_field', too_long: 'err_too_long', no_hardware: 'err_no_hardware',
+                preset_damaged: 'err_preset_damaged', band_missing: 'err_missing', instrument_missing: 'err_missing',
+                preset_missing: 'err_missing' };
+  bandMessage(map[code] ? t(map[code]) : (error.kind === 'connection' ? error.message : t('error', { detail: error.message })), 'error');
+}
+
+function fillOptions(list, values) {
+  list.replaceChildren(...values.map((value) => { const o = el('option'); o.value = value; return o; }));
+}
 
 async function loadBandList() {
   state.bands = await api('/api/bands');
@@ -326,22 +494,152 @@ async function loadBandList() {
     const item = el('li');
     item.append(el('span', band.name));
     item.append(el('span', [band.genre, band.second_genre].filter(Boolean).join(' / ') || t('none'), 'sub'));
-    item.addEventListener('click', () => selectBand(band.id, item));
+    item.addEventListener('click', () => bandAction(async () => { bandMessage(''); await selectBand(band.id, item); }).catch(bandError));
     return item;
   }));
 }
 
-async function selectBand(id, item) {
-  const band = await api('/api/bands/' + id);
-  document.querySelectorAll('#band-list li').forEach((li) => li.classList.toggle('active', li === item));
-  $('band-name').textContent = band.name;
-  $('band-genres').textContent = [band.genre, band.second_genre].filter(Boolean).join(' / ') || t('none');
-  $('band-persona').textContent = band.persona || t('none');
-  $('band-hardware').replaceChildren(...band.instruments.map((row) => {
-    const tr = el('tr'); tr.append(el('td', row.category), el('td', row.details)); return tr;
+async function refreshHardwareChoices() {
+  const group = $('hw-group').value.trim();
+  const choices = await api('/api/hardware/choices?category=' + encodeURIComponent(group));
+  fillOptions($('hw-groups'), choices.groups);
+  fillOptions($('hw-details-list'), choices.details);
+}
+
+async function loadPresets() {
+  const presets = await api('/api/presets');
+  bandState.presets = Array.isArray(presets) ? presets : [];
+  const select = $('preset-select');
+  select.replaceChildren(...bandState.presets.map((p) => {
+    const o = el('option', p.name + ' (' + p.items.length + ')'); o.value = p.id; return o;
   }));
+  if (!bandState.presets.length) { const o = el('option', t('no_presets')); o.value = ''; select.append(o); }
+  for (const id of ['btn-preset-add', 'btn-preset-replace']) $(id).disabled = !bandState.presets.length;
+}
+
+async function selectBand(id, item) {
+  const band = await api('/api/bands/' + id + '/full');
+  bandState.band = band;
+  if (item) bandState.item = item;
+  document.querySelectorAll('#band-list li').forEach((li) => li.classList.toggle('active', li === bandState.item));
+  $('band-name').textContent = band.name;
+  $('b-genre').value = band.genre || '';
+  $('b-second').value = band.second_genre || '';
+  fillOptions($('genre-options'), band.genre_catalog);
+  $('b-persona').replaceChildren(...band.personas.map((p) => { const o = el('option', p); o.value = p; return o; }));
+  $('b-persona').value = band.personas.includes(band.persona) ? band.persona : band.personas[0];
+  renderHardware();
+  resetHardwareForm();
+  renderProjects(id, band.projects);
+  $('band-empty').hidden = true;
+  $('band-body').hidden = false;
+  await Promise.all([refreshHardwareChoices(), loadPresets()]);
+}
+
+function renderHardware() {
+  const rows = bandState.band.instruments.map((row) => {
+    const tr = el('tr');
+    tr.classList.toggle('editing', bandState.editing === row.id);
+    const actions = el('td', null, 'row-actions');
+    const edit = el('button', t('edit'));
+    edit.addEventListener('click', () => startEditHardware(row));
+    const del = el('button', t('delete'), 'danger');
+    del.addEventListener('click', () => bandAction(() => deleteHardware(row)));
+    actions.append(edit, del);
+    tr.append(el('td', row.category), el('td', row.details), actions);
+    return tr;
+  });
+  if (!rows.length) { const tr = el('tr'); const td = el('td', t('no_hardware'), 'hint'); td.colSpan = 3; tr.append(td); rows.push(tr); }
+  $('band-hardware').replaceChildren(...rows);
+}
+
+function resetHardwareForm() {
+  bandState.editing = null;
+  $('hw-group').value = '';
+  $('hw-details').value = '';
+  $('btn-hw-save').textContent = t('hw_add');
+  $('btn-hw-cancel').hidden = true;
+}
+
+function startEditHardware(row) {
+  bandState.editing = row.id;
+  $('hw-group').value = row.category;
+  $('hw-details').value = row.details;
+  $('btn-hw-save').textContent = t('hw_save');
+  $('btn-hw-cancel').hidden = false;
+  renderHardware();
+  refreshHardwareChoices().catch(bandError);
+}
+
+async function reloadBand(message) {
+  await selectBand(bandState.band.id);
+  await loadBandList();
+  document.querySelectorAll('#band-list li').forEach((li, i) => {
+    if (state.bands[i] && state.bands[i].id === bandState.band.id) { li.classList.add('active'); bandState.item = li; }
+  });
+  if (message) bandMessage(message);
+}
+
+async function saveBandProfile() {
+  try {
+    await api('/api/bands/' + bandState.band.id, { method: 'POST',
+      body: { genre: $('b-genre').value, second_genre: $('b-second').value, persona: $('b-persona').value } });
+    await reloadBand(t('band_saved'));
+  } catch (error) { bandError(error); }
+}
+
+async function saveHardware() {
+  const body = { category: $('hw-group').value, details: $('hw-details').value };
+  try {
+    if (bandState.editing) await api('/api/instruments/' + bandState.editing, { method: 'POST', body });
+    else await api('/api/bands/' + bandState.band.id + '/instruments', { method: 'POST', body });
+    bandMessage('');
+    await selectBand(bandState.band.id);
+  } catch (error) { bandError(error); }
+}
+
+async function deleteHardware(row) {
+  if (!confirm(t('confirm_delete_hw', { entry: row.category + ': ' + row.details }))) return;
+  try {
+    await api('/api/instruments/' + row.id + '/delete', { method: 'POST', body: {} });
+    bandMessage('');
+    await selectBand(bandState.band.id);
+  } catch (error) { bandError(error); }
+}
+
+async function transferPreset(mode) {
+  const id = Number($('preset-select').value);
+  const preset = bandState.presets.find((p) => p.id === id);
+  if (!preset) return;
+  if (mode === 'replace' && !confirm(t('confirm_replace', { name: preset.name, band: bandState.band.name }))) return;
+  try {
+    const result = await api('/api/presets/' + id + '/transfer', { method: 'POST',
+      body: { band_id: bandState.band.id, mode, confirm: mode === 'replace' } });
+    await selectBand(bandState.band.id);
+    bandMessage(mode === 'add' ? t('preset_added', result) : t('preset_replaced', result));
+  } catch (error) { bandError(error); }
+}
+
+async function saveAsPreset() {
+  const name = (prompt(t('preset_name_prompt')) || '').trim();
+  if (!name) return;
+  const url = '/api/bands/' + bandState.band.id + '/presets';
+  try {
+    let result;
+    try {
+      result = await api(url, { method: 'POST', body: { name } });
+    } catch (error) {
+      if (error.status !== 409 || !confirm(t('preset_overwrite', { name }))) throw error;
+      result = await api(url, { method: 'POST', body: { name, overwrite: true } });
+    }
+    await loadPresets();
+    bandMessage(t('preset_saved', result));
+  } catch (error) { if (error.status !== 409) bandError(error); }
+}
+
+function renderProjects(bandId, rows) {
   const projects = new Map();
-  for (const row of band.projects) {
+  for (const row of rows) {
     if (!projects.has(row.id)) projects.set(row.id, { name: row.name, songs: [] });
     if (row.song_id) projects.get(row.id).songs.push(row);
   }
@@ -351,14 +649,12 @@ async function selectBand(id, item) {
     item.append(el('span', project.name));
     for (const song of project.songs) {
       const link = el('span', '♪ ' + song.song_title, 'sub');
-      link.addEventListener('click', (event) => { event.stopPropagation(); openSongFromBand(id, song.song_id); });
+      link.addEventListener('click', (event) => { event.stopPropagation(); openSongFromBand(bandId, song.song_id); });
       item.append(link);
     }
     return item;
   }));
   if (!projects.size) list.replaceChildren(el('li', t('no_projects'), 'hint'));
-  $('band-empty').hidden = true;
-  $('band-body').hidden = false;
 }
 
 async function openSongFromBand(bandId, songId) {
@@ -368,6 +664,15 @@ async function openSongFromBand(bandId, songId) {
   await loadSongs();
   await selectSong(songId);
 }
+
+let hwTimer;
+$('hw-group').addEventListener('input', () => { clearTimeout(hwTimer); hwTimer = setTimeout(() => refreshHardwareChoices().catch(bandError), 250); });
+$('btn-band-save').addEventListener('click', () => bandAction(saveBandProfile));
+$('btn-hw-save').addEventListener('click', () => bandAction(saveHardware));
+$('btn-hw-cancel').addEventListener('click', () => { resetHardwareForm(); renderHardware(); });
+$('btn-preset-add').addEventListener('click', () => bandAction(() => transferPreset('add')));
+$('btn-preset-replace').addEventListener('click', () => bandAction(() => transferPreset('replace')));
+$('btn-preset-save').addEventListener('click', () => bandAction(saveAsPreset));
 
 /* ------------------------------------------------------------------ start */
 

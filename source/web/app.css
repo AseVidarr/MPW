@@ -70,6 +70,14 @@ h3 { font-size: 13px; margin: 8px 0 2px; color: var(--muted); }
 .table { border-collapse: collapse; width: 100%; }
 .table th, .table td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--border); }
 .table th { color: var(--muted); font-weight: 600; }
+.hw-form { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.hw-form input { flex: 1 1 200px; }
+.hw-form select { flex: 1 1 220px; }
+.table td.row-actions { white-space: nowrap; text-align: right; }
+.table td.row-actions button { padding: 3px 10px; margin-left: 4px; font-weight: 500; }
+.table tr.editing td { background: #263c5a; }
+button.danger { background: #6b2f2f; border-color: #8a3c3c; }
+button.danger:hover:not(:disabled) { background: #7f3a3a; }
 .footer { padding: 4px 16px; color: var(--muted); font-size: 11px; background: var(--panel); border-top: 1px solid var(--border); }
 
 @media (max-width: 1100px) {

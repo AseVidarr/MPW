@@ -1526,3 +1526,128 @@ def save_prompt_text_file(con, sid, version_id, style, lyrics, band_root=None):
     with (folder / filename).open('x', encoding='utf-8', newline='\n') as stream:
         stream.write(payload)
     return folder / filename
+
+
+# ---------------------------------------------------------------------------
+# Bands tab: profile, instruments/hardware and hardware presets (database only).
+# Same rules as the desktop app; shared with the browser GUI (mpw_web.py).
+# ---------------------------------------------------------------------------
+PERSONAS = ('Keep Current', 'Keine', 'Individuell')
+HARDWARE_TEXT_LIMIT = 500
+
+
+class BandDataError(ValueError):
+    """Validation problem with a stable code for translated messages."""
+
+    def __init__(self, code, **values):
+        super().__init__(code)
+        self.code, self.values = code, values
+
+
+def _clean_text(value, field, limit=HARDWARE_TEXT_LIMIT, required=True):
+    if not isinstance(value, str):
+        raise BandDataError('invalid_field', field=field)
+    value = value.strip()
+    if required and not value:
+        raise BandDataError('empty_field', field=field)
+    if len(value) > limit:
+        raise BandDataError('too_long', field=field, limit=limit)
+    return value
+
+
+def update_band_profile(con, band_id, genre, second_genre, persona):
+    """Genres and persona of an existing band (the name stays: band folders depend on it)."""
+    genre = _clean_text(genre, 'genre', 200, required=False)
+    second_genre = _clean_text(second_genre, 'second_genre', 200, required=False)
+    if persona not in PERSONAS:
+        raise BandDataError('invalid_persona')
+    with con:
+        if con.execute('UPDATE bands SET genre=?,second_genre=?,persona=? WHERE id=?',
+                       (genre, second_genre, persona, band_id)).rowcount != 1:
+            raise BandDataError('band_missing')
+        # keep the genre menus complete, like the desktop genre catalog
+        for value in (genre, second_genre):
+            if value:
+                con.execute('INSERT OR IGNORE INTO genre_catalog(name) VALUES(?)', (value,))
+
+
+def band_instruments(con, band_id):
+    return [{'id': r[0], 'category': r[1] or '', 'details': r[2] or ''} for r in con.execute(
+        'SELECT id,category,details FROM instruments WHERE band_id=? ORDER BY id', (band_id,))]
+
+
+def add_instrument(con, band_id, category, details):
+    category, details = _clean_text(category, 'category'), _clean_text(details, 'details')
+    with con:
+        if con.execute('SELECT 1 FROM bands WHERE id=?', (band_id,)).fetchone() is None:
+            raise BandDataError('band_missing')
+        return con.execute('INSERT INTO instruments(band_id,category,details) VALUES(?,?,?)',
+                           (band_id, category, details)).lastrowid
+
+
+def update_instrument(con, instrument_id, category, details):
+    category, details = _clean_text(category, 'category'), _clean_text(details, 'details')
+    with con:
+        if con.execute('UPDATE instruments SET category=?,details=? WHERE id=?',
+                       (category, details, instrument_id)).rowcount != 1:
+            raise BandDataError('instrument_missing')
+
+
+def delete_instrument(con, instrument_id):
+    with con:
+        if con.execute('DELETE FROM instruments WHERE id=?', (instrument_id,)).rowcount != 1:
+            raise BandDataError('instrument_missing')
+
+
+def load_preset_items(con, preset_id):
+    """(name, [[category, details], ...]) of a saved preset; damaged data is refused."""
+    row = con.execute('SELECT name,items_json FROM hardware_presets WHERE id=?', (preset_id,)).fetchone()
+    if row is None:
+        raise BandDataError('preset_missing')
+    try:
+        items = json.loads(row[1])
+    except (ValueError, TypeError) as exc:
+        raise BandDataError('preset_damaged') from exc
+    if not isinstance(items, list) or any(not isinstance(x, list) or len(x) != 2
+                                          or not all(isinstance(v, str) for v in x) for x in items):
+        raise BandDataError('preset_damaged')
+    return row[0], items
+
+
+def save_band_hardware_as_preset(con, band_id, name, overwrite=False):
+    """Store the band's hardware as a named preset. Returns (preset id, item count)."""
+    name = _clean_text(name, 'name', 120)
+    items = [[c, d] for c, d in con.execute(
+        'SELECT category,details FROM instruments WHERE band_id=? ORDER BY id', (band_id,))]
+    if not items:
+        raise BandDataError('no_hardware')
+    payload = json.dumps(items, ensure_ascii=False)
+    with con:
+        existing = con.execute('SELECT id FROM hardware_presets WHERE name=? COLLATE NOCASE', (name,)).fetchone()
+        if existing and not overwrite:
+            raise BandDataError('preset_exists', name=name)
+        if existing:
+            con.execute('UPDATE hardware_presets SET items_json=? WHERE id=?', (payload, existing[0]))
+            return existing[0], len(items)
+        return con.execute('INSERT INTO hardware_presets(name,items_json) VALUES(?,?)', (name, payload)).lastrowid, len(items)
+
+
+def transfer_preset_to_band(con, preset_id, band_id, mode):
+    """mode 'add': only missing entries (existing hardware stays); 'replace': all hardware replaced.
+    Returns {'name', 'added', 'skipped', 'removed'}."""
+    if mode not in ('add', 'replace'):
+        raise BandDataError('invalid_mode')
+    name, items = load_preset_items(con, preset_id)
+    if con.execute('SELECT 1 FROM bands WHERE id=?', (band_id,)).fetchone() is None:
+        raise BandDataError('band_missing')
+    existing = con.execute('SELECT category,details FROM instruments WHERE band_id=?', (band_id,)).fetchall()
+    with con:
+        if mode == 'replace':
+            con.execute('DELETE FROM instruments WHERE band_id=?', (band_id,))
+            new_items = [(c, d) for c, d in items]
+        else:
+            new_items = preset_items_missing(existing, items)
+        con.executemany('INSERT INTO instruments(band_id,category,details) VALUES(?,?,?)',
+                        [(band_id, c, d) for c, d in new_items])
+    return {'name': name, 'added': len(new_items), 'skipped': len(items) - len(new_items) if mode == 'add' else 0,
+            'removed': len(existing) if mode == 'replace' else 0}

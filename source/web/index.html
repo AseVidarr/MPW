@@ -71,16 +71,39 @@
       <div class="empty" id="band-empty" data-i18n="no_band">Bitte links eine Band auswählen.</div>
       <div id="band-body" hidden>
         <h1 id="band-name"></h1>
-        <dl class="facts">
-          <dt data-i18n="genres">Genres</dt><dd id="band-genres"></dd>
-          <dt data-i18n="persona">Persona</dt><dd id="band-persona"></dd>
-        </dl>
+        <div class="fields">
+          <label><span data-i18n="genre_main">Hauptgenre</span><input id="b-genre" list="genre-options" maxlength="200"></label>
+          <label><span data-i18n="genre_second">Zweitgenre</span><input id="b-second" list="genre-options" maxlength="200"></label>
+          <label><span data-i18n="persona">Persona</span><select id="b-persona"></select></label>
+        </div>
+        <datalist id="genre-options"></datalist>
+        <div class="actions">
+          <button id="btn-band-save" class="primary" data-i18n="band_save">Bandprofil speichern</button>
+          <span class="hint" data-i18n="band_name_hint">Der Bandname wird in der Desktop-App geändert (Band-Ordner).</span>
+        </div>
+        <div id="band-message" class="message" hidden></div>
+
         <h2 data-i18n="hardware">Instrumente / Hardware</h2>
-        <table class="table"><thead><tr><th data-i18n="group">Gruppe</th><th data-i18n="hardware">Instrumente / Hardware</th></tr></thead>
+        <table class="table"><thead><tr><th data-i18n="group">Gruppe</th><th data-i18n="hardware">Instrumente / Hardware</th><th></th></tr></thead>
           <tbody id="band-hardware"></tbody></table>
+        <div class="hw-form">
+          <input id="hw-group" list="hw-groups" maxlength="500" data-i18n-placeholder="group">
+          <input id="hw-details" list="hw-details-list" maxlength="500" data-i18n-placeholder="hardware">
+          <button id="btn-hw-save" data-i18n="hw_add">Instrument hinzufügen</button>
+          <button id="btn-hw-cancel" data-i18n="cancel" hidden>Abbrechen</button>
+        </div>
+        <datalist id="hw-groups"></datalist><datalist id="hw-details-list"></datalist>
+
+        <h2 data-i18n="presets">Hardware-Presets</h2>
+        <div class="hw-form">
+          <select id="preset-select"></select>
+          <button id="btn-preset-add" data-i18n="preset_add">Preset zur Band hinzufügen</button>
+          <button id="btn-preset-replace" data-i18n="preset_replace">Preset auf Band anwenden (ersetzen)</button>
+          <button id="btn-preset-save" data-i18n="preset_save">Band-Hardware als Preset speichern</button>
+        </div>
+
         <h2 data-i18n="projects">Song/Projekte</h2>
         <ul id="band-projects" class="list"></ul>
-        <div class="hint" data-i18n="bands_readonly">Bands werden in dieser Stufe nur angezeigt; bearbeiten in der Desktop-App.</div>
       </div>
     </div>
   </section>

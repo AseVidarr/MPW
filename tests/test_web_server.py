@@ -151,6 +151,59 @@ class WebServerTests(unittest.TestCase):
         self.assertEqual(self.json_call('POST', '/api/songs/99', self.payload())[0], 404)
         self.assertEqual(self.json_call('POST', '/api/bands', {})[0], 405)
 
+    # --- stage 2: bands editing ---
+    def test_band_profile_update_keeps_name_and_fills_genre_catalog(self):
+        status, band = self.json_call('POST', '/api/bands/1', {'genre': 'Delta Blues', 'second_genre': 'Folk Metal',
+                                                                'persona': 'Individuell', 'name': 'Hacked'})
+        self.assertEqual(status, 200)
+        self.assertEqual((band['name'], band['genre'], band['persona']), ('Iron Delta', 'Delta Blues', 'Individuell'))
+        self.assertIn('Folk Metal', band['genre_catalog'])
+        self.assertEqual(self.json_call('POST', '/api/bands/1', {'genre': '', 'second_genre': '', 'persona': 'Boss'})[1]['error'],
+                         'invalid_persona')
+        self.assertEqual(self.json_call('POST', '/api/bands/99', {'genre': '', 'second_genre': '', 'persona': 'Keine'})[0], 404)
+
+    def test_hardware_add_update_delete_and_choices(self):
+        status, created = self.json_call('POST', '/api/bands/1/instruments', {'category': ' Mikrofon ', 'details': 'SM7B'})
+        self.assertEqual(status, 200)
+        band = self.json_call('GET', '/api/bands/1/full')[1]
+        self.assertEqual([(i['category'], i['details']) for i in band['instruments']],
+                         [('Gitarre', 'Les Paul'), ('Mikrofon', 'SM7B')])
+        self.assertEqual(self.json_call('POST', f"/api/instruments/{created['id']}", {'category': 'Mikrofon', 'details': 'U87'})[0], 200)
+        choices = self.json_call('GET', '/api/hardware/choices?category=mikrofon')[1]
+        self.assertEqual((choices['groups'], choices['details']), (['Gitarre', 'Mikrofon'], ['U87']))
+        self.assertEqual(self.json_call('POST', f"/api/instruments/{created['id']}/delete", {})[0], 200)
+        self.assertEqual(self.json_call('POST', f"/api/instruments/{created['id']}/delete", {})[0], 404)
+        self.assertEqual(self.json_call('POST', '/api/bands/1/instruments', {'category': '', 'details': 'x'})[1]['error'], 'empty_field')
+        self.assertEqual(self.json_call('POST', '/api/bands/1/instruments', {'category': 'x', 'details': 'y' * 501})[1]['error'], 'too_long')
+        self.assertEqual(self.json_call('POST', '/api/bands/1/instruments', {'category': 'x', 'details': 'y'}, token=False)[0], 403)
+
+    def test_presets_save_add_and_replace_with_confirmation(self):
+        status, saved = self.json_call('POST', '/api/bands/1/presets', {'name': 'Studio A'})
+        self.assertEqual((status, saved['count']), (200, 1))
+        self.assertEqual(self.json_call('POST', '/api/bands/1/presets', {'name': 'studio a'})[0], 409)   # exists
+        self.assertEqual(self.json_call('POST', '/api/bands/1/presets', {'name': 'studio a', 'overwrite': True})[0], 200)
+        with closing(sqlite3.connect(self.db)) as con, con:
+            con.execute("INSERT INTO bands(name) VALUES ('Band B')")
+            con.execute("INSERT INTO instruments(band_id,category,details) VALUES (2,'Drums','Tama')")
+        pid = self.json_call('GET', '/api/presets')[1][0]['id']
+        status, result = self.json_call('POST', f'/api/presets/{pid}/transfer', {'band_id': 2, 'mode': 'add'})
+        self.assertEqual((status, result['added'], result['skipped']), (200, 1, 0))
+        self.assertEqual(self.json_call('POST', f'/api/presets/{pid}/transfer', {'band_id': 2, 'mode': 'add'})[1]['skipped'], 1)
+        # replacing needs an explicit confirmation flag
+        self.assertEqual(self.json_call('POST', f'/api/presets/{pid}/transfer', {'band_id': 2, 'mode': 'replace'})[1]['error'],
+                         'confirm_required')
+        status, result = self.json_call('POST', f'/api/presets/{pid}/transfer', {'band_id': 2, 'mode': 'replace', 'confirm': True})
+        self.assertEqual((status, result['removed'], result['added']), (200, 2, 1))
+        band = self.json_call('GET', '/api/bands/2/full')[1]
+        self.assertEqual([(i['category'], i['details']) for i in band['instruments']], [('Gitarre', 'Les Paul')])
+        with closing(sqlite3.connect(self.db)) as con, con:
+            con.execute("INSERT INTO hardware_presets(name,items_json) VALUES ('kaputt','{not json')")
+        bad = self.json_call('GET', '/api/presets')[1]
+        bad_id = next(p['id'] for p in bad if p['name'] == 'kaputt')
+        self.assertEqual(self.json_call('POST', f'/api/presets/{bad_id}/transfer', {'band_id': 2, 'mode': 'add'})[1]['error'],
+                         'preset_damaged')
+        self.assertEqual(self.json_call('POST', '/api/bands/2/presets', {'name': ''})[1]['error'], 'empty_field')
+
     def test_language_from_mpw_configuration(self):
         # Own temp root: never read or write a configuration outside the test folder.
         saved_root = self.ws.ROOT
@@ -171,7 +224,9 @@ class WebFilesTests(unittest.TestCase):
         for lang in ('de', 'en', 'fr', 'es', 'it'):
             start = block.index(f'\n  {lang}: {{')
             end = block.index('\n  },', start)
-            languages[lang] = set(__import__('re').findall(r'\b([a-z_0-9]+): ', block[start + 6:end]))
+            # strip string literals first, so words like "ersetzt:" inside texts are not taken for keys
+            body = __import__('re').sub(r"'(?:\\.|[^'\\])*'|\"(?:\\.|[^\"\\])*\"", '""', block[start + 6:end])
+            languages[lang] = set(__import__('re').findall(r'\b([a-z_0-9]+): ', body))
         for lang, keys in languages.items():
             self.assertEqual(keys, languages['de'], lang)
         html = (SOURCE_DIR / 'web' / 'index.html').read_text(encoding='utf-8')
