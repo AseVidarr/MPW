@@ -749,6 +749,120 @@ def restore_backup(archive_path, root):
             raise
 
 
+# ---------------------------------------------------------------------------
+# Backup settings, inventory and audit log (shared by the desktop tabs and the browser GUI).
+# ---------------------------------------------------------------------------
+BACKUP_INTERVALS = (0, 1, 3, 7, 14, 30)
+BACKUP_KEEP_COUNTS = (3, 5, 10, 20, 50)
+BACKUP_LOG_NAME = 'MPW_Backup_Pruefprotokoll.jsonl'
+
+
+def backup_settings(root=None):
+    settings_file = Path(root or ROOT) / 'backup_settings.json'
+    try:
+        data = json.loads(settings_file.read_text(encoding='utf-8')) if settings_file.exists() else {}
+        return data if isinstance(data, dict) else {}
+    except (OSError, ValueError, TypeError):
+        return {}
+
+
+def save_backup_settings(root=None, **changes):
+    root = Path(root or ROOT)
+    data = backup_settings(root)
+    data.update(changes)
+    settings_file = root / 'backup_settings.json'
+    tmp = settings_file.with_suffix('.json.tmp')
+    tmp.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding='utf-8')
+    tmp.replace(settings_file)
+
+
+def backup_directory(root=None):
+    """Persistently configured backup folder, independent of the live database."""
+    root = Path(root or ROOT)
+    configured = backup_settings(root).get('backup_directory', '')
+    if isinstance(configured, str) and configured.strip():
+        return Path(configured).expanduser()
+    return root / 'backups'
+
+
+def backup_inventory(folder):
+    """ZIP files in the backup folder, newest first: [{'name','bytes','modified','automatic'}]."""
+    folder = Path(folder)
+    if not folder.is_dir():
+        return None
+    items = []
+    for path in folder.glob('*.zip'):
+        try:
+            if path.is_file():
+                stat = path.stat()
+                items.append({'name': path.name, 'bytes': stat.st_size, 'modified': stat.st_mtime,
+                              'automatic': path.name.startswith('MPW_auto_')})
+        except OSError:
+            continue
+    return sorted(items, key=lambda item: item['modified'], reverse=True)
+
+
+def backup_log_entries(folder, limit=100):
+    """Last entries of the append-only backup audit log (newest last); unreadable lines are skipped."""
+    path = Path(folder) / BACKUP_LOG_NAME
+    if not path.is_file():
+        return []
+    entries = []
+    for line in path.read_text(encoding='utf-8', errors='replace').splitlines():
+        try:
+            entry = json.loads(line)
+        except (ValueError, TypeError):
+            continue
+        if isinstance(entry, dict) and entry.get('status') in ('OK', 'FEHLER'):
+            entries.append({k: str(entry.get(k, '')) for k in ('timestamp', 'file', 'status', 'details')})
+    return entries[-limit:] if limit else entries
+
+
+def automatic_backup_due(root=None, now=None):
+    """(interval_days, last_automatic_timestamp or None, next_due_timestamp or None) – read-only."""
+    root = Path(root or ROOT)
+    interval = backup_settings(root).get('automatic_interval_days', 0)
+    interval = interval if isinstance(interval, int) and interval > 0 else 0
+    folder = backup_directory(root)
+    last = None
+    if folder.is_dir():
+        try:
+            last = max((p.stat().st_mtime for p in folder.glob('MPW_auto_*.zip') if p.is_file()), default=None)
+        except OSError:
+            last = None
+    due = (last + interval * 86400 if last else (now or datetime.now().timestamp())) if interval else None
+    return interval, last, due
+
+
+def backup_file_in(folder, name):
+    """A backup ZIP chosen by plain file name inside the backup folder (no paths, no other files)."""
+    if not isinstance(name, str) or not name.lower().endswith('.zip') or Path(name).name != name or name in ('.', '..'):
+        raise BandDataError('invalid_backup_name')
+    path = Path(folder) / name
+    if not path.is_file():
+        raise BandDataError('backup_missing')
+    return path
+
+
+def test_backup_destination(root, folder):
+    """Write test (a temporary file that is removed again) plus free-space check; creates no backup."""
+    folder = Path(folder)
+    if not folder.is_dir():
+        raise OSError(f'Backup-Ordner nicht erreichbar: {folder}')
+    with tempfile.NamedTemporaryFile(prefix='mpw_zieltest_', suffix='.tmp', dir=folder, delete=True) as test:
+        test.write(b'MPW backup target write test\n')
+        test.flush()
+        os.fsync(test.fileno())
+    return check_backup_free_space(root, folder / 'MPW_test.zip')
+
+
+def new_backup_path(root, prefix='MPW_backup'):
+    folder = backup_directory(root)
+    if not folder.is_dir():
+        raise OSError(f'Das konfigurierte Backup-Laufwerk ist nicht verfügbar: {folder}')
+    return folder / f'{prefix}_{datetime.now():%Y%m%d_%H%M%S_%f}.zip'
+
+
 def extract_prompt(text):
     """Accept JSON or MPW tagged output. Never run generated content as code."""
     candidate = text.strip()

@@ -111,6 +111,11 @@ button.danger:hover:not(:disabled) { background: #7f3a3a; }
 .release-form select, .release-form input { flex: 1 1 140px; }
 @media (max-width: 1100px) { .mr-columns { grid-template-columns: 1fr; } #view-media { grid-template-columns: 240px 1fr; } }
 #view-conn { grid-template-columns: 1fr; }
+#view-backup { grid-template-columns: 1fr; }
+#bk-body { display: flex; flex-direction: column; gap: 12px; max-width: 980px; }
+#bk-folder-input { flex: 1 1 360px; }
+.bk-ok { color: var(--good); }
+.bk-bad { color: var(--bad); }
 #conn-body { display: flex; flex-direction: column; gap: 12px; max-width: 980px; }
 .conn-group { border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 14px; background: var(--panel); }
 .conn-group legend { font-weight: 600; padding: 0 6px; }

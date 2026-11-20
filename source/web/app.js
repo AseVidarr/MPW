@@ -63,6 +63,67 @@ const I18N = {
     band_created: "Band „{name}“ angelegt. Verzeichnis: {folder}",
     band_imported: "Band „{name}“ übernommen. Vorhandenes Verzeichnis: {folder} (nichts verändert).",
     band_prompt_warning: "Der Prompt-Ordner konnte nicht angelegt werden: {detail}",
+    tab_backup: "Backup",
+    bk_intro: "Vollbackup sichert ausschließlich die MPW-Datenbank – keine Medien oder Band-/Projektdateien. Jede Sicherung wird auf ZIP- und SQLite-Integrität geprüft und im Prüfprotokoll vermerkt.",
+    bk_status: "Status",
+    bk_create: "Vollbackup jetzt erstellen …",
+    bk_integrity: "Datenbank-Integrität prüfen",
+    bk_test: "Backup-Ziel testen",
+    bk_check_all: "Alle Backups prüfen",
+    bk_log: "Prüfprotokoll anzeigen",
+    bk_automatic: "Automatische Sicherung",
+    bk_interval: "Sicherungsintervall:",
+    bk_keep: "Aufbewahrung:",
+    bk_settings_save: "Einstellungen speichern",
+    bk_auto_hint: "Fällige automatische Sicherungen erstellt die Desktop-App beim Programmstart. Nur automatische MPW_auto_-Backups werden nach der gewählten Anzahl gelöscht.",
+    bk_folder: "Backup-Ordner",
+    bk_folder_save: "Ordner übernehmen …",
+    bk_list: "Vorhandene Backups",
+    bk_err_word: "Das Bestätigungswort stimmt nicht. Es wurde nichts wiederhergestellt.",
+    bk_err_busy: "Es läuft bereits eine Sicherung, Prüfung oder Wiederherstellung. Bitte warten.",
+    bk_err_unreachable: "Der Backup-Ordner ist nicht erreichbar (Laufwerk angeschlossen?).",
+    bk_err_absolute: "Bitte einen vollständigen Ordnerpfad angeben (z. B. D:\\MPW-Backups oder /Volumes/Backup/MPW).",
+    bk_err_folder: "Der Ordner kann nicht verwendet werden: {detail}",
+    bk_off: "Deaktiviert",
+    bk_daily: "Täglich",
+    bk_3days: "Alle 3 Tage",
+    bk_weekly: "Wöchentlich",
+    bk_14days: "Alle 14 Tage",
+    bk_monthly: "Monatlich (30 Tage)",
+    bk_keep_n: "{n} automatische Backups",
+    bk_folder_ok: "Backup-Ordner: {folder}",
+    bk_folder_missing: "Backup-Ordner nicht erreichbar: {folder}",
+    bk_stats: "Backup-Statistik: {ok} erfolgreich · {failed} fehlgeschlagen",
+    bk_last_failed: "LETZTES BACKUP FEHLGESCHLAGEN: {time} · {file}\nGrund: {detail}",
+    bk_last_ok: "Letzte erfolgreiche Prüfung: {time} · {file}",
+    bk_auto_off: "Automatische Sicherung: deaktiviert",
+    bk_auto_status: "Letzte automatische Sicherung: {last} · Nächste Sicherung: {next} (beim nächsten Start der Desktop-App)",
+    bk_none: "keine",
+    bk_type_auto: "automatisch",
+    bk_type_other: "manuell / Sicherheit",
+    bk_check: "Prüfen",
+    bk_restore: "Wiederherstellen …",
+    bk_empty: "Noch keine Backups in diesem Ordner.",
+    bk_confirm_create: "Jetzt ein Vollbackup der MPW-Datenbank erstellen?\n\nZiel: {folder}\nMedien und Band-/Projektdateien werden nicht gesichert.",
+    bk_running: "Vollbackup läuft …",
+    bk_created: "Vollbackup erstellt und geprüft: {file}",
+    bk_failed: "Fehlgeschlagen: {detail}",
+    bk_checking: "Backups werden geprüft …",
+    bk_checked: "Prüfung abgeschlossen: {ok} gültig, {bad} beschädigt / nicht lesbar.",
+    bk_integrity_ok: "Datenbank-Integrität: OK. {detail}\nEs wurden keine Daten verändert.",
+    bk_integrity_bad: "Datenbank-Integrität: Fehler.\n{detail}",
+    bk_test_ok: "Backup-Ziel einsatzbereit: {folder}\nSchreibtest erfolgreich; Testdatei entfernt.\nFreier Speicher: {free} GiB · Mindestbedarf: {need} GiB\nEs wurde kein Backup erstellt.",
+    bk_test_bad: "Backup-Zielprüfung fehlgeschlagen: {folder}\n{detail}",
+    bk_log_title: "Backup-Prüfprotokoll (neueste zuerst, max. 100):",
+    bk_log_empty: "Noch kein Prüfprotokoll im Backup-Ordner vorhanden.",
+    bk_settings_saved: "Einstellungen für die automatische Sicherung gespeichert.",
+    bk_confirm_folder: "Diesen Ordner als Backup-Ordner verwenden?\n\n{folder}\n\nEr wird bei Bedarf angelegt; ein kurzer Schreibtest wird durchgeführt. Vorhandene Backups werden nicht verschoben.",
+    bk_folder_saved: "Backup-Ordner gespeichert: {folder}",
+    bk_confirm_restore: "ACHTUNG: Die MPW-Datenbank wird durch das Backup „{name}“ ERSETZT.\n\nVorher wird automatisch ein Sicherheitsbackup des aktuellen Stands angelegt. Medien sowie Band-/Projektordner bleiben unverändert.\n\nDie Desktop-App muss dafür geschlossen sein. Fortfahren?",
+    bk_restore_word: "Zur Bestätigung bitte {word} eingeben:",
+    bk_restoring: "Sicherheitsbackup und Wiederherstellung laufen …",
+    bk_restored: "Wiederhergestellt aus „{name}“.\nSicherheitsbackup des vorherigen Stands: {safety}\nBitte die Seite neu laden.",
+    bk_restore_failed: "Wiederherstellung nicht durchgeführt: {detail}\nSicherheitsbackup: {safety}\nIst die Desktop-App noch geöffnet? Dann bitte schließen und erneut versuchen.",
     tab_media: "Medien & Releases",
     media_links: "Verlinkte Plattform-Medien",
     media_files: "Mediendateien",
@@ -210,6 +271,67 @@ const I18N = {
     band_created: "Band “{name}” created. Directory: {folder}",
     band_imported: "Band “{name}” imported. Existing directory: {folder} (nothing changed).",
     band_prompt_warning: "The prompt folder could not be created: {detail}",
+    tab_backup: "Backup",
+    bk_intro: "A full backup saves only the MPW database – not media or band/project files. Every backup is checked for ZIP and SQLite integrity and recorded in the audit log.",
+    bk_status: "Status",
+    bk_create: "Create full backup now …",
+    bk_integrity: "Check database integrity",
+    bk_test: "Test backup destination",
+    bk_check_all: "Check all backups",
+    bk_log: "Show audit log",
+    bk_automatic: "Automatic backup",
+    bk_interval: "Backup interval:",
+    bk_keep: "Retention:",
+    bk_settings_save: "Save settings",
+    bk_auto_hint: "Due automatic backups are created by the desktop app at startup. Only automatic MPW_auto_ backups are deleted according to the selected count.",
+    bk_folder: "Backup folder",
+    bk_folder_save: "Use folder …",
+    bk_list: "Existing backups",
+    bk_err_word: "The confirmation word does not match. Nothing was restored.",
+    bk_err_busy: "A backup, check or restore is already running. Please wait.",
+    bk_err_unreachable: "The backup folder is not reachable (drive connected?).",
+    bk_err_absolute: "Please enter a full folder path (e.g. D:\\MPW-Backups or /Volumes/Backup/MPW).",
+    bk_err_folder: "The folder cannot be used: {detail}",
+    bk_off: "Disabled",
+    bk_daily: "Daily",
+    bk_3days: "Every 3 days",
+    bk_weekly: "Weekly",
+    bk_14days: "Every 14 days",
+    bk_monthly: "Monthly (30 days)",
+    bk_keep_n: "{n} automatic backups",
+    bk_folder_ok: "Backup folder: {folder}",
+    bk_folder_missing: "Backup folder unavailable: {folder}",
+    bk_stats: "Backup statistics: {ok} successful · {failed} failed",
+    bk_last_failed: "LAST BACKUP FAILED: {time} · {file}\nReason: {detail}",
+    bk_last_ok: "Last successful verification: {time} · {file}",
+    bk_auto_off: "Automatic backup: disabled",
+    bk_auto_status: "Last automatic backup: {last} · Next backup: {next} (at the next start of the desktop app)",
+    bk_none: "none",
+    bk_type_auto: "automatic",
+    bk_type_other: "manual / safety",
+    bk_check: "Check",
+    bk_restore: "Restore …",
+    bk_empty: "No backups in this folder yet.",
+    bk_confirm_create: "Create a full backup of the MPW database now?\n\nDestination: {folder}\nMedia and band/project files are not included.",
+    bk_running: "Full backup running …",
+    bk_created: "Full backup created and verified: {file}",
+    bk_failed: "Failed: {detail}",
+    bk_checking: "Checking backups …",
+    bk_checked: "Check finished: {ok} valid, {bad} damaged / unreadable.",
+    bk_integrity_ok: "Database integrity: OK. {detail}\nNo data was changed.",
+    bk_integrity_bad: "Database integrity: error.\n{detail}",
+    bk_test_ok: "Backup destination ready: {folder}\nWrite test successful; test file removed.\nFree space: {free} GiB · Minimum needed: {need} GiB\nNo backup was created.",
+    bk_test_bad: "Backup destination check failed: {folder}\n{detail}",
+    bk_log_title: "Backup audit log (newest first, max. 100):",
+    bk_log_empty: "No audit log in the backup folder yet.",
+    bk_settings_saved: "Automatic backup settings saved.",
+    bk_confirm_folder: "Use this folder as the backup folder?\n\n{folder}\n\nIt is created if needed and a short write test is done. Existing backups are not moved.",
+    bk_folder_saved: "Backup folder saved: {folder}",
+    bk_confirm_restore: "WARNING: The MPW database will be REPLACED by the backup “{name}”.\n\nA safety backup of the current state is created first. Media and band/project folders stay unchanged.\n\nThe desktop app must be closed. Continue?",
+    bk_restore_word: "To confirm, please enter {word}:",
+    bk_restoring: "Safety backup and restore running …",
+    bk_restored: "Restored from “{name}”.\nSafety backup of the previous state: {safety}\nPlease reload the page.",
+    bk_restore_failed: "Restore not carried out: {detail}\nSafety backup: {safety}\nIs the desktop app still open? Then close it and try again.",
     tab_media: "Media & Releases",
     media_links: "Linked platform media",
     media_files: "Media files",
@@ -357,6 +479,67 @@ const I18N = {
     band_created: "Groupe « {name} » créé. Dossier : {folder}",
     band_imported: "Groupe « {name} » importé. Dossier existant : {folder} (rien modifié).",
     band_prompt_warning: "Le dossier des prompts n’a pas pu être créé : {detail}",
+    tab_backup: "Sauvegarde",
+    bk_intro: "Une sauvegarde complète enregistre uniquement la base MPW – sans médias ni fichiers de groupes/projets. Chaque sauvegarde est vérifiée (ZIP et SQLite) et consignée dans le journal.",
+    bk_status: "État",
+    bk_create: "Créer une sauvegarde complète …",
+    bk_integrity: "Vérifier l’intégrité de la base",
+    bk_test: "Tester la destination",
+    bk_check_all: "Vérifier toutes les sauvegardes",
+    bk_log: "Afficher le journal",
+    bk_automatic: "Sauvegarde automatique",
+    bk_interval: "Fréquence des sauvegardes :",
+    bk_keep: "Conservation :",
+    bk_settings_save: "Enregistrer les réglages",
+    bk_auto_hint: "Les sauvegardes automatiques dues sont créées par l’application de bureau au démarrage. Seules les sauvegardes MPW_auto_ sont supprimées selon la limite choisie.",
+    bk_folder: "Dossier de sauvegarde",
+    bk_folder_save: "Utiliser ce dossier …",
+    bk_list: "Sauvegardes existantes",
+    bk_err_word: "Le mot de confirmation ne correspond pas. Rien n’a été restauré.",
+    bk_err_busy: "Une sauvegarde, vérification ou restauration est déjà en cours. Veuillez patienter.",
+    bk_err_unreachable: "Le dossier de sauvegarde est inaccessible (lecteur connecté ?).",
+    bk_err_absolute: "Indiquez un chemin complet (p. ex. D:\\MPW-Backups ou /Volumes/Backup/MPW).",
+    bk_err_folder: "Ce dossier ne peut pas être utilisé : {detail}",
+    bk_off: "Désactivé",
+    bk_daily: "Chaque jour",
+    bk_3days: "Tous les 3 jours",
+    bk_weekly: "Chaque semaine",
+    bk_14days: "Tous les 14 jours",
+    bk_monthly: "Chaque mois (30 jours)",
+    bk_keep_n: "{n} sauvegardes automatiques",
+    bk_folder_ok: "Dossier de sauvegarde : {folder}",
+    bk_folder_missing: "Dossier de sauvegarde inaccessible : {folder}",
+    bk_stats: "Statistiques : {ok} réussies · {failed} échouées",
+    bk_last_failed: "DERNIÈRE SAUVEGARDE ÉCHOUÉE : {time} · {file}\nRaison : {detail}",
+    bk_last_ok: "Dernière vérification réussie : {time} · {file}",
+    bk_auto_off: "Sauvegarde automatique : désactivée",
+    bk_auto_status: "Dernière sauvegarde automatique : {last} · Prochaine : {next} (au prochain démarrage de l’application de bureau)",
+    bk_none: "aucune",
+    bk_type_auto: "automatique",
+    bk_type_other: "manuelle / sécurité",
+    bk_check: "Vérifier",
+    bk_restore: "Restaurer …",
+    bk_empty: "Aucune sauvegarde dans ce dossier.",
+    bk_confirm_create: "Créer maintenant une sauvegarde complète de la base MPW ?\n\nDestination : {folder}\nLes médias et fichiers de groupes/projets ne sont pas inclus.",
+    bk_running: "Sauvegarde complète en cours …",
+    bk_created: "Sauvegarde créée et vérifiée : {file}",
+    bk_failed: "Échec : {detail}",
+    bk_checking: "Vérification des sauvegardes …",
+    bk_checked: "Vérification terminée : {ok} valides, {bad} endommagées / illisibles.",
+    bk_integrity_ok: "Intégrité de la base : OK. {detail}\nAucune donnée n’a été modifiée.",
+    bk_integrity_bad: "Intégrité de la base : erreur.\n{detail}",
+    bk_test_ok: "Destination prête : {folder}\nTest d’écriture réussi ; fichier de test supprimé.\nEspace libre : {free} Gio · Minimum requis : {need} Gio\nAucune sauvegarde n’a été créée.",
+    bk_test_bad: "Échec du test de la destination : {folder}\n{detail}",
+    bk_log_title: "Journal des sauvegardes (plus récentes d’abord, max. 100) :",
+    bk_log_empty: "Aucun journal dans le dossier de sauvegarde.",
+    bk_settings_saved: "Réglages de sauvegarde automatique enregistrés.",
+    bk_confirm_folder: "Utiliser ce dossier pour les sauvegardes ?\n\n{folder}\n\nIl est créé si nécessaire et un court test d’écriture est effectué. Les sauvegardes existantes ne sont pas déplacées.",
+    bk_folder_saved: "Dossier de sauvegarde enregistré : {folder}",
+    bk_confirm_restore: "ATTENTION : la base MPW sera REMPLACÉE par la sauvegarde « {name} ».\n\nUne sauvegarde de sécurité de l’état actuel est créée d’abord. Les médias et dossiers de groupes/projets restent inchangés.\n\nL’application de bureau doit être fermée. Continuer ?",
+    bk_restore_word: "Pour confirmer, saisissez {word} :",
+    bk_restoring: "Sauvegarde de sécurité et restauration en cours …",
+    bk_restored: "Restauré depuis « {name} ».\nSauvegarde de sécurité de l’état précédent : {safety}\nVeuillez recharger la page.",
+    bk_restore_failed: "Restauration non effectuée : {detail}\nSauvegarde de sécurité : {safety}\nL’application de bureau est-elle encore ouverte ? Fermez-la et réessayez.",
     tab_media: "Médias & sorties",
     media_links: "Médias de plateforme liés",
     media_files: "Fichiers médias",
@@ -504,6 +687,67 @@ const I18N = {
     band_created: "Banda «{name}» creada. Carpeta: {folder}",
     band_imported: "Banda «{name}» importada. Carpeta existente: {folder} (sin cambios).",
     band_prompt_warning: "No se pudo crear la carpeta de prompts: {detail}",
+    tab_backup: "Copia de seguridad",
+    bk_intro: "La copia completa guarda solo la base de datos MPW, sin medios ni archivos de bandas/proyectos. Cada copia se comprueba (ZIP y SQLite) y se anota en el registro.",
+    bk_status: "Estado",
+    bk_create: "Crear copia completa ahora …",
+    bk_integrity: "Comprobar integridad de la base",
+    bk_test: "Probar destino",
+    bk_check_all: "Comprobar todas las copias",
+    bk_log: "Mostrar registro",
+    bk_automatic: "Copia automática",
+    bk_interval: "Intervalo de copia:",
+    bk_keep: "Conservación:",
+    bk_settings_save: "Guardar ajustes",
+    bk_auto_hint: "Las copias automáticas pendientes las crea la aplicación de escritorio al iniciar. Solo se eliminan copias MPW_auto_ según el límite elegido.",
+    bk_folder: "Carpeta de copias",
+    bk_folder_save: "Usar esta carpeta …",
+    bk_list: "Copias existentes",
+    bk_err_word: "La palabra de confirmación no coincide. No se ha restaurado nada.",
+    bk_err_busy: "Ya hay una copia, comprobación o restauración en curso. Espere.",
+    bk_err_unreachable: "La carpeta de copias no está disponible (¿unidad conectada?).",
+    bk_err_absolute: "Indique una ruta completa (p. ej. D:\\MPW-Backups o /Volumes/Backup/MPW).",
+    bk_err_folder: "No se puede usar la carpeta: {detail}",
+    bk_off: "Desactivado",
+    bk_daily: "Diario",
+    bk_3days: "Cada 3 días",
+    bk_weekly: "Semanal",
+    bk_14days: "Cada 14 días",
+    bk_monthly: "Mensual (30 días)",
+    bk_keep_n: "{n} copias automáticas",
+    bk_folder_ok: "Carpeta de copias: {folder}",
+    bk_folder_missing: "Carpeta de copias no disponible: {folder}",
+    bk_stats: "Estadísticas: {ok} correctas · {failed} fallidas",
+    bk_last_failed: "ÚLTIMA COPIA FALLIDA: {time} · {file}\nMotivo: {detail}",
+    bk_last_ok: "Última verificación correcta: {time} · {file}",
+    bk_auto_off: "Copia automática: desactivada",
+    bk_auto_status: "Última copia automática: {last} · Próxima: {next} (al iniciar la aplicación de escritorio)",
+    bk_none: "ninguna",
+    bk_type_auto: "automática",
+    bk_type_other: "manual / seguridad",
+    bk_check: "Comprobar",
+    bk_restore: "Restaurar …",
+    bk_empty: "Aún no hay copias en esta carpeta.",
+    bk_confirm_create: "¿Crear ahora una copia completa de la base MPW?\n\nDestino: {folder}\nNo se incluyen medios ni archivos de bandas/proyectos.",
+    bk_running: "Copia completa en curso …",
+    bk_created: "Copia creada y comprobada: {file}",
+    bk_failed: "Error: {detail}",
+    bk_checking: "Comprobando copias …",
+    bk_checked: "Comprobación terminada: {ok} válidas, {bad} dañadas / ilegibles.",
+    bk_integrity_ok: "Integridad de la base: OK. {detail}\nNo se modificó ningún dato.",
+    bk_integrity_bad: "Integridad de la base: error.\n{detail}",
+    bk_test_ok: "Destino listo: {folder}\nPrueba de escritura correcta; archivo de prueba eliminado.\nEspacio libre: {free} GiB · Mínimo necesario: {need} GiB\nNo se creó ninguna copia.",
+    bk_test_bad: "Falló la prueba del destino: {folder}\n{detail}",
+    bk_log_title: "Registro de copias (más recientes primero, máx. 100):",
+    bk_log_empty: "Aún no hay registro en la carpeta de copias.",
+    bk_settings_saved: "Ajustes de copia automática guardados.",
+    bk_confirm_folder: "¿Usar esta carpeta para las copias?\n\n{folder}\n\nSe crea si hace falta y se hace una breve prueba de escritura. Las copias existentes no se mueven.",
+    bk_folder_saved: "Carpeta de copias guardada: {folder}",
+    bk_confirm_restore: "ATENCIÓN: la base MPW será REEMPLAZADA por la copia «{name}».\n\nAntes se crea una copia de seguridad del estado actual. Los medios y las carpetas de bandas/proyectos no cambian.\n\nLa aplicación de escritorio debe estar cerrada. ¿Continuar?",
+    bk_restore_word: "Para confirmar, escriba {word}:",
+    bk_restoring: "Copia de seguridad y restauración en curso …",
+    bk_restored: "Restaurado desde «{name}».\nCopia de seguridad del estado anterior: {safety}\nVuelva a cargar la página.",
+    bk_restore_failed: "Restauración no realizada: {detail}\nCopia de seguridad: {safety}\n¿Sigue abierta la aplicación de escritorio? Ciérrela y vuelva a intentarlo.",
     tab_media: "Medios y lanzamientos",
     media_links: "Medios de plataforma enlazados",
     media_files: "Archivos multimedia",
@@ -651,6 +895,67 @@ const I18N = {
     band_created: "Gruppo «{name}» creato. Cartella: {folder}",
     band_imported: "Gruppo «{name}» importato. Cartella esistente: {folder} (nessuna modifica).",
     band_prompt_warning: "Impossibile creare la cartella dei prompt: {detail}",
+    tab_backup: "Backup",
+    bk_intro: "Il backup completo salva solo il database MPW, senza media o file di gruppi/progetti. Ogni backup viene verificato (ZIP e SQLite) e registrato nel protocollo.",
+    bk_status: "Stato",
+    bk_create: "Crea backup completo ora …",
+    bk_integrity: "Verifica integrità del database",
+    bk_test: "Prova destinazione",
+    bk_check_all: "Verifica tutti i backup",
+    bk_log: "Mostra protocollo",
+    bk_automatic: "Backup automatico",
+    bk_interval: "Intervallo backup:",
+    bk_keep: "Conservazione:",
+    bk_settings_save: "Salva impostazioni",
+    bk_auto_hint: "I backup automatici dovuti vengono creati dall’app desktop all’avvio. Vengono eliminati solo i backup MPW_auto_ oltre il numero scelto.",
+    bk_folder: "Cartella backup",
+    bk_folder_save: "Usa questa cartella …",
+    bk_list: "Backup esistenti",
+    bk_err_word: "La parola di conferma non corrisponde. Non è stato ripristinato nulla.",
+    bk_err_busy: "È già in corso un backup, una verifica o un ripristino. Attendere.",
+    bk_err_unreachable: "La cartella backup non è raggiungibile (unità collegata?).",
+    bk_err_absolute: "Indica un percorso completo (ad es. D:\\MPW-Backups o /Volumes/Backup/MPW).",
+    bk_err_folder: "La cartella non può essere usata: {detail}",
+    bk_off: "Disattivato",
+    bk_daily: "Ogni giorno",
+    bk_3days: "Ogni 3 giorni",
+    bk_weekly: "Settimanale",
+    bk_14days: "Ogni 14 giorni",
+    bk_monthly: "Mensile (30 giorni)",
+    bk_keep_n: "{n} backup automatici",
+    bk_folder_ok: "Cartella backup: {folder}",
+    bk_folder_missing: "Cartella backup non raggiungibile: {folder}",
+    bk_stats: "Statistiche backup: {ok} riusciti · {failed} non riusciti",
+    bk_last_failed: "ULTIMO BACKUP NON RIUSCITO: {time} · {file}\nMotivo: {detail}",
+    bk_last_ok: "Ultima verifica riuscita: {time} · {file}",
+    bk_auto_off: "Backup automatico: disattivato",
+    bk_auto_status: "Ultimo backup automatico: {last} · Prossimo: {next} (al prossimo avvio dell’app desktop)",
+    bk_none: "nessuno",
+    bk_type_auto: "automatico",
+    bk_type_other: "manuale / sicurezza",
+    bk_check: "Verifica",
+    bk_restore: "Ripristina …",
+    bk_empty: "Nessun backup in questa cartella.",
+    bk_confirm_create: "Creare ora un backup completo del database MPW?\n\nDestinazione: {folder}\nMedia e file di gruppi/progetti non sono inclusi.",
+    bk_running: "Backup completo in corso …",
+    bk_created: "Backup creato e verificato: {file}",
+    bk_failed: "Non riuscito: {detail}",
+    bk_checking: "Verifica dei backup in corso …",
+    bk_checked: "Verifica completata: {ok} validi, {bad} danneggiati / illeggibili.",
+    bk_integrity_ok: "Integrità database: OK. {detail}\nNessun dato è stato modificato.",
+    bk_integrity_bad: "Integrità database: errore.\n{detail}",
+    bk_test_ok: "Destinazione pronta: {folder}\nTest di scrittura riuscito; file di prova rimosso.\nSpazio libero: {free} GiB · Minimo necessario: {need} GiB\nNessun backup è stato creato.",
+    bk_test_bad: "Verifica destinazione non riuscita: {folder}\n{detail}",
+    bk_log_title: "Protocollo backup (più recenti prima, max. 100):",
+    bk_log_empty: "Nessun protocollo nella cartella backup.",
+    bk_settings_saved: "Impostazioni del backup automatico salvate.",
+    bk_confirm_folder: "Usare questa cartella per i backup?\n\n{folder}\n\nViene creata se necessario e si esegue un breve test di scrittura. I backup esistenti non vengono spostati.",
+    bk_folder_saved: "Cartella backup salvata: {folder}",
+    bk_confirm_restore: "ATTENZIONE: il database MPW verrà SOSTITUITO dal backup «{name}».\n\nPrima viene creato un backup di sicurezza dello stato attuale. Media e cartelle di gruppi/progetti restano invariati.\n\nL’app desktop deve essere chiusa. Continuare?",
+    bk_restore_word: "Per confermare, inserisci {word}:",
+    bk_restoring: "Backup di sicurezza e ripristino in corso …",
+    bk_restored: "Ripristinato da «{name}».\nBackup di sicurezza dello stato precedente: {safety}\nRicarica la pagina.",
+    bk_restore_failed: "Ripristino non eseguito: {detail}\nBackup di sicurezza: {safety}\nL’app desktop è ancora aperta? Chiudila e riprova.",
     tab_media: "Media & pubblicazioni",
     media_links: "Media collegati alle piattaforme",
     media_files: "File multimediali",
@@ -1245,6 +1550,167 @@ $('btn-band-new').addEventListener('click', () => bandAction(showNewBandForm).ca
 $('btn-band-new-cancel').addEventListener('click', hideNewBandForm);
 $('btn-band-create').addEventListener('click', () => bandAction(createBand).catch((error) => newBandMessage(error.message, 'error')));
 $('n-name').addEventListener('keydown', (event) => { if (event.key === 'Enter') $('btn-band-create').click(); });
+
+/* ------------------------------------------------------------------ Backup (stage 8) */
+
+const bkState = { info: null, busy: false, checks: {} };
+
+function bkMessage(text, kind) {
+  const box = $('bk-message');
+  box.textContent = text;
+  box.className = 'message' + (kind ? ' ' + kind : '');
+  box.hidden = !text;
+}
+
+const bkDate = (seconds) => new Date(seconds * 1000).toLocaleString(state.lang);
+const bkSize = (bytes) => (bytes / 1048576).toFixed(1) + ' MB';
+
+function bkErrorText(error) {
+  const data = error.data || {};
+  const map = { confirm_text: 'bk_err_word', backup_busy: 'bk_err_busy', backup_missing: 'err_missing',
+                invalid_backup_name: 'err_missing', folder_unreachable: 'bk_err_unreachable',
+                folder_not_absolute: 'bk_err_absolute', folder_unusable: 'bk_err_folder' };
+  if (map[data.error]) return t(map[data.error], { detail: data.detail || '' });
+  return error.kind === 'connection' ? error.message : t('error', { detail: error.message });
+}
+
+async function bkAction(fn) {
+  if (bkState.busy) return;
+  bkState.busy = true;
+  bkRender();
+  try { await fn(); } catch (error) { bkMessage(bkErrorText(error), 'error'); }
+  finally { bkState.busy = false; bkRender(); }
+}
+
+async function bkLoad() {
+  bkState.info = await api('/api/backup');
+  const info = bkState.info;
+  const labels = { 0: t('bk_off'), 1: t('bk_daily'), 3: t('bk_3days'), 7: t('bk_weekly'), 14: t('bk_14days'), 30: t('bk_monthly') };
+  $('bk-interval').replaceChildren(...info.intervals.map((d) => { const o = el('option', labels[d] || d); o.value = d; return o; }));
+  $('bk-keep').replaceChildren(...info.keep_counts.map((n) => { const o = el('option', t('bk_keep_n', { n })); o.value = n; return o; }));
+  $('bk-interval').value = String(info.interval);
+  $('bk-keep').value = String(info.keep);
+  $('bk-folder-input').value = info.folder;
+  bkRender();
+}
+
+function bkRender() {
+  const info = bkState.info;
+  for (const id of ['btn-bk-create', 'btn-bk-integrity', 'btn-bk-test', 'btn-bk-all', 'btn-bk-log', 'btn-bk-settings', 'btn-bk-folder']) {
+    $(id).disabled = bkState.busy;
+  }
+  if (!info) return;
+  $('bk-folder').textContent = (info.reachable ? '✔ ' : '⚠ ') + t(info.reachable ? 'bk_folder_ok' : 'bk_folder_missing', { folder: info.folder });
+  const latest = info.stats.latest;
+  let stats = t('bk_stats', { ok: info.stats.ok, failed: info.stats.failed });
+  if (latest && latest.status === 'FEHLER') stats += '\n⚠ ' + t('bk_last_failed', { time: latest.timestamp, file: latest.file, detail: latest.details });
+  else if (latest) stats += '\n' + t('bk_last_ok', { time: latest.timestamp, file: latest.file });
+  $('bk-stats').textContent = stats;
+  $('bk-auto').textContent = !info.interval ? t('bk_auto_off')
+    : t('bk_auto_status', { last: info.last_automatic ? bkDate(info.last_automatic) : t('bk_none'), next: bkDate(info.next_due) });
+  const rows = info.backups.map((backup) => {
+    const row = el('li', null, 'link-row');
+    const text = el('div', null, 'grow');
+    const check = bkState.checks[backup.name];
+    const head = el('div', (check ? (check.ok ? '✓ ' : '✗ ') : '') + backup.name, check ? (check.ok ? 'bk-ok' : 'bk-bad') : null);
+    text.append(head, el('div', bkSize(backup.bytes) + ' · ' + bkDate(backup.modified) + ' · '
+      + t(backup.automatic ? 'bk_type_auto' : 'bk_type_other') + (check && !check.ok ? ' · ' + check.error : ''), 'hint'));
+    const verify = el('button', t('bk_check'));
+    verify.addEventListener('click', () => bkAction(() => bkValidate(backup.name)));
+    const restore = el('button', t('bk_restore'), 'danger');
+    restore.addEventListener('click', () => bkAction(() => bkRestore(backup.name)));
+    verify.disabled = restore.disabled = bkState.busy;
+    row.append(text, verify, restore);
+    return row;
+  });
+  $('bk-list').replaceChildren(...(rows.length ? rows : [el('li', t(info.reachable ? 'bk_empty' : 'bk_err_unreachable'), 'hint')]));
+}
+
+async function bkWait(job, runningText) {
+  const began = Date.now();
+  for (;;) {
+    bkMessage(runningText + ' (' + Math.round((Date.now() - began) / 1000) + ' s)', 'warn');
+    await sleep(1000);
+    const result = await api('/api/backup/jobs/' + job);
+    if (result.status !== 'running') return result;
+  }
+}
+
+async function bkCreate() {
+  if (!confirm(t('bk_confirm_create', { folder: bkState.info.folder }))) return;
+  const started = await api('/api/backup/create', { method: 'POST', body: { confirm: true } });
+  const result = await bkWait(started.job, t('bk_running'));
+  if (result.status === 'done') bkMessage(t('bk_created', { file: result.file }));
+  else bkMessage(t('bk_failed', { detail: (result.error && result.error.detail) || '?' }), 'error');
+  await bkLoad();
+}
+
+async function bkValidate(name) {
+  const started = await api('/api/backup/validate', { method: 'POST', body: name ? { name } : {} });
+  const result = await bkWait(started.job, t('bk_checking'));
+  if (result.status !== 'done') { bkMessage(t('bk_failed', { detail: (result.error && result.error.detail) || '?' }), 'error'); return; }
+  for (const r of result.results) bkState.checks[r.name] = r;
+  const bad = result.results.filter((r) => !r.ok);
+  bkMessage(t('bk_checked', { ok: result.results.length - bad.length, bad: bad.length })
+    + (bad.length ? '\n' + bad.map((r) => '✗ ' + r.name + ': ' + r.error).join('\n') : ''), bad.length ? 'error' : '');
+}
+
+async function bkIntegrity() {
+  const result = await api('/api/backup/integrity', { method: 'POST', body: {} });
+  bkMessage(result.ok ? t('bk_integrity_ok', { detail: result.detail }) : t('bk_integrity_bad', { detail: result.detail }), result.ok ? '' : 'error');
+}
+
+async function bkTest() {
+  const result = await api('/api/backup/test', { method: 'POST', body: {} });
+  bkMessage(result.ok ? t('bk_test_ok', { folder: result.folder, free: (result.available / 1073741824).toFixed(2),
+                                         need: (result.required / 1073741824).toFixed(2) })
+                      : t('bk_test_bad', { folder: result.folder, detail: result.detail }), result.ok ? '' : 'error');
+}
+
+async function bkShowLog() {
+  const result = await api('/api/backup/log');
+  bkMessage(result.entries.length
+    ? t('bk_log_title') + '\n' + result.entries.map((e) => (e.status === 'OK' ? '✓ ' : '✗ ') + e.timestamp + ' · ' + e.file
+      + (e.status === 'OK' ? '' : ' · ' + e.details)).join('\n')
+    : t('bk_log_empty'));
+}
+
+async function bkSaveSettings() {
+  await api('/api/backup/settings', { method: 'POST',
+    body: { interval: Number($('bk-interval').value), keep: Number($('bk-keep').value) } });
+  bkMessage(t('bk_settings_saved'));
+  await bkLoad();
+}
+
+async function bkSaveFolder() {
+  const folder = $('bk-folder-input').value.trim();
+  if (!folder || !confirm(t('bk_confirm_folder', { folder }))) return;
+  const result = await api('/api/backup/folder', { method: 'POST', body: { folder, confirm: true } });
+  bkState.checks = {};
+  bkMessage(t('bk_folder_saved', { folder: result.folder }));
+  await bkLoad();
+}
+
+async function bkRestore(name) {
+  // Two steps like a dangerous desktop action: a clear warning, then the confirmation word.
+  if (!confirm(t('bk_confirm_restore', { name }))) return;
+  const word = prompt(t('bk_restore_word', { word: bkState.info.restore_word }));
+  if (word === null) return;
+  const started = await api('/api/backup/restore', { method: 'POST', body: { name, confirm: true, confirm_text: word.trim() } });
+  const result = await bkWait(started.job, t('bk_restoring'));
+  if (result.status !== 'done') bkMessage(t('bk_restore_failed', { detail: (result.error && result.error.detail) || '?', safety: '–' }), 'error');
+  else if (result.ok) bkMessage(t('bk_restored', { name, safety: result.safety }), 'warn');
+  else bkMessage(t('bk_restore_failed', { detail: result.detail, safety: result.safety }), 'error');
+  await bkLoad();
+}
+
+$('btn-bk-create').addEventListener('click', () => bkAction(bkCreate));
+$('btn-bk-integrity').addEventListener('click', () => bkAction(bkIntegrity));
+$('btn-bk-test').addEventListener('click', () => bkAction(bkTest));
+$('btn-bk-all').addEventListener('click', () => bkAction(() => bkValidate(null)));
+$('btn-bk-log').addEventListener('click', () => bkAction(bkShowLog));
+$('btn-bk-settings').addEventListener('click', () => bkAction(bkSaveSettings));
+$('btn-bk-folder').addEventListener('click', () => bkAction(bkSaveFolder));
 
 /* ------------------------------------------------------------------ Medien & Releases (stage 7) */
 
@@ -2144,6 +2610,8 @@ function switchView(name) {
   $('view-ai').hidden = name !== 'ai';
   $('view-conn').hidden = name !== 'conn';
   $('view-media').hidden = name !== 'media';
+  $('view-backup').hidden = name !== 'backup';
+  if (name === 'backup' && !bkState.info) bkAction(bkLoad);
   if (name === 'media' && !$('mr-band').options.length) mrInit().catch((error) => mrMessage('rl-message', mrErrorText(error), 'error'));
   if (name === 'conn' && !connState.info) connInit().catch((error) => connMessage(connErrorText(error), 'error'));
   if (name === 'bands' && !$('band-list').children.length) loadBandList().catch(fatal);

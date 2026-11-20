@@ -275,6 +275,86 @@ class WebServerTests(unittest.TestCase):
         self.assertEqual(self.json_call('POST', '/api/songs/1/prompt-versions', {**body, 'lyrics': ' '})[1]['error'], 'empty_field')
         self.assertEqual(self.json_call('POST', '/api/songs/99/prompt-versions', body)[0], 404)
 
+    # --- stage 8: Backup (temp data only) ---
+    def wait_backup(self, job_id):
+        for _ in range(200):
+            job = self.json_call('GET', f'/api/backup/jobs/{job_id}')[1]
+            if job['status'] != 'running':
+                return job
+            time.sleep(0.05)
+        self.fail('backup job did not finish')
+
+    def use_backup_folder(self):
+        folder = Path(self.tmp.name) / 'Sicherungen'
+        self.assertEqual(self.json_call('POST', '/api/backup/folder', {'folder': str(folder)})[1]['error'], 'confirm_required')
+        self.assertEqual(self.json_call('POST', '/api/backup/folder', {'folder': 'relativ', 'confirm': True})[1]['error'],
+                         'folder_not_absolute')
+        self.assertEqual(self.json_call('POST', '/api/backup/folder', {'folder': str(folder), 'confirm': True})[0], 200)
+        return folder
+
+    def test_backup_folder_settings_and_status(self):
+        info = self.json_call('GET', '/api/backup')[1]
+        self.assertIs(info['reachable'], False)  # default <data>/backups does not exist yet
+        folder = self.use_backup_folder()
+        info = self.json_call('GET', '/api/backup')[1]
+        self.assertEqual((info['reachable'], info['folder'], info['backups']), (True, str(folder), []))
+        self.assertEqual(self.json_call('POST', '/api/backup/settings', {'interval': 2, 'keep': 10})[0], 400)
+        self.assertEqual(self.json_call('POST', '/api/backup/settings', {'interval': 7, 'keep': 4})[0], 400)
+        self.assertEqual(self.json_call('POST', '/api/backup/settings', {'interval': 7, 'keep': 20})[0], 200)
+        info = self.json_call('GET', '/api/backup')[1]
+        self.assertEqual((info['interval'], info['keep']), (7, 20))
+        self.assertIsNotNone(info['next_due'])  # no automatic backup yet: due at the next desktop start
+        settings = json.loads((Path(self.tmp.name) / 'backup_settings.json').read_text(encoding='utf-8'))
+        self.assertEqual((settings['automatic_interval_days'], settings['backup_directory']), (7, str(folder)))
+        self.assertIs(self.json_call('POST', '/api/backup/integrity', {})[1]['ok'], True)
+        test = self.json_call('POST', '/api/backup/test', {})[1]
+        self.assertIs(test['ok'], True)
+        self.assertEqual(list(folder.iterdir()), [])  # the write test leaves nothing behind
+
+    def test_backup_create_validate_and_log(self):
+        folder = self.use_backup_folder()
+        self.assertEqual(self.json_call('POST', '/api/backup/create', {})[1]['error'], 'confirm_required')
+        job = self.wait_backup(self.json_call('POST', '/api/backup/create', {'confirm': True})[1]['job'])
+        self.assertEqual(job['status'], 'done')
+        self.assertTrue((folder / job['file']).is_file())
+        self.ws.validate_backup(folder / job['file'])
+        (folder / 'kaputt.zip').write_bytes(b'not a zip')
+        result = self.wait_backup(self.json_call('POST', '/api/backup/validate', {})[1]['job'])
+        self.assertEqual({r['name']: r['ok'] for r in result['results']}, {job['file']: True, 'kaputt.zip': False})
+        single = self.wait_backup(self.json_call('POST', '/api/backup/validate', {'name': job['file']})[1]['job'])
+        self.assertEqual([r['ok'] for r in single['results']], [True])
+        for bad in ('../workstation.db', 'x/../y.zip', 'fehlt.zip', 'backup_settings.json'):
+            self.assertIn(self.json_call('POST', '/api/backup/validate', {'name': bad})[0], (400, 404), bad)
+        info = self.json_call('GET', '/api/backup')[1]
+        self.assertEqual((info['stats']['ok'], info['stats']['failed']), (1, 0))
+        self.assertEqual([b['name'] for b in info['backups']][:1], ['kaputt.zip'])  # newest first
+        self.assertEqual(self.json_call('GET', '/api/backup/log')[1]['entries'][0]['status'], 'OK')
+
+    def test_backup_restore_needs_two_confirmations_and_makes_safety_backup(self):
+        folder = self.use_backup_folder()
+        backup = self.wait_backup(self.json_call('POST', '/api/backup/create', {'confirm': True})[1]['job'])['file']
+        with closing(sqlite3.connect(self.db)) as con, con:
+            con.execute("INSERT INTO bands(name) VALUES ('Nach dem Backup')")
+        body = {'name': backup, 'confirm': True, 'confirm_text': 'WIEDERHERSTELLEN'}
+        self.assertEqual(self.json_call('POST', '/api/backup/restore', {**body, 'confirm': False})[1]['error'], 'confirm_required')
+        self.assertEqual(self.json_call('POST', '/api/backup/restore', {**body, 'confirm_text': 'ja'})[1]['error'], 'confirm_text')
+        self.assertEqual(self.json_call('POST', '/api/backup/restore', {**body, 'name': '../workstation.db'})[0], 400)
+        with closing(sqlite3.connect(self.db)) as con:  # nothing changed so far
+            self.assertEqual(con.execute('SELECT COUNT(*) FROM bands').fetchone()[0], 2)
+        job = self.wait_backup(self.json_call('POST', '/api/backup/restore', body)[1]['job'])
+        self.assertEqual((job['status'], job['ok']), ('done', True))
+        self.assertTrue(job['safety'].startswith('MPW_vor_Wiederherstellung_'))
+        self.assertTrue((folder / job['safety']).is_file())
+        with closing(sqlite3.connect(self.db)) as con:
+            self.assertEqual([r[0] for r in con.execute('SELECT name FROM bands')], ['Iron Delta'])
+        # the safety backup still holds the state before the restore
+        with tempfile.TemporaryDirectory() as tmp:
+            import zipfile
+            with zipfile.ZipFile(folder / job['safety']) as archive:
+                archive.extract('workstation.db', tmp)
+            with closing(sqlite3.connect(Path(tmp) / 'workstation.db')) as con:
+                self.assertEqual(con.execute('SELECT COUNT(*) FROM bands').fetchone()[0], 2)
+
     # --- stage 7: Medien & Releases ---
     def test_media_links_add_and_delete_with_confirmation(self):
         body = {'platform': 'Spotify', 'url': 'https://open.spotify.com/track/x', 'label': 'Single'}

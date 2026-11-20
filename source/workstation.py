@@ -7068,28 +7068,16 @@ class Workstation(QMainWindow):
         self.release_song.currentIndexChanged.connect(self.refresh_releases)
         self.tabs.addTab(page,'Releases Distri')
 
+    # Same settings file and rules as the browser GUI (mpw_core).
     def backup_settings(self):
-        settings_file = ROOT / 'backup_settings.json'
-        try:
-            data = json.loads(settings_file.read_text(encoding='utf-8')) if settings_file.exists() else {}
-            return data if isinstance(data, dict) else {}
-        except (OSError, ValueError, TypeError):
-            return {}
+        return mpw_core.backup_settings(ROOT)
 
     def save_backup_settings(self, **changes):
-        data = self.backup_settings()
-        data.update(changes)
-        settings_file = ROOT / 'backup_settings.json'
-        tmp = settings_file.with_suffix('.json.tmp')
-        tmp.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding='utf-8')
-        tmp.replace(settings_file)
+        mpw_core.save_backup_settings(ROOT, **changes)
 
     def backup_directory(self):
         """Persistently configured backup folder, independent of the live database."""
-        configured = self.backup_settings().get('backup_directory', '')
-        if isinstance(configured, str) and configured.strip():
-            return Path(configured).expanduser()
-        return ROOT / 'backups'
+        return mpw_core.backup_directory(ROOT)
 
     def save_automatic_backup_preferences(self):
         try:

@@ -25,6 +25,7 @@ import threading
 import urllib.error
 import urllib.request
 import webbrowser
+import zipfile
 from contextlib import closing
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -756,7 +757,190 @@ def api_save_release_platform(server, query, body, release_id):
     return {'saved': True}
 
 
+# --------------------------------------------------------------------------- Backup (stage 8)
+
+RESTORE_CONFIRM_WORD = 'WIEDERHERSTELLEN'
+
+
+def _root(server):
+    return server.db_path.parent
+
+
+def api_backup_info(server, query, body):
+    """Backup folder, automatic settings, inventory and audit-log statistics (read-only)."""
+    root = _root(server)
+    folder = ws.backup_directory(root)
+    settings = ws.backup_settings(root)
+    inventory = ws.backup_inventory(folder)
+    entries = ws.backup_log_entries(folder, limit=0) if inventory is not None else []
+    interval, last, due = ws.automatic_backup_due(root)
+    keep = settings.get('automatic_keep_count', 10)
+    return {'folder': str(folder), 'reachable': inventory is not None, 'backups': inventory or [],
+            'interval': interval, 'keep': keep if keep in ws.BACKUP_KEEP_COUNTS else 10,
+            'intervals': list(ws.BACKUP_INTERVALS), 'keep_counts': list(ws.BACKUP_KEEP_COUNTS),
+            'last_automatic': last, 'next_due': due,
+            'stats': {'ok': sum(e['status'] == 'OK' for e in entries),
+                      'failed': sum(e['status'] == 'FEHLER' for e in entries),
+                      'latest': entries[-1] if entries else None},
+            'restore_word': RESTORE_CONFIRM_WORD}
+
+
+def _needs_confirm(body):
+    if not (isinstance(body, dict) and body.get('confirm') is True):
+        raise ApiError(400, 'confirm_required')
+
+
+def _backup_job(server, func):
+    def finish(result):
+        return {'status': 'done', **result}
+    try:
+        return {'job': server.backup_jobs.start('backup', func, finish=finish)}
+    except ApiError as exc:
+        if exc.message == 'ai_busy':
+            raise ApiError(409, 'backup_busy') from exc
+        raise
+
+
+def api_backup_create(server, query, body):
+    """Full backup now (database only, verified ZIP + SQLite, logged) into the backup folder."""
+    _needs_confirm(body)
+    root = _root(server)
+
+    def run():
+        destination = ws.new_backup_path(root)
+        with closing(core.open_read(server.db_path)) as con:
+            ws.create_backup(con, root, destination)
+        return {'file': destination.name}
+    return _backup_job(server, run)
+
+
+def api_backup_validate(server, query, body):
+    """Check one backup (by file name) or all backups: ZIP structure and SQLite integrity. Read-only."""
+    folder = ws.backup_directory(_root(server))
+    name = body.get('name') if isinstance(body, dict) else None
+    if name is not None:
+        try:
+            targets = [ws.backup_file_in(folder, name)]
+        except ws.BandDataError as exc:
+            raise ApiError(404 if exc.code == 'backup_missing' else 400, exc.code) from exc
+    else:
+        inventory = ws.backup_inventory(folder)
+        if inventory is None:
+            raise ApiError(400, 'folder_unreachable')
+        targets = [folder / item['name'] for item in inventory]
+
+    def run():
+        results = []
+        for path in targets:
+            try:
+                ws.validate_backup(path)
+                results.append({'name': path.name, 'ok': True, 'error': ''})
+            except (OSError, ValueError, sqlite3.Error, zipfile.BadZipFile, RuntimeError) as exc:
+                results.append({'name': path.name, 'ok': False, 'error': str(exc)[:300]})
+        return {'results': results}
+    return _backup_job(server, run)
+
+
+def api_backup_job(server, query, body, job_id):
+    job = server.backup_jobs.get(job_id)
+    if job is None:
+        raise ApiError(404, 'job_missing')
+    return job
+
+
+def api_backup_integrity(server, query, body):
+    """Read-only integrity check of the live database (independent read-only connection)."""
+    try:
+        return {'ok': True, 'detail': str(ws.check_live_database_integrity(_root(server)) or '')}
+    except (sqlite3.Error, OSError, ValueError) as exc:
+        return {'ok': False, 'detail': str(exc)[:500]}
+
+
+def api_backup_log(server, query, body):
+    folder = ws.backup_directory(_root(server))
+    return {'entries': list(reversed(ws.backup_log_entries(folder, 100))) if folder.is_dir() else []}
+
+
+def api_backup_settings(server, query, body):
+    """Automatic backups: interval and how many MPW_auto_ backups are kept (same file as the desktop)."""
+    if not isinstance(body, dict):
+        raise ApiError(400, 'invalid_body')
+    interval, keep = body.get('interval'), body.get('keep')
+    if interval not in ws.BACKUP_INTERVALS or keep not in ws.BACKUP_KEEP_COUNTS or isinstance(interval, bool):
+        raise ApiError(400, 'invalid_field', {'field': 'interval'})
+    ws.save_backup_settings(_root(server), automatic_interval_days=interval, automatic_keep_count=keep)
+    return {'saved': True}
+
+
+def api_backup_folder(server, query, body):
+    """Set the backup folder (created if needed, write test) – only after a yes."""
+    _needs_confirm(body)
+    folder = _body_text(body, 'folder')
+    if not isinstance(folder, str) or not folder.strip() or len(folder) > 1000:
+        raise ApiError(400, 'invalid_field', {'field': 'folder'})
+    path = Path(folder.strip()).expanduser()
+    if not path.is_absolute():
+        raise ApiError(400, 'folder_not_absolute')
+    try:
+        path.mkdir(parents=True, exist_ok=True)
+        with tempfile.NamedTemporaryFile(prefix='mpw_backup_test_', dir=path, delete=True):
+            pass
+        ws.save_backup_settings(_root(server), backup_directory=str(path))
+    except OSError as exc:
+        raise ApiError(400, 'folder_unusable', {'detail': str(exc)[:300]}) from exc
+    return {'folder': str(path)}
+
+
+def api_backup_test(server, query, body):
+    root = _root(server)
+    folder = ws.backup_directory(root)
+    try:
+        available, required = ws.test_backup_destination(root, folder)
+    except (OSError, ValueError) as exc:
+        return {'ok': False, 'folder': str(folder), 'detail': str(exc)[:500]}
+    return {'ok': True, 'folder': str(folder), 'available': available, 'required': required}
+
+
+def api_backup_restore(server, query, body):
+    """Restore the database from a backup: two confirmations, then a safety backup, then the restore.
+
+    Media and band/project folders are never touched. If another MPW program still has the
+    database open, the restore is refused and nothing changes.
+    """
+    _needs_confirm(body)
+    if body.get('confirm_text') != RESTORE_CONFIRM_WORD:
+        raise ApiError(400, 'confirm_text')
+    root = _root(server)
+    folder = ws.backup_directory(root)
+    try:
+        source = ws.backup_file_in(folder, body.get('name'))
+    except ws.BandDataError as exc:
+        raise ApiError(404 if exc.code == 'backup_missing' else 400, exc.code) from exc
+
+    def run():
+        ws.validate_backup(source)
+        safety = ws.new_backup_path(root, 'MPW_vor_Wiederherstellung')
+        with closing(core.open_read(server.db_path)) as con:
+            ws.create_backup(con, root, safety)
+        try:
+            ws.restore_backup(source, root)
+        except Exception as exc:
+            return {'ok': False, 'safety': safety.name, 'detail': str(exc)[:500]}
+        return {'ok': True, 'safety': safety.name}
+    return _backup_job(server, run)
+
+
 ROUTES = [
+    ('GET', re.compile(r'^/api/backup$'), api_backup_info),
+    ('POST', re.compile(r'^/api/backup/create$'), api_backup_create),
+    ('POST', re.compile(r'^/api/backup/validate$'), api_backup_validate),
+    ('GET', re.compile(r'^/api/backup/jobs/([0-9a-f]{16})$'), api_backup_job),
+    ('POST', re.compile(r'^/api/backup/integrity$'), api_backup_integrity),
+    ('GET', re.compile(r'^/api/backup/log$'), api_backup_log),
+    ('POST', re.compile(r'^/api/backup/settings$'), api_backup_settings),
+    ('POST', re.compile(r'^/api/backup/folder$'), api_backup_folder),
+    ('POST', re.compile(r'^/api/backup/test$'), api_backup_test),
+    ('POST', re.compile(r'^/api/backup/restore$'), api_backup_restore),
     ('GET', re.compile(r'^/api/songs/(\d+)/media$'), api_song_media),
     ('POST', re.compile(r'^/api/songs/(\d+)/media-links$'), api_add_media_link),
     ('POST', re.compile(r'^/api/songs/(\d+)/media-links/(\d+)/delete$'), api_delete_media_link),
@@ -817,6 +1001,7 @@ class MPWWebServer(ThreadingHTTPServer):
         self.static_dir = Path(static_dir or web_directory())
         self.ai_jobs = AiJobs()
         self.check_jobs = AiJobs()  # KI-Verbindungen status checks (do not block prompt requests)
+        self.backup_jobs = AiJobs()  # backups, checks and restore: one at a time
 
     @property
     def port(self):

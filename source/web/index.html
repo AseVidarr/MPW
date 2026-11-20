@@ -15,6 +15,7 @@
     <button class="tab" data-view="media" role="tab" data-i18n="tab_media">Medien &amp; Releases</button>
     <button class="tab" data-view="ai" role="tab" data-i18n="tab_ai">AI Prompt Launcher</button>
     <button class="tab" data-view="conn" role="tab" data-i18n="tab_conn">KI-Verbindungen</button>
+    <button class="tab" data-view="backup" role="tab" data-i18n="tab_backup">Backup</button>
   </nav>
   <div class="meta" id="meta"></div>
 </header>
@@ -125,6 +126,49 @@
         <ul id="band-projects" class="list"></ul>
       </div>
       <datalist id="genre-options"></datalist>
+    </div>
+  </section>
+
+  <!-- Backup -->
+  <section id="view-backup" class="view" hidden>
+    <div class="editor">
+      <div id="bk-body">
+        <p class="hint" data-i18n="bk_intro">Vollbackup sichert ausschließlich die MPW-Datenbank – keine Medien oder Band-/Projektdateien. Jede Sicherung wird auf ZIP- und SQLite-Integrität geprüft und im Prüfprotokoll vermerkt.</p>
+        <fieldset class="conn-group">
+          <legend data-i18n="bk_status">Status</legend>
+          <div class="conn-line" id="bk-folder"></div>
+          <div class="conn-line" id="bk-stats"></div>
+          <div class="conn-line" id="bk-auto"></div>
+          <div class="actions wrap">
+            <button id="btn-bk-create" class="primary" data-i18n="bk_create">Vollbackup jetzt erstellen …</button>
+            <button id="btn-bk-integrity" data-i18n="bk_integrity">Datenbank-Integrität prüfen</button>
+            <button id="btn-bk-test" data-i18n="bk_test">Backup-Ziel testen</button>
+            <button id="btn-bk-all" data-i18n="bk_check_all">Alle Backups prüfen</button>
+            <button id="btn-bk-log" data-i18n="bk_log">Prüfprotokoll anzeigen</button>
+          </div>
+        </fieldset>
+        <div id="bk-message" class="message" hidden></div>
+        <fieldset class="conn-group">
+          <legend data-i18n="bk_automatic">Automatische Sicherung</legend>
+          <div class="hw-form">
+            <label class="conn-target"><span data-i18n="bk_interval">Sicherungsintervall:</span><select id="bk-interval"></select></label>
+            <label class="conn-target"><span data-i18n="bk_keep">Aufbewahrung:</span><select id="bk-keep"></select></label>
+            <button id="btn-bk-settings" data-i18n="bk_settings_save">Einstellungen speichern</button>
+          </div>
+          <div class="hint" data-i18n="bk_auto_hint">Fällige automatische Sicherungen erstellt die Desktop-App beim Programmstart. Nur automatische MPW_auto_-Backups werden nach der gewählten Anzahl gelöscht.</div>
+        </fieldset>
+        <fieldset class="conn-group">
+          <legend data-i18n="bk_folder">Backup-Ordner</legend>
+          <div class="hw-form">
+            <input id="bk-folder-input" maxlength="1000" spellcheck="false" autocomplete="off">
+            <button id="btn-bk-folder" data-i18n="bk_folder_save">Ordner übernehmen …</button>
+          </div>
+        </fieldset>
+        <fieldset class="conn-group">
+          <legend data-i18n="bk_list">Vorhandene Backups</legend>
+          <ul id="bk-list" class="plain-list"></ul>
+        </fieldset>
+      </div>
     </div>
   </section>
 
