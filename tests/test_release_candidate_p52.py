@@ -7,8 +7,8 @@ class ReleaseCandidateChecks(unittest.TestCase):
     def test_rc_build_identifiers(self):
         build = (ROOT / 'scripts/build.ps1').read_text(encoding='utf-8')
         iss = (ROOT / 'installer/MPW.iss').read_text(encoding='utf-8')
-        self.assertIn('MPW_Portable_v2.2.0_Alpha21_Preview52_RC1', build)
-        self.assertIn('MPW_Setup_v2.2.0_Alpha21_Preview52_RC1', iss)
+        self.assertIn('MPW_Portable_v2.2.0_RC2', build)
+        self.assertIn('MPW_Setup_v2.2.0_RC2', iss)
     def test_release_audit_is_read_only(self):
         script = (ROOT / 'scripts/verify-release-candidate.ps1').read_text(encoding='utf-8')
         self.assertIn('OpenRead($zip)', script)

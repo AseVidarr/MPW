@@ -11,8 +11,8 @@ LAUNCH = (ROOT / 'scripts/Launch-Portable.ps1').read_text(encoding='utf-8-sig')
 class ReleasePreflightTests(unittest.TestCase):
     def test_version_and_output_names_consistent(self):
         self.assertIn('#define AppVersion "2.2.0"', ISS)
-        self.assertRegex(ISS, r'MPW_Setup_v2\.2\.0_Alpha21_Preview52_RC1')
-        self.assertRegex(BUILD, r'MPW_Portable_v2\.2\.0_Alpha21_Preview52_RC1')
+        self.assertRegex(ISS, r'MPW_Setup_v2\.2\.0_RC2')
+        self.assertRegex(BUILD, r'MPW_Portable_v2\.2\.0_RC2')
         self.assertNotIn('MPW_Setup_v2.1.0', ISS)
         self.assertNotIn('MPW_Portable_v2.1.0', BUILD)
 

@@ -20,7 +20,7 @@ class InstallerAcceptanceTests(unittest.TestCase):
         self.assertNotIn('[UninstallDelete]',self.iss)
         self.assertIn('PrivilegesRequired=lowest',self.iss)
     def test_version_consistency(self):
-        self.assertIn('Preview52_RC1',self.iss)
-        self.assertIn('Preview52_RC1',self.build)
+        self.assertIn('v2.2.0_RC2',self.iss)
+        self.assertIn('v2.2.0_RC2',self.build)
         self.assertIn('Get-FileHash',self.script)
 if __name__=='__main__': unittest.main()

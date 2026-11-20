@@ -23,7 +23,7 @@ class UpgradeSafetyP44(unittest.TestCase):
         self.assertNotIn('[UninstallDelete]',self.iss)
         self.assertNotIn('[InstallDelete]',self.iss)
     def test_version_and_manifest_guard(self):
-        self.assertIn("APP_VERSION = '2.2.0 Alpha 21 Preview 52 RC1'",self.app)
-        self.assertIn('Preview52_RC1',self.iss)
+        self.assertIn("APP_VERSION = '2.2.0 RC2'",self.app)
+        self.assertIn('v2.2.0_RC2',self.iss)
         self.assertIn('Manifest darf nicht im Datenbestand liegen',self.s)
 if __name__=='__main__': unittest.main()

@@ -6,8 +6,8 @@ BUILD=(ROOT/'scripts/build.ps1').read_text(encoding='utf-8-sig')
 ISS=(ROOT/'installer/MPW.iss').read_text(encoding='utf-8')
 class ReleaseBuildGuards(unittest.TestCase):
     def test_version(self):
-        self.assertRegex(BUILD, r'Preview52_RC1')
-        self.assertRegex(ISS, r'MPW_Setup_v2\.2\.0_Alpha21_Preview52_RC1')
+        self.assertRegex(BUILD, r'v2.2.0_RC2')
+        self.assertRegex(ISS, r'MPW_Setup_v2\.2\.0_RC2')
     def test_dependencies_and_python(self):
         self.assertIn('sys.version_info >= (3,10)', BUILD)
         self.assertIn('import PyInstaller, PySide6, mutagen', BUILD)

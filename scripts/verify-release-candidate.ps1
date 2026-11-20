@@ -8,7 +8,7 @@ $root = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 if (-not $DistDirectory) { $DistDirectory = Join-Path $root 'dist' }
 if (-not (Test-Path -LiteralPath $DistDirectory -PathType Container)) { throw "dist-Verzeichnis fehlt: $DistDirectory" }
 $dist = (Resolve-Path -LiteralPath $DistDirectory).Path
-$version = 'v2.2.0_Alpha21_Preview52_RC1'
+$version = 'v2.2.0_RC2'
 $zip = Join-Path $dist "MPW_Portable_$version.zip"
 $installer = Join-Path $dist "MPW_Setup_$version.exe"
 $exe = Join-Path $dist 'MPW/MPW.exe'

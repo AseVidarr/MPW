@@ -11,7 +11,7 @@ set -eu
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 PY="${PYTHON:-python3}"
-VERSION_TAG="v2.2.0_Alpha21_Preview52_RC1"
+VERSION_TAG="v2.2.0_RC2"
 
 case "$(uname -s)" in
   Darwin) OS=macOS; START=Start-MPW-Web.command ;;

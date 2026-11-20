@@ -127,6 +127,7 @@ jobs:
     permissions:
       contents: write
     steps:
+      - uses: actions/checkout@v7  # for RELEASE_NOTES.md
       - uses: actions/download-artifact@v8
         with:
           path: pakete
@@ -135,7 +136,5 @@ jobs:
         with:
           draft: true
           files: pakete/*
-          body: |
-            MPW ${{ github.ref_name }} – Release-Entwurf (vor dem Veröffentlichen prüfen).
-            - Windows: Setup (Desktop-App + Browser) und Portable (ZIP)
-            - macOS / Linux: Portable, nur Browser-Oberfläche (tar.gz) – siehe LIESMICH_MAC_LINUX.txt
+          name: MPW ${{ github.ref_name }}
+          body_path: RELEASE_NOTES.md

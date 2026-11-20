@@ -46,7 +46,7 @@ except ImportError:
     mutagen_file = None
 
 
-APP_VERSION = '2.2.0 Alpha 21 Preview 52 RC1'
+APP_VERSION = '2.2.0 RC2'
 
 
 LEGACY_ROOT = Path.home() / 'MusicProductionWorkstation'

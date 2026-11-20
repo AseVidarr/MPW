@@ -53,7 +53,7 @@ $webExe=Join-Path $dist 'MPW/MPW-Web.exe'
 Assert-NonEmptyFile $webExe 'MPW-Web.exe'
 & $webExe --self-test
 Assert-LastExit 'Web-Selbsttest'
-$portable=Join-Path $dist 'MPW_Portable_v2.2.0_Alpha21_Preview52_RC1'
+$portable=Join-Path $dist 'MPW_Portable_v2.2.0_RC2'
 if(Test-Path $portable){throw 'Portable-Ziel existiert bereits. Bitte alte Ausgabe manuell sichern/umbenennen; keine automatische Loeschung.'}
 New-Item -ItemType Directory $portable | Out-Null
 Copy-Item (Join-Path $dist 'MPW') (Join-Path $portable 'App') -Recurse
@@ -63,9 +63,9 @@ Assert-NonEmptyFile (Join-Path $portable 'App/MPW-Web.exe') 'Portable MPW-Web.ex
 Copy-Item (Join-Path $root 'scripts/Start-MPW-Portable.cmd') $portable
 Copy-Item (Join-Path $root 'scripts/Start-MPW-Web-Portable.cmd') $portable
 Copy-Item (Join-Path $root 'scripts/Launch-Portable.ps1') $portable
-'Standalone MPW portable build v2.2.0 Alpha21 Preview52_RC1' | Set-Content -LiteralPath (Join-Path $portable '.mpw-portable-v2') -Encoding Ascii
+'Standalone MPW portable build v2.2.0 RC2' | Set-Content -LiteralPath (Join-Path $portable '.mpw-portable-v2') -Encoding Ascii
 'Portable data is stored in Data. Do not delete this directory during updates.' | Set-Content -Encoding UTF8 (Join-Path $portable 'DATEN_HINWEIS.txt')
-$portableZip=Join-Path $dist 'MPW_Portable_v2.2.0_Alpha21_Preview52_RC1.zip'
+$portableZip=Join-Path $dist 'MPW_Portable_v2.2.0_RC2.zip'
 if(Test-Path $portableZip){throw 'Portable-ZIP existiert bereits. Bitte alte Ausgabe manuell sichern/umbenennen.'}
 Compress-Archive -Path (Join-Path $portable '*') -DestinationPath $portableZip
 Assert-NonEmptyFile $portableZip 'Portable-ZIP'
@@ -93,7 +93,7 @@ if($isccPath){
   Write-Host "Inno Setup Compiler: $isccPath"
   & $isccPath $iss
   Assert-LastExit 'Inno Setup'
-  Assert-NonEmptyFile (Join-Path $dist 'MPW_Setup_v2.2.0_Alpha21_Preview52_RC1.exe') 'Installer-EXE'
+  Assert-NonEmptyFile (Join-Path $dist 'MPW_Setup_v2.2.0_RC2.exe') 'Installer-EXE'
 }else{
   Write-Warning 'ISCC.exe fehlt. Portable-Version wurde erstellt, Installer noch nicht kompiliert. Inno Setup 7 oder 6 installieren und Build erneut starten.'
 }
