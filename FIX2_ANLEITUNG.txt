@@ -1,0 +1,5 @@
+MPW v2.1.0 FIX2
+Inno Setup 7 wird unter C:\Program Files\Inno Setup 7\ISCC.exe erkannt.
+SHA256SUMS.txt wird von der Hashberechnung ausgeschlossen.
+WICHTIG: In einen NEUEN Ordner entpacken und dort scripts\build.ps1 starten.
+Produktive MPW-Daten nicht in den Buildordner kopieren.

@@ -1,0 +1,409 @@
+﻿id,name
+1,Synth-Pop
+2,Dance-Pop
+3,Electropop
+4,Indie Pop
+5,Art Pop
+6,Dream Pop
+7,K-Pop
+8,J-Pop
+9,Teen Pop
+10,Power Pop
+11,Chamber Pop
+12,Hyperpop
+13,Classic Rock
+14,Hard Rock
+15,Blues Rock
+16,Southern Rock
+17,Progressive Rock
+18,Psychedelic Rock
+19,Garage Rock
+20,Stoner Rock
+21,Arena Rock
+22,Rockabilly
+23,Boogie Rock
+24,Heavy Metal
+25,Thrash Metal
+26,Death Metal
+27,Melodic Death Metal
+28,Black Metal
+29,Doom Metal
+30,Power Metal
+31,Symphonic Metal
+32,Viking Metal
+33,Folk Metal
+34,Pagan Metal
+35,Groove Metal
+36,Nu Metal
+37,Metalcore
+38,Deathcore
+39,Progressive Metal
+40,Technical Death Metal
+41,Industrial Metal
+42,Gothic Metal
+43,Theatrical Epic Metal
+44,Delta Blues
+45,Chicago Blues
+46,Texas Blues
+47,British Blues
+48,Electric Blues
+49,Acoustic Blues
+50,Country Blues
+51,Mississippi Blues
+52,Piedmont Blues
+53,Hill Country Blues
+54,Jump Blues
+55,Boogie-Woogie
+56,Acid Blues
+57,Dixieland
+58,Swing
+59,Bebop
+60,Hard Bop
+61,Cool Jazz
+62,Modal Jazz
+63,Free Jazz
+64,Jazz Fusion
+65,Smooth Jazz
+66,Latin Jazz
+67,Acid Jazz
+68,Vocal Jazz
+69,Contemporary Jazz
+70,Traditional Country
+71,Honky-Tonk
+72,Outlaw Country
+73,Bluegrass
+74,Country Rock
+75,Country Pop
+76,Americana
+77,Alternative Country
+78,Western Swing
+79,Nashville Sound
+80,Traditional Folk
+81,Contemporary Folk
+82,Celtic Folk
+83,Nordic Folk
+84,Norse Folk
+85,German Folk
+86,British Folk
+87,American Folk
+88,Folk Rock
+89,Neo-Folk
+90,Dark Folk
+91,Folk Punk
+92,Baroque
+93,Classical Period
+94,Romantic
+95,Renaissance Classical
+96,Contemporary Classical
+97,Minimalism
+98,Opera
+99,Chamber Music
+100,Symphonic Music
+101,Choral Classical
+102,Electronica
+103,IDM
+104,Electro
+105,Synthwave
+106,Retrowave
+107,Vaporwave
+108,Berlin School
+109,Glitch
+110,Downtempo
+111,Electroacoustic
+112,Experimental Electronic
+113,Big Room EDM
+114,Festival EDM
+115,Dance
+116,Electro Dance
+117,Future Rave
+118,Hard Dance
+119,Hands Up
+120,Eurodance
+121,Dancecore
+122,Melbourne Bounce
+123,Chicago House
+124,Deep House
+125,Tech House
+126,Progressive House
+127,Afro House
+128,Organic House
+129,Soulful House
+130,Acid House
+131,French House
+132,Tropical House
+133,Bass House
+134,Detroit Techno
+135,Minimal Techno
+136,Industrial Techno
+137,Hard Techno
+138,Acid Techno
+139,Dub Techno
+140,Melodic Techno
+141,Schranz
+142,Peak Time Techno
+143,Classic Trance
+144,Uplifting Trance
+145,Progressive Trance
+146,Psytrance
+147,Goa Trance
+148,Vocal Trance
+149,Tech Trance
+150,Hard Trance
+151,Dream Trance
+152,Liquid Drum & Bass
+153,Neurofunk
+154,Jump Up
+155,Atmospheric DnB
+156,Techstep
+157,Darkstep
+158,Jungle
+159,Drumfunk
+160,Dancefloor DnB
+161,Classic Dubstep
+162,Brostep
+163,Riddim
+164,Melodic Dubstep
+165,Future Bass
+166,UK Bass
+167,Trap EDM
+168,Bassline
+169,Glitch Hop
+170,Midtempo Bass
+171,Old School Hip-Hop
+172,Boom Bap
+173,East Coast Rap
+174,West Coast Rap
+175,Gangsta Rap
+176,Trap
+177,Drill
+178,Conscious Rap
+179,Alternative Hip-Hop
+180,Detroit Rap
+181,Cloud Rap
+182,Lo-Fi Hip-Hop
+183,Classic R&B
+184,Contemporary R&B
+185,Neo-Soul
+186,Classic Soul
+187,Southern Soul
+188,Motown
+189,Quiet Storm
+190,Alternative R&B
+191,Blue-Eyed Soul
+192,Classic Funk
+193,P-Funk
+194,Jazz-Funk
+195,Electro-Funk
+196,Funk Rock
+197,Funk Metal
+198,Afro-Funk
+199,Deep Funk
+200,Modern Funk
+201,Classic Disco
+202,Euro Disco
+203,Italo Disco
+204,Nu-Disco
+205,Space Disco
+206,Disco House
+207,Hi-NRG
+208,Post-Disco
+209,Roots Reggae
+210,Rocksteady
+211,Dub
+212,Lovers Rock
+213,Ragga
+214,Digital Reggae
+215,Reggae Fusion
+216,Conscious Reggae
+217,Jamaican Ska
+218,2 Tone
+219,Third Wave Ska
+220,Ska Punk
+221,Ska Jazz
+222,Ska Rock
+223,Punk Rock
+224,Hardcore Punk
+225,Street Punk
+226,Anarcho-Punk
+227,Crust Punk
+228,Pop Punk
+229,Skate Punk
+230,Oi!
+231,Post-Punk
+232,Melodic Hardcore
+233,Gothic Rock
+234,Darkwave
+235,Coldwave
+236,Ethereal Wave
+237,Neoclassical Darkwave
+238,Gothic Pop
+239,Deathrock
+240,Dark Cabaret
+241,Industrial
+242,Industrial Rock
+243,EBM
+244,Electro-Industrial
+245,Aggrotech
+246,Power Noise
+247,Rhythmic Noise
+248,Neue Deutsche Härte
+249,Industrial Dance
+250,Alternative Rock
+251,Indie Rock
+252,Indie Folk
+253,Shoegaze
+254,Grunge
+255,Britpop
+256,Post-Rock
+257,Math Rock
+258,Noise Rock
+259,Slowcore
+260,Salsa
+261,Bachata
+262,Merengue
+263,Cumbia
+264,Latin Pop
+265,Latin Rock
+266,Bossa Nova
+267,Samba
+268,Tango
+269,Regional Mexican
+270,Classic Reggaeton
+271,Old School Reggaeton
+272,Modern Reggaeton
+273,Neo-Perreo
+274,Latin Urban
+275,Reggaeton Pop
+276,Reggaeton Fusion
+277,Afrobeat
+278,Afrobeats
+279,Amapiano
+280,Highlife
+281,Juju
+282,Fuji
+283,Soukous
+284,Makossa
+285,Gqom
+286,Kwaito
+287,Afro-Pop
+288,Afro-Tech
+289,Soca
+290,Calypso
+291,Zouk
+292,Kompa
+293,Chutney
+294,Bouyon
+295,Dancehall
+296,Mento
+297,Caribbean Fusion
+298,Arabic Music
+299,Indian Classical
+300,Bollywood
+301,Balkan Music
+302,Klezmer
+303,Flamenco
+304,Fado
+305,Turkish Folk
+306,Asian Traditional
+307,Global Fusion
+308,Ambient
+309,Dark Ambient
+310,Drone Ambient
+311,Space Ambient
+312,Nature Ambient
+313,Isolationism
+314,Ambient Electronic
+315,Ambient Drone
+316,Cinematic Ambient
+317,Meditation Music
+318,Healing Music
+319,Spiritual Instrumental
+320,Nature Soundscapes
+321,Relaxation Music
+322,New Age Electronic
+323,Avant-Garde
+324,Noise
+325,Harsh Noise
+326,Musique Concrète
+327,Free Improvisation
+328,Sound Art
+329,Experimental Rock
+330,Film Score
+331,Orchestral Score
+332,Game Soundtrack
+333,Trailer Music
+334,Epic Cinematic
+335,Hybrid Orchestral
+336,Horror Score
+337,Documentary Score
+338,Anime Soundtrack
+339,Traditional Gospel
+340,Contemporary Gospel
+341,Black Gospel
+342,Southern Gospel
+343,Gospel Choir
+344,Gospel Blues
+345,Urban Gospel
+346,Worship
+347,Contemporary Christian Music
+348,Christian Rock
+349,Christian Metal
+350,Sacred Music
+351,Hymns
+352,Liturgical Music
+353,Deutscher Schlager
+354,Popschlager
+355,Partyschlager
+356,Discofox
+357,Retro-Schlager
+358,Moderner Schlager
+359,Deutsche Volksmusik
+360,Alpine Volksmusik
+361,Oberkrainer
+362,Blasmusik
+363,Bayerische Volksmusik
+364,Austrian Folk
+365,Traditional Polka
+366,French Chanson
+367,German Chanson
+368,Liedermacher
+369,Acoustic Singer-Songwriter
+370,Contemporary Singer-Songwriter
+371,Folk Singer-Songwriter
+372,Easy Listening
+373,Lounge
+374,Chillout
+375,Exotica
+376,Cocktail Jazz
+377,Background Instrumental
+378,Balearic Chill
+379,Lo-Fi Jazz
+380,Chillhop
+381,Lo-Fi House
+382,Lo-Fi Indie
+383,Bedroom Pop
+384,Tape Lo-Fi
+385,Kinderlieder
+386,Nursery Rhymes
+387,Educational Songs
+388,Children's Pop
+389,Children's Folk
+390,Lullabies
+391,Comedy Music
+392,Musical Parody
+393,Satirical Songs
+394,Novelty Songs
+395,Comedy Rock
+396,Comedy Rap
+397,Military March
+398,Marching Band
+399,Brass March
+400,Drum Corps
+401,Ceremonial March
+402,Military Band
+403,Medieval Music
+404,Renaissance Folk
+405,Ancient Music
+406,Viking Age Inspired Folk
+407,Historical Reenactment Music
+408,Traditional Instrumental

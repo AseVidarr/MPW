@@ -1,0 +1,1 @@
+FIX 8: TXT/MD-Vorschau (nur lesen, bis 5 MB) und Doppelklick zum Öffnen mit Standardanwendung. Windows-GUI-Test ausstehend.

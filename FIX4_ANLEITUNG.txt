@@ -1,0 +1,14 @@
+FIX 4 – Portable-Datenisolierung (Build-Quellpaket)
+- Portable-Erkennung durch .mpw-portable-v2 neben App-Verzeichnis
+- Erkennung erfolgt auch bei direktem Start von App\MPW.exe
+- Im Portable-Modus kein Registry-/Legacy-Fallback und keine MPW_DATA_ROOT-Übernahme
+- Symlink auf Data wird abgewiesen
+- Build erzeugt Portable-Marker und löscht bestehende Portable-Ausgaben nicht
+- Installer-Verhalten bleibt unverändert; es darf bestehende Daten nicht migrieren ohne separate Prüfung
+
+BUILD: neues leeres Verzeichnis, dann scripts\build.ps1 ausführen.
+TEST: py -3 tests\test_portable_isolation.py
+ABNAHME: Diagnose muss einen Data-Pfad innerhalb des Portable-Ordners zeigen.
+WICHTIG: Datenpfade, die Anwender manuell innerhalb der App auswählen, sind nicht grundsätzlich gesperrt.
+Eine vollständige Prüfung aller externen Medien-/Backup-Referenzen ist noch ausstehend.
+Kein Windows-EXE-Build in dieser Umgebung ausgeführt.

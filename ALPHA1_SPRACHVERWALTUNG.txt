@@ -1,0 +1,10 @@
+MPW 2.2.0 Alpha 1
+Neue Sprachverwaltung im Reiter Konfiguration.
+Automatische Erkennung per QLocale (de/en/fr/es/it, sonst Englisch).
+Manuelle Auswahl wird in app_configuration.json als ui_language gespeichert.
+Die Spracheinstellungen selbst wechseln ohne Neustart.
+WICHTIG: Dies ist die erste Entwicklungsstufe, KEINE vollständige Übersetzung
+aller Reiter, Dialoge und Hilfetexte. Diese bleiben vorerst deutsch.
+Bestehende Songdaten und Datenbankschema unverändert.
+Windows Build: powershell -ExecutionPolicy Bypass -File .\\scripts\\build.ps1
+Noch nicht auf Windows GUI-getestet.

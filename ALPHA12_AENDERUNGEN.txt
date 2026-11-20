@@ -1,0 +1,6 @@
+MPW v2.2.0 Alpha 12
+Drei dynamische Sicherheitsabfragen in de/en/fr/es/it lokalisiert:
+- Song-Eintrag anlegen
+- Vorhandenen Bandordner uebernehmen
+- Projekt-Unterordner ergaenzen
+Syntax und Uebersetzungsplatzhalter statisch geprueft. Windows GUI-Test noch offen.

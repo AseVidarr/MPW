@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MPW – Music Production Workstation</title>
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">MPW <span class="brand-sub" data-i18n="app_sub">im Browser</span></div>
+  <nav class="tabs" role="tablist">
+    <button class="tab active" data-view="songs" role="tab" data-i18n="tab_songs">Songs &amp; Suno</button>
+    <button class="tab" data-view="bands" role="tab" data-i18n="tab_bands">Bands</button>
+  </nav>
+  <div class="meta" id="meta"></div>
+</header>
+
+<main>
+  <!-- Songs & Suno -->
+  <section id="view-songs" class="view">
+    <aside class="sidebar">
+      <select id="band-filter" aria-label="Band"></select>
+      <input id="song-search" type="search" data-i18n-placeholder="search_placeholder">
+      <div class="count" id="song-count"></div>
+      <ul id="song-list" class="list"></ul>
+    </aside>
+    <div class="editor" id="editor">
+      <div class="empty" id="editor-empty" data-i18n="no_song">Bitte links einen Song auswählen.</div>
+      <div id="editor-body" hidden>
+        <h1 id="song-title"></h1>
+        <div class="song-path" id="song-path"></div>
+        <div class="fields">
+          <label><span data-i18n="status">Status</span><select id="f-status"></select></label>
+          <label><span data-i18n="distributor">Distributor</span><input id="f-distributor" maxlength="500"></label>
+          <label><span data-i18n="platforms">Plattformen</span><input id="f-platforms" maxlength="500"></label>
+        </div>
+        <div class="texts">
+          <label class="textbox"><span><span data-i18n="style">Style</span> <em id="c-style"></em></span>
+            <textarea id="f-style" spellcheck="false"></textarea></label>
+          <label class="textbox"><span><span data-i18n="lyrics">Lyrics</span> <em id="c-lyrics"></em></span>
+            <textarea id="f-lyrics" spellcheck="false"></textarea></label>
+        </div>
+        <div class="actions">
+          <button id="btn-save" class="primary" data-i18n="save">Song speichern</button>
+          <button id="btn-revert" data-i18n="revert">Änderungen verwerfen</button>
+          <span id="dirty" class="dirty" hidden data-i18n="unsaved">Ungespeicherte Änderungen</span>
+        </div>
+        <div id="message" class="message" hidden></div>
+      </div>
+    </div>
+    <aside class="versions">
+      <h2 data-i18n="versions">Gespeicherte Prompt-Versionen</h2>
+      <ul id="version-list" class="list"></ul>
+      <div id="version-preview" class="preview" hidden>
+        <div class="preview-head" id="version-head"></div>
+        <h3 data-i18n="style">Style</h3><pre id="v-style"></pre>
+        <h3 data-i18n="lyrics">Lyrics</h3><pre id="v-lyrics"></pre>
+        <button id="btn-load-version" data-i18n="version_load">In den Editor übernehmen</button>
+        <div class="hint" data-i18n="version_load_hint">Gespeichert wird erst mit „Song speichern“.</div>
+      </div>
+    </aside>
+  </section>
+
+  <!-- Bands -->
+  <section id="view-bands" class="view" hidden>
+    <aside class="sidebar">
+      <ul id="band-list" class="list"></ul>
+    </aside>
+    <div class="editor">
+      <div class="empty" id="band-empty" data-i18n="no_band">Bitte links eine Band auswählen.</div>
+      <div id="band-body" hidden>
+        <h1 id="band-name"></h1>
+        <dl class="facts">
+          <dt data-i18n="genres">Genres</dt><dd id="band-genres"></dd>
+          <dt data-i18n="persona">Persona</dt><dd id="band-persona"></dd>
+        </dl>
+        <h2 data-i18n="hardware">Instrumente / Hardware</h2>
+        <table class="table"><thead><tr><th data-i18n="group">Gruppe</th><th data-i18n="hardware">Instrumente / Hardware</th></tr></thead>
+          <tbody id="band-hardware"></tbody></table>
+        <h2 data-i18n="projects">Song/Projekte</h2>
+        <ul id="band-projects" class="list"></ul>
+        <div class="hint" data-i18n="bands_readonly">Bands werden in dieser Stufe nur angezeigt; bearbeiten in der Desktop-App.</div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer" data-i18n="footer">Lokal auf diesem PC · dieselben Daten wie die installierte MPW</footer>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,1 @@
+Alpha 7: 7 feste Tooltips in de/en/fr/es/it. Dropdowns und Kontextmenüs noch nicht vollständig übersetzt: deren Texte werden teils für Programmlogik verwendet; sichere Umstellung benötigt stabile Kennungen. Syntax und ZIP geprüft; Windows-GUI-Test offen.

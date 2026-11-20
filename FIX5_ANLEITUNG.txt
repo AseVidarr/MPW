@@ -1,0 +1,3 @@
+FIX5: Beispielprofil erzeugt Band- und Projektordner, Konfiguration ist Standard-Startreiter bei Erststart, Zwischenablage-Import-Button ausgeblendet, Standard-Backupordner wird angelegt.
+Build unter Windows: powershell -ExecutionPolicy Bypass -File .\scripts\build.ps1
+WICHTIG: In frischem Ordner entpacken und Build ausfuehren. Keine vorhandenen produktiven Daten zum Testen verwenden. Windows-Funktionstests stehen aus.

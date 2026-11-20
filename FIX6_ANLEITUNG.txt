@@ -1,0 +1,1 @@
+FIX 6: Songs & Suno -> INFOS öffnet einen Rich-Text-Dialog mit Formatierung und Speicherung pro Song in song_infos. Additive SQLite-Migration; bestehende Daten bleiben erhalten. Windows-Build mit scripts/build.ps1. Noch kein Windows-GUI-Test durchgeführt.

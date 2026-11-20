@@ -1,0 +1,5 @@
+MPW v2.2.0 Alpha 13 – Backup-Dialoge
+
+5 dynamische Meldungsvorlagen in de/en/fr/es/it: altes Medienbackup, Wiederherstellungswarnung, Erfolgsmeldung, Backup-Ordner nicht erreichbar, Datei-Explorer nicht geöffnet.
+Nur sichtbare Meldungstexte geändert. Dateinamen/Pfade werden unverändert eingesetzt.
+Prüfung: Python AST-Syntax, Übersetzungsplatzhalter, ZIP-CRC. Windows-GUI-Test ausstehend.

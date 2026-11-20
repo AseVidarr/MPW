@@ -1,0 +1,2332 @@
+{
+  "version": "1.0",
+  "languages": [
+    "de",
+    "en",
+    "fr",
+    "es",
+    "it"
+  ],
+  "translation_status": "English names only; other languages fallback to English",
+  "main_genres": [
+    {
+      "id": 1,
+      "name": "Pop",
+      "subgenre_ids": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Rock",
+      "subgenre_ids": [
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Metal",
+      "subgenre_ids": [
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Blues",
+      "subgenre_ids": [
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        15
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Jazz",
+      "subgenre_ids": [
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69
+      ]
+    },
+    {
+      "id": 6,
+      "name": "Country",
+      "subgenre_ids": [
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        78,
+        79
+      ]
+    },
+    {
+      "id": 7,
+      "name": "Folk",
+      "subgenre_ids": [
+        80,
+        81,
+        82,
+        83,
+        84,
+        85,
+        86,
+        87,
+        88,
+        89,
+        90,
+        91
+      ]
+    },
+    {
+      "id": 8,
+      "name": "Classical",
+      "subgenre_ids": [
+        92,
+        93,
+        94,
+        95,
+        96,
+        97,
+        98,
+        99,
+        100,
+        101
+      ]
+    },
+    {
+      "id": 9,
+      "name": "Electronic",
+      "subgenre_ids": [
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111,
+        112
+      ]
+    },
+    {
+      "id": 10,
+      "name": "EDM / Dance",
+      "subgenre_ids": [
+        113,
+        114,
+        115,
+        116,
+        117,
+        118,
+        119,
+        120,
+        121,
+        122
+      ]
+    },
+    {
+      "id": 11,
+      "name": "House",
+      "subgenre_ids": [
+        123,
+        124,
+        125,
+        126,
+        127,
+        128,
+        129,
+        130,
+        131,
+        132,
+        133
+      ]
+    },
+    {
+      "id": 12,
+      "name": "Techno",
+      "subgenre_ids": [
+        134,
+        135,
+        136,
+        137,
+        138,
+        139,
+        140,
+        141,
+        142
+      ]
+    },
+    {
+      "id": 13,
+      "name": "Trance",
+      "subgenre_ids": [
+        143,
+        144,
+        145,
+        146,
+        147,
+        148,
+        149,
+        150,
+        151
+      ]
+    },
+    {
+      "id": 14,
+      "name": "Drum & Bass",
+      "subgenre_ids": [
+        152,
+        153,
+        154,
+        155,
+        156,
+        157,
+        158,
+        159,
+        160
+      ]
+    },
+    {
+      "id": 15,
+      "name": "Dubstep / Bass Music",
+      "subgenre_ids": [
+        161,
+        162,
+        163,
+        164,
+        165,
+        166,
+        167,
+        168,
+        169,
+        170
+      ]
+    },
+    {
+      "id": 16,
+      "name": "Hip-Hop / Rap",
+      "subgenre_ids": [
+        171,
+        172,
+        173,
+        174,
+        175,
+        176,
+        177,
+        178,
+        179,
+        180,
+        181,
+        182
+      ]
+    },
+    {
+      "id": 17,
+      "name": "R&B / Soul",
+      "subgenre_ids": [
+        183,
+        184,
+        185,
+        186,
+        187,
+        188,
+        189,
+        190,
+        191
+      ]
+    },
+    {
+      "id": 18,
+      "name": "Funk",
+      "subgenre_ids": [
+        192,
+        193,
+        194,
+        195,
+        196,
+        197,
+        198,
+        199,
+        200
+      ]
+    },
+    {
+      "id": 19,
+      "name": "Disco",
+      "subgenre_ids": [
+        201,
+        202,
+        203,
+        204,
+        205,
+        206,
+        207,
+        208
+      ]
+    },
+    {
+      "id": 20,
+      "name": "Reggae",
+      "subgenre_ids": [
+        209,
+        210,
+        211,
+        212,
+        213,
+        214,
+        215,
+        216
+      ]
+    },
+    {
+      "id": 21,
+      "name": "Ska",
+      "subgenre_ids": [
+        217,
+        218,
+        219,
+        220,
+        221,
+        222
+      ]
+    },
+    {
+      "id": 22,
+      "name": "Punk",
+      "subgenre_ids": [
+        223,
+        224,
+        225,
+        226,
+        227,
+        228,
+        229,
+        230,
+        231,
+        232
+      ]
+    },
+    {
+      "id": 23,
+      "name": "Gothic / Darkwave",
+      "subgenre_ids": [
+        233,
+        234,
+        235,
+        236,
+        237,
+        238,
+        239,
+        240
+      ]
+    },
+    {
+      "id": 24,
+      "name": "Industrial",
+      "subgenre_ids": [
+        241,
+        242,
+        41,
+        243,
+        244,
+        245,
+        246,
+        247,
+        248,
+        249
+      ]
+    },
+    {
+      "id": 25,
+      "name": "Alternative / Indie",
+      "subgenre_ids": [
+        250,
+        251,
+        252,
+        4,
+        253,
+        254,
+        255,
+        256,
+        257,
+        258,
+        259
+      ]
+    },
+    {
+      "id": 26,
+      "name": "Latin",
+      "subgenre_ids": [
+        260,
+        261,
+        262,
+        263,
+        264,
+        265,
+        266,
+        267,
+        268,
+        66,
+        269
+      ]
+    },
+    {
+      "id": 27,
+      "name": "Reggaeton",
+      "subgenre_ids": [
+        270,
+        271,
+        272,
+        273,
+        274,
+        275,
+        276
+      ]
+    },
+    {
+      "id": 28,
+      "name": "Afro / African Music",
+      "subgenre_ids": [
+        277,
+        278,
+        279,
+        127,
+        280,
+        281,
+        282,
+        283,
+        284,
+        285,
+        286,
+        287,
+        288
+      ]
+    },
+    {
+      "id": 29,
+      "name": "Caribbean",
+      "subgenre_ids": [
+        289,
+        290,
+        291,
+        292,
+        293,
+        294,
+        295,
+        296,
+        297
+      ]
+    },
+    {
+      "id": 30,
+      "name": "World / Global Music",
+      "subgenre_ids": [
+        298,
+        299,
+        300,
+        301,
+        302,
+        303,
+        304,
+        305,
+        306,
+        307
+      ]
+    },
+    {
+      "id": 31,
+      "name": "Ambient",
+      "subgenre_ids": [
+        308,
+        309,
+        310,
+        311,
+        312,
+        313,
+        314,
+        315,
+        316
+      ]
+    },
+    {
+      "id": 32,
+      "name": "New Age",
+      "subgenre_ids": [
+        317,
+        318,
+        319,
+        320,
+        321,
+        322
+      ]
+    },
+    {
+      "id": 33,
+      "name": "Experimental",
+      "subgenre_ids": [
+        323,
+        324,
+        325,
+        326,
+        111,
+        327,
+        328,
+        329
+      ]
+    },
+    {
+      "id": 34,
+      "name": "Soundtrack / Score",
+      "subgenre_ids": [
+        330,
+        331,
+        332,
+        333,
+        334,
+        335,
+        336,
+        337,
+        338
+      ]
+    },
+    {
+      "id": 35,
+      "name": "Gospel",
+      "subgenre_ids": [
+        339,
+        340,
+        341,
+        342,
+        343,
+        344,
+        345
+      ]
+    },
+    {
+      "id": 36,
+      "name": "Christian / Sacred",
+      "subgenre_ids": [
+        346,
+        347,
+        348,
+        349,
+        350,
+        351,
+        352
+      ]
+    },
+    {
+      "id": 37,
+      "name": "Schlager",
+      "subgenre_ids": [
+        353,
+        354,
+        355,
+        356,
+        357,
+        358
+      ]
+    },
+    {
+      "id": 38,
+      "name": "Volksmusik",
+      "subgenre_ids": [
+        359,
+        360,
+        361,
+        362,
+        363,
+        364,
+        365
+      ]
+    },
+    {
+      "id": 39,
+      "name": "Chanson / Singer-Songwriter",
+      "subgenre_ids": [
+        366,
+        367,
+        368,
+        369,
+        370,
+        371
+      ]
+    },
+    {
+      "id": 40,
+      "name": "Easy Listening / Lounge",
+      "subgenre_ids": [
+        372,
+        373,
+        374,
+        375,
+        376,
+        377,
+        378
+      ]
+    },
+    {
+      "id": 41,
+      "name": "Lo-Fi",
+      "subgenre_ids": [
+        182,
+        379,
+        380,
+        381,
+        382,
+        383,
+        384
+      ]
+    },
+    {
+      "id": 42,
+      "name": "Children's Music",
+      "subgenre_ids": [
+        385,
+        386,
+        387,
+        388,
+        389,
+        390
+      ]
+    },
+    {
+      "id": 43,
+      "name": "Comedy / Novelty",
+      "subgenre_ids": [
+        391,
+        392,
+        393,
+        394,
+        395,
+        396
+      ]
+    },
+    {
+      "id": 44,
+      "name": "Marching / Military",
+      "subgenre_ids": [
+        397,
+        398,
+        399,
+        400,
+        401,
+        402
+      ]
+    },
+    {
+      "id": 45,
+      "name": "Traditional / Historical",
+      "subgenre_ids": [
+        403,
+        404,
+        405,
+        406,
+        407,
+        408
+      ]
+    }
+  ],
+  "subgenres": [
+    {
+      "id": 1,
+      "name": "Synth-Pop"
+    },
+    {
+      "id": 2,
+      "name": "Dance-Pop"
+    },
+    {
+      "id": 3,
+      "name": "Electropop"
+    },
+    {
+      "id": 4,
+      "name": "Indie Pop"
+    },
+    {
+      "id": 5,
+      "name": "Art Pop"
+    },
+    {
+      "id": 6,
+      "name": "Dream Pop"
+    },
+    {
+      "id": 7,
+      "name": "K-Pop"
+    },
+    {
+      "id": 8,
+      "name": "J-Pop"
+    },
+    {
+      "id": 9,
+      "name": "Teen Pop"
+    },
+    {
+      "id": 10,
+      "name": "Power Pop"
+    },
+    {
+      "id": 11,
+      "name": "Chamber Pop"
+    },
+    {
+      "id": 12,
+      "name": "Hyperpop"
+    },
+    {
+      "id": 13,
+      "name": "Classic Rock"
+    },
+    {
+      "id": 14,
+      "name": "Hard Rock"
+    },
+    {
+      "id": 15,
+      "name": "Blues Rock"
+    },
+    {
+      "id": 16,
+      "name": "Southern Rock"
+    },
+    {
+      "id": 17,
+      "name": "Progressive Rock"
+    },
+    {
+      "id": 18,
+      "name": "Psychedelic Rock"
+    },
+    {
+      "id": 19,
+      "name": "Garage Rock"
+    },
+    {
+      "id": 20,
+      "name": "Stoner Rock"
+    },
+    {
+      "id": 21,
+      "name": "Arena Rock"
+    },
+    {
+      "id": 22,
+      "name": "Rockabilly"
+    },
+    {
+      "id": 23,
+      "name": "Boogie Rock"
+    },
+    {
+      "id": 24,
+      "name": "Heavy Metal"
+    },
+    {
+      "id": 25,
+      "name": "Thrash Metal"
+    },
+    {
+      "id": 26,
+      "name": "Death Metal"
+    },
+    {
+      "id": 27,
+      "name": "Melodic Death Metal"
+    },
+    {
+      "id": 28,
+      "name": "Black Metal"
+    },
+    {
+      "id": 29,
+      "name": "Doom Metal"
+    },
+    {
+      "id": 30,
+      "name": "Power Metal"
+    },
+    {
+      "id": 31,
+      "name": "Symphonic Metal"
+    },
+    {
+      "id": 32,
+      "name": "Viking Metal"
+    },
+    {
+      "id": 33,
+      "name": "Folk Metal"
+    },
+    {
+      "id": 34,
+      "name": "Pagan Metal"
+    },
+    {
+      "id": 35,
+      "name": "Groove Metal"
+    },
+    {
+      "id": 36,
+      "name": "Nu Metal"
+    },
+    {
+      "id": 37,
+      "name": "Metalcore"
+    },
+    {
+      "id": 38,
+      "name": "Deathcore"
+    },
+    {
+      "id": 39,
+      "name": "Progressive Metal"
+    },
+    {
+      "id": 40,
+      "name": "Technical Death Metal"
+    },
+    {
+      "id": 41,
+      "name": "Industrial Metal"
+    },
+    {
+      "id": 42,
+      "name": "Gothic Metal"
+    },
+    {
+      "id": 43,
+      "name": "Theatrical Epic Metal"
+    },
+    {
+      "id": 44,
+      "name": "Delta Blues"
+    },
+    {
+      "id": 45,
+      "name": "Chicago Blues"
+    },
+    {
+      "id": 46,
+      "name": "Texas Blues"
+    },
+    {
+      "id": 47,
+      "name": "British Blues"
+    },
+    {
+      "id": 48,
+      "name": "Electric Blues"
+    },
+    {
+      "id": 49,
+      "name": "Acoustic Blues"
+    },
+    {
+      "id": 50,
+      "name": "Country Blues"
+    },
+    {
+      "id": 51,
+      "name": "Mississippi Blues"
+    },
+    {
+      "id": 52,
+      "name": "Piedmont Blues"
+    },
+    {
+      "id": 53,
+      "name": "Hill Country Blues"
+    },
+    {
+      "id": 54,
+      "name": "Jump Blues"
+    },
+    {
+      "id": 55,
+      "name": "Boogie-Woogie"
+    },
+    {
+      "id": 56,
+      "name": "Acid Blues"
+    },
+    {
+      "id": 57,
+      "name": "Dixieland"
+    },
+    {
+      "id": 58,
+      "name": "Swing"
+    },
+    {
+      "id": 59,
+      "name": "Bebop"
+    },
+    {
+      "id": 60,
+      "name": "Hard Bop"
+    },
+    {
+      "id": 61,
+      "name": "Cool Jazz"
+    },
+    {
+      "id": 62,
+      "name": "Modal Jazz"
+    },
+    {
+      "id": 63,
+      "name": "Free Jazz"
+    },
+    {
+      "id": 64,
+      "name": "Jazz Fusion"
+    },
+    {
+      "id": 65,
+      "name": "Smooth Jazz"
+    },
+    {
+      "id": 66,
+      "name": "Latin Jazz"
+    },
+    {
+      "id": 67,
+      "name": "Acid Jazz"
+    },
+    {
+      "id": 68,
+      "name": "Vocal Jazz"
+    },
+    {
+      "id": 69,
+      "name": "Contemporary Jazz"
+    },
+    {
+      "id": 70,
+      "name": "Traditional Country"
+    },
+    {
+      "id": 71,
+      "name": "Honky-Tonk"
+    },
+    {
+      "id": 72,
+      "name": "Outlaw Country"
+    },
+    {
+      "id": 73,
+      "name": "Bluegrass"
+    },
+    {
+      "id": 74,
+      "name": "Country Rock"
+    },
+    {
+      "id": 75,
+      "name": "Country Pop"
+    },
+    {
+      "id": 76,
+      "name": "Americana"
+    },
+    {
+      "id": 77,
+      "name": "Alternative Country"
+    },
+    {
+      "id": 78,
+      "name": "Western Swing"
+    },
+    {
+      "id": 79,
+      "name": "Nashville Sound"
+    },
+    {
+      "id": 80,
+      "name": "Traditional Folk"
+    },
+    {
+      "id": 81,
+      "name": "Contemporary Folk"
+    },
+    {
+      "id": 82,
+      "name": "Celtic Folk"
+    },
+    {
+      "id": 83,
+      "name": "Nordic Folk"
+    },
+    {
+      "id": 84,
+      "name": "Norse Folk"
+    },
+    {
+      "id": 85,
+      "name": "German Folk"
+    },
+    {
+      "id": 86,
+      "name": "British Folk"
+    },
+    {
+      "id": 87,
+      "name": "American Folk"
+    },
+    {
+      "id": 88,
+      "name": "Folk Rock"
+    },
+    {
+      "id": 89,
+      "name": "Neo-Folk"
+    },
+    {
+      "id": 90,
+      "name": "Dark Folk"
+    },
+    {
+      "id": 91,
+      "name": "Folk Punk"
+    },
+    {
+      "id": 92,
+      "name": "Baroque"
+    },
+    {
+      "id": 93,
+      "name": "Classical Period"
+    },
+    {
+      "id": 94,
+      "name": "Romantic"
+    },
+    {
+      "id": 95,
+      "name": "Renaissance Classical"
+    },
+    {
+      "id": 96,
+      "name": "Contemporary Classical"
+    },
+    {
+      "id": 97,
+      "name": "Minimalism"
+    },
+    {
+      "id": 98,
+      "name": "Opera"
+    },
+    {
+      "id": 99,
+      "name": "Chamber Music"
+    },
+    {
+      "id": 100,
+      "name": "Symphonic Music"
+    },
+    {
+      "id": 101,
+      "name": "Choral Classical"
+    },
+    {
+      "id": 102,
+      "name": "Electronica"
+    },
+    {
+      "id": 103,
+      "name": "IDM"
+    },
+    {
+      "id": 104,
+      "name": "Electro"
+    },
+    {
+      "id": 105,
+      "name": "Synthwave"
+    },
+    {
+      "id": 106,
+      "name": "Retrowave"
+    },
+    {
+      "id": 107,
+      "name": "Vaporwave"
+    },
+    {
+      "id": 108,
+      "name": "Berlin School"
+    },
+    {
+      "id": 109,
+      "name": "Glitch"
+    },
+    {
+      "id": 110,
+      "name": "Downtempo"
+    },
+    {
+      "id": 111,
+      "name": "Electroacoustic"
+    },
+    {
+      "id": 112,
+      "name": "Experimental Electronic"
+    },
+    {
+      "id": 113,
+      "name": "Big Room EDM"
+    },
+    {
+      "id": 114,
+      "name": "Festival EDM"
+    },
+    {
+      "id": 115,
+      "name": "Dance"
+    },
+    {
+      "id": 116,
+      "name": "Electro Dance"
+    },
+    {
+      "id": 117,
+      "name": "Future Rave"
+    },
+    {
+      "id": 118,
+      "name": "Hard Dance"
+    },
+    {
+      "id": 119,
+      "name": "Hands Up"
+    },
+    {
+      "id": 120,
+      "name": "Eurodance"
+    },
+    {
+      "id": 121,
+      "name": "Dancecore"
+    },
+    {
+      "id": 122,
+      "name": "Melbourne Bounce"
+    },
+    {
+      "id": 123,
+      "name": "Chicago House"
+    },
+    {
+      "id": 124,
+      "name": "Deep House"
+    },
+    {
+      "id": 125,
+      "name": "Tech House"
+    },
+    {
+      "id": 126,
+      "name": "Progressive House"
+    },
+    {
+      "id": 127,
+      "name": "Afro House"
+    },
+    {
+      "id": 128,
+      "name": "Organic House"
+    },
+    {
+      "id": 129,
+      "name": "Soulful House"
+    },
+    {
+      "id": 130,
+      "name": "Acid House"
+    },
+    {
+      "id": 131,
+      "name": "French House"
+    },
+    {
+      "id": 132,
+      "name": "Tropical House"
+    },
+    {
+      "id": 133,
+      "name": "Bass House"
+    },
+    {
+      "id": 134,
+      "name": "Detroit Techno"
+    },
+    {
+      "id": 135,
+      "name": "Minimal Techno"
+    },
+    {
+      "id": 136,
+      "name": "Industrial Techno"
+    },
+    {
+      "id": 137,
+      "name": "Hard Techno"
+    },
+    {
+      "id": 138,
+      "name": "Acid Techno"
+    },
+    {
+      "id": 139,
+      "name": "Dub Techno"
+    },
+    {
+      "id": 140,
+      "name": "Melodic Techno"
+    },
+    {
+      "id": 141,
+      "name": "Schranz"
+    },
+    {
+      "id": 142,
+      "name": "Peak Time Techno"
+    },
+    {
+      "id": 143,
+      "name": "Classic Trance"
+    },
+    {
+      "id": 144,
+      "name": "Uplifting Trance"
+    },
+    {
+      "id": 145,
+      "name": "Progressive Trance"
+    },
+    {
+      "id": 146,
+      "name": "Psytrance"
+    },
+    {
+      "id": 147,
+      "name": "Goa Trance"
+    },
+    {
+      "id": 148,
+      "name": "Vocal Trance"
+    },
+    {
+      "id": 149,
+      "name": "Tech Trance"
+    },
+    {
+      "id": 150,
+      "name": "Hard Trance"
+    },
+    {
+      "id": 151,
+      "name": "Dream Trance"
+    },
+    {
+      "id": 152,
+      "name": "Liquid Drum & Bass"
+    },
+    {
+      "id": 153,
+      "name": "Neurofunk"
+    },
+    {
+      "id": 154,
+      "name": "Jump Up"
+    },
+    {
+      "id": 155,
+      "name": "Atmospheric DnB"
+    },
+    {
+      "id": 156,
+      "name": "Techstep"
+    },
+    {
+      "id": 157,
+      "name": "Darkstep"
+    },
+    {
+      "id": 158,
+      "name": "Jungle"
+    },
+    {
+      "id": 159,
+      "name": "Drumfunk"
+    },
+    {
+      "id": 160,
+      "name": "Dancefloor DnB"
+    },
+    {
+      "id": 161,
+      "name": "Classic Dubstep"
+    },
+    {
+      "id": 162,
+      "name": "Brostep"
+    },
+    {
+      "id": 163,
+      "name": "Riddim"
+    },
+    {
+      "id": 164,
+      "name": "Melodic Dubstep"
+    },
+    {
+      "id": 165,
+      "name": "Future Bass"
+    },
+    {
+      "id": 166,
+      "name": "UK Bass"
+    },
+    {
+      "id": 167,
+      "name": "Trap EDM"
+    },
+    {
+      "id": 168,
+      "name": "Bassline"
+    },
+    {
+      "id": 169,
+      "name": "Glitch Hop"
+    },
+    {
+      "id": 170,
+      "name": "Midtempo Bass"
+    },
+    {
+      "id": 171,
+      "name": "Old School Hip-Hop"
+    },
+    {
+      "id": 172,
+      "name": "Boom Bap"
+    },
+    {
+      "id": 173,
+      "name": "East Coast Rap"
+    },
+    {
+      "id": 174,
+      "name": "West Coast Rap"
+    },
+    {
+      "id": 175,
+      "name": "Gangsta Rap"
+    },
+    {
+      "id": 176,
+      "name": "Trap"
+    },
+    {
+      "id": 177,
+      "name": "Drill"
+    },
+    {
+      "id": 178,
+      "name": "Conscious Rap"
+    },
+    {
+      "id": 179,
+      "name": "Alternative Hip-Hop"
+    },
+    {
+      "id": 180,
+      "name": "Detroit Rap"
+    },
+    {
+      "id": 181,
+      "name": "Cloud Rap"
+    },
+    {
+      "id": 182,
+      "name": "Lo-Fi Hip-Hop"
+    },
+    {
+      "id": 183,
+      "name": "Classic R&B"
+    },
+    {
+      "id": 184,
+      "name": "Contemporary R&B"
+    },
+    {
+      "id": 185,
+      "name": "Neo-Soul"
+    },
+    {
+      "id": 186,
+      "name": "Classic Soul"
+    },
+    {
+      "id": 187,
+      "name": "Southern Soul"
+    },
+    {
+      "id": 188,
+      "name": "Motown"
+    },
+    {
+      "id": 189,
+      "name": "Quiet Storm"
+    },
+    {
+      "id": 190,
+      "name": "Alternative R&B"
+    },
+    {
+      "id": 191,
+      "name": "Blue-Eyed Soul"
+    },
+    {
+      "id": 192,
+      "name": "Classic Funk"
+    },
+    {
+      "id": 193,
+      "name": "P-Funk"
+    },
+    {
+      "id": 194,
+      "name": "Jazz-Funk"
+    },
+    {
+      "id": 195,
+      "name": "Electro-Funk"
+    },
+    {
+      "id": 196,
+      "name": "Funk Rock"
+    },
+    {
+      "id": 197,
+      "name": "Funk Metal"
+    },
+    {
+      "id": 198,
+      "name": "Afro-Funk"
+    },
+    {
+      "id": 199,
+      "name": "Deep Funk"
+    },
+    {
+      "id": 200,
+      "name": "Modern Funk"
+    },
+    {
+      "id": 201,
+      "name": "Classic Disco"
+    },
+    {
+      "id": 202,
+      "name": "Euro Disco"
+    },
+    {
+      "id": 203,
+      "name": "Italo Disco"
+    },
+    {
+      "id": 204,
+      "name": "Nu-Disco"
+    },
+    {
+      "id": 205,
+      "name": "Space Disco"
+    },
+    {
+      "id": 206,
+      "name": "Disco House"
+    },
+    {
+      "id": 207,
+      "name": "Hi-NRG"
+    },
+    {
+      "id": 208,
+      "name": "Post-Disco"
+    },
+    {
+      "id": 209,
+      "name": "Roots Reggae"
+    },
+    {
+      "id": 210,
+      "name": "Rocksteady"
+    },
+    {
+      "id": 211,
+      "name": "Dub"
+    },
+    {
+      "id": 212,
+      "name": "Lovers Rock"
+    },
+    {
+      "id": 213,
+      "name": "Ragga"
+    },
+    {
+      "id": 214,
+      "name": "Digital Reggae"
+    },
+    {
+      "id": 215,
+      "name": "Reggae Fusion"
+    },
+    {
+      "id": 216,
+      "name": "Conscious Reggae"
+    },
+    {
+      "id": 217,
+      "name": "Jamaican Ska"
+    },
+    {
+      "id": 218,
+      "name": "2 Tone"
+    },
+    {
+      "id": 219,
+      "name": "Third Wave Ska"
+    },
+    {
+      "id": 220,
+      "name": "Ska Punk"
+    },
+    {
+      "id": 221,
+      "name": "Ska Jazz"
+    },
+    {
+      "id": 222,
+      "name": "Ska Rock"
+    },
+    {
+      "id": 223,
+      "name": "Punk Rock"
+    },
+    {
+      "id": 224,
+      "name": "Hardcore Punk"
+    },
+    {
+      "id": 225,
+      "name": "Street Punk"
+    },
+    {
+      "id": 226,
+      "name": "Anarcho-Punk"
+    },
+    {
+      "id": 227,
+      "name": "Crust Punk"
+    },
+    {
+      "id": 228,
+      "name": "Pop Punk"
+    },
+    {
+      "id": 229,
+      "name": "Skate Punk"
+    },
+    {
+      "id": 230,
+      "name": "Oi!"
+    },
+    {
+      "id": 231,
+      "name": "Post-Punk"
+    },
+    {
+      "id": 232,
+      "name": "Melodic Hardcore"
+    },
+    {
+      "id": 233,
+      "name": "Gothic Rock"
+    },
+    {
+      "id": 234,
+      "name": "Darkwave"
+    },
+    {
+      "id": 235,
+      "name": "Coldwave"
+    },
+    {
+      "id": 236,
+      "name": "Ethereal Wave"
+    },
+    {
+      "id": 237,
+      "name": "Neoclassical Darkwave"
+    },
+    {
+      "id": 238,
+      "name": "Gothic Pop"
+    },
+    {
+      "id": 239,
+      "name": "Deathrock"
+    },
+    {
+      "id": 240,
+      "name": "Dark Cabaret"
+    },
+    {
+      "id": 241,
+      "name": "Industrial"
+    },
+    {
+      "id": 242,
+      "name": "Industrial Rock"
+    },
+    {
+      "id": 243,
+      "name": "EBM"
+    },
+    {
+      "id": 244,
+      "name": "Electro-Industrial"
+    },
+    {
+      "id": 245,
+      "name": "Aggrotech"
+    },
+    {
+      "id": 246,
+      "name": "Power Noise"
+    },
+    {
+      "id": 247,
+      "name": "Rhythmic Noise"
+    },
+    {
+      "id": 248,
+      "name": "Neue Deutsche Härte"
+    },
+    {
+      "id": 249,
+      "name": "Industrial Dance"
+    },
+    {
+      "id": 250,
+      "name": "Alternative Rock"
+    },
+    {
+      "id": 251,
+      "name": "Indie Rock"
+    },
+    {
+      "id": 252,
+      "name": "Indie Folk"
+    },
+    {
+      "id": 253,
+      "name": "Shoegaze"
+    },
+    {
+      "id": 254,
+      "name": "Grunge"
+    },
+    {
+      "id": 255,
+      "name": "Britpop"
+    },
+    {
+      "id": 256,
+      "name": "Post-Rock"
+    },
+    {
+      "id": 257,
+      "name": "Math Rock"
+    },
+    {
+      "id": 258,
+      "name": "Noise Rock"
+    },
+    {
+      "id": 259,
+      "name": "Slowcore"
+    },
+    {
+      "id": 260,
+      "name": "Salsa"
+    },
+    {
+      "id": 261,
+      "name": "Bachata"
+    },
+    {
+      "id": 262,
+      "name": "Merengue"
+    },
+    {
+      "id": 263,
+      "name": "Cumbia"
+    },
+    {
+      "id": 264,
+      "name": "Latin Pop"
+    },
+    {
+      "id": 265,
+      "name": "Latin Rock"
+    },
+    {
+      "id": 266,
+      "name": "Bossa Nova"
+    },
+    {
+      "id": 267,
+      "name": "Samba"
+    },
+    {
+      "id": 268,
+      "name": "Tango"
+    },
+    {
+      "id": 269,
+      "name": "Regional Mexican"
+    },
+    {
+      "id": 270,
+      "name": "Classic Reggaeton"
+    },
+    {
+      "id": 271,
+      "name": "Old School Reggaeton"
+    },
+    {
+      "id": 272,
+      "name": "Modern Reggaeton"
+    },
+    {
+      "id": 273,
+      "name": "Neo-Perreo"
+    },
+    {
+      "id": 274,
+      "name": "Latin Urban"
+    },
+    {
+      "id": 275,
+      "name": "Reggaeton Pop"
+    },
+    {
+      "id": 276,
+      "name": "Reggaeton Fusion"
+    },
+    {
+      "id": 277,
+      "name": "Afrobeat"
+    },
+    {
+      "id": 278,
+      "name": "Afrobeats"
+    },
+    {
+      "id": 279,
+      "name": "Amapiano"
+    },
+    {
+      "id": 280,
+      "name": "Highlife"
+    },
+    {
+      "id": 281,
+      "name": "Juju"
+    },
+    {
+      "id": 282,
+      "name": "Fuji"
+    },
+    {
+      "id": 283,
+      "name": "Soukous"
+    },
+    {
+      "id": 284,
+      "name": "Makossa"
+    },
+    {
+      "id": 285,
+      "name": "Gqom"
+    },
+    {
+      "id": 286,
+      "name": "Kwaito"
+    },
+    {
+      "id": 287,
+      "name": "Afro-Pop"
+    },
+    {
+      "id": 288,
+      "name": "Afro-Tech"
+    },
+    {
+      "id": 289,
+      "name": "Soca"
+    },
+    {
+      "id": 290,
+      "name": "Calypso"
+    },
+    {
+      "id": 291,
+      "name": "Zouk"
+    },
+    {
+      "id": 292,
+      "name": "Kompa"
+    },
+    {
+      "id": 293,
+      "name": "Chutney"
+    },
+    {
+      "id": 294,
+      "name": "Bouyon"
+    },
+    {
+      "id": 295,
+      "name": "Dancehall"
+    },
+    {
+      "id": 296,
+      "name": "Mento"
+    },
+    {
+      "id": 297,
+      "name": "Caribbean Fusion"
+    },
+    {
+      "id": 298,
+      "name": "Arabic Music"
+    },
+    {
+      "id": 299,
+      "name": "Indian Classical"
+    },
+    {
+      "id": 300,
+      "name": "Bollywood"
+    },
+    {
+      "id": 301,
+      "name": "Balkan Music"
+    },
+    {
+      "id": 302,
+      "name": "Klezmer"
+    },
+    {
+      "id": 303,
+      "name": "Flamenco"
+    },
+    {
+      "id": 304,
+      "name": "Fado"
+    },
+    {
+      "id": 305,
+      "name": "Turkish Folk"
+    },
+    {
+      "id": 306,
+      "name": "Asian Traditional"
+    },
+    {
+      "id": 307,
+      "name": "Global Fusion"
+    },
+    {
+      "id": 308,
+      "name": "Ambient"
+    },
+    {
+      "id": 309,
+      "name": "Dark Ambient"
+    },
+    {
+      "id": 310,
+      "name": "Drone Ambient"
+    },
+    {
+      "id": 311,
+      "name": "Space Ambient"
+    },
+    {
+      "id": 312,
+      "name": "Nature Ambient"
+    },
+    {
+      "id": 313,
+      "name": "Isolationism"
+    },
+    {
+      "id": 314,
+      "name": "Ambient Electronic"
+    },
+    {
+      "id": 315,
+      "name": "Ambient Drone"
+    },
+    {
+      "id": 316,
+      "name": "Cinematic Ambient"
+    },
+    {
+      "id": 317,
+      "name": "Meditation Music"
+    },
+    {
+      "id": 318,
+      "name": "Healing Music"
+    },
+    {
+      "id": 319,
+      "name": "Spiritual Instrumental"
+    },
+    {
+      "id": 320,
+      "name": "Nature Soundscapes"
+    },
+    {
+      "id": 321,
+      "name": "Relaxation Music"
+    },
+    {
+      "id": 322,
+      "name": "New Age Electronic"
+    },
+    {
+      "id": 323,
+      "name": "Avant-Garde"
+    },
+    {
+      "id": 324,
+      "name": "Noise"
+    },
+    {
+      "id": 325,
+      "name": "Harsh Noise"
+    },
+    {
+      "id": 326,
+      "name": "Musique Concrète"
+    },
+    {
+      "id": 327,
+      "name": "Free Improvisation"
+    },
+    {
+      "id": 328,
+      "name": "Sound Art"
+    },
+    {
+      "id": 329,
+      "name": "Experimental Rock"
+    },
+    {
+      "id": 330,
+      "name": "Film Score"
+    },
+    {
+      "id": 331,
+      "name": "Orchestral Score"
+    },
+    {
+      "id": 332,
+      "name": "Game Soundtrack"
+    },
+    {
+      "id": 333,
+      "name": "Trailer Music"
+    },
+    {
+      "id": 334,
+      "name": "Epic Cinematic"
+    },
+    {
+      "id": 335,
+      "name": "Hybrid Orchestral"
+    },
+    {
+      "id": 336,
+      "name": "Horror Score"
+    },
+    {
+      "id": 337,
+      "name": "Documentary Score"
+    },
+    {
+      "id": 338,
+      "name": "Anime Soundtrack"
+    },
+    {
+      "id": 339,
+      "name": "Traditional Gospel"
+    },
+    {
+      "id": 340,
+      "name": "Contemporary Gospel"
+    },
+    {
+      "id": 341,
+      "name": "Black Gospel"
+    },
+    {
+      "id": 342,
+      "name": "Southern Gospel"
+    },
+    {
+      "id": 343,
+      "name": "Gospel Choir"
+    },
+    {
+      "id": 344,
+      "name": "Gospel Blues"
+    },
+    {
+      "id": 345,
+      "name": "Urban Gospel"
+    },
+    {
+      "id": 346,
+      "name": "Worship"
+    },
+    {
+      "id": 347,
+      "name": "Contemporary Christian Music"
+    },
+    {
+      "id": 348,
+      "name": "Christian Rock"
+    },
+    {
+      "id": 349,
+      "name": "Christian Metal"
+    },
+    {
+      "id": 350,
+      "name": "Sacred Music"
+    },
+    {
+      "id": 351,
+      "name": "Hymns"
+    },
+    {
+      "id": 352,
+      "name": "Liturgical Music"
+    },
+    {
+      "id": 353,
+      "name": "Deutscher Schlager"
+    },
+    {
+      "id": 354,
+      "name": "Popschlager"
+    },
+    {
+      "id": 355,
+      "name": "Partyschlager"
+    },
+    {
+      "id": 356,
+      "name": "Discofox"
+    },
+    {
+      "id": 357,
+      "name": "Retro-Schlager"
+    },
+    {
+      "id": 358,
+      "name": "Moderner Schlager"
+    },
+    {
+      "id": 359,
+      "name": "Deutsche Volksmusik"
+    },
+    {
+      "id": 360,
+      "name": "Alpine Volksmusik"
+    },
+    {
+      "id": 361,
+      "name": "Oberkrainer"
+    },
+    {
+      "id": 362,
+      "name": "Blasmusik"
+    },
+    {
+      "id": 363,
+      "name": "Bayerische Volksmusik"
+    },
+    {
+      "id": 364,
+      "name": "Austrian Folk"
+    },
+    {
+      "id": 365,
+      "name": "Traditional Polka"
+    },
+    {
+      "id": 366,
+      "name": "French Chanson"
+    },
+    {
+      "id": 367,
+      "name": "German Chanson"
+    },
+    {
+      "id": 368,
+      "name": "Liedermacher"
+    },
+    {
+      "id": 369,
+      "name": "Acoustic Singer-Songwriter"
+    },
+    {
+      "id": 370,
+      "name": "Contemporary Singer-Songwriter"
+    },
+    {
+      "id": 371,
+      "name": "Folk Singer-Songwriter"
+    },
+    {
+      "id": 372,
+      "name": "Easy Listening"
+    },
+    {
+      "id": 373,
+      "name": "Lounge"
+    },
+    {
+      "id": 374,
+      "name": "Chillout"
+    },
+    {
+      "id": 375,
+      "name": "Exotica"
+    },
+    {
+      "id": 376,
+      "name": "Cocktail Jazz"
+    },
+    {
+      "id": 377,
+      "name": "Background Instrumental"
+    },
+    {
+      "id": 378,
+      "name": "Balearic Chill"
+    },
+    {
+      "id": 379,
+      "name": "Lo-Fi Jazz"
+    },
+    {
+      "id": 380,
+      "name": "Chillhop"
+    },
+    {
+      "id": 381,
+      "name": "Lo-Fi House"
+    },
+    {
+      "id": 382,
+      "name": "Lo-Fi Indie"
+    },
+    {
+      "id": 383,
+      "name": "Bedroom Pop"
+    },
+    {
+      "id": 384,
+      "name": "Tape Lo-Fi"
+    },
+    {
+      "id": 385,
+      "name": "Kinderlieder"
+    },
+    {
+      "id": 386,
+      "name": "Nursery Rhymes"
+    },
+    {
+      "id": 387,
+      "name": "Educational Songs"
+    },
+    {
+      "id": 388,
+      "name": "Children's Pop"
+    },
+    {
+      "id": 389,
+      "name": "Children's Folk"
+    },
+    {
+      "id": 390,
+      "name": "Lullabies"
+    },
+    {
+      "id": 391,
+      "name": "Comedy Music"
+    },
+    {
+      "id": 392,
+      "name": "Musical Parody"
+    },
+    {
+      "id": 393,
+      "name": "Satirical Songs"
+    },
+    {
+      "id": 394,
+      "name": "Novelty Songs"
+    },
+    {
+      "id": 395,
+      "name": "Comedy Rock"
+    },
+    {
+      "id": 396,
+      "name": "Comedy Rap"
+    },
+    {
+      "id": 397,
+      "name": "Military March"
+    },
+    {
+      "id": 398,
+      "name": "Marching Band"
+    },
+    {
+      "id": 399,
+      "name": "Brass March"
+    },
+    {
+      "id": 400,
+      "name": "Drum Corps"
+    },
+    {
+      "id": 401,
+      "name": "Ceremonial March"
+    },
+    {
+      "id": 402,
+      "name": "Military Band"
+    },
+    {
+      "id": 403,
+      "name": "Medieval Music"
+    },
+    {
+      "id": 404,
+      "name": "Renaissance Folk"
+    },
+    {
+      "id": 405,
+      "name": "Ancient Music"
+    },
+    {
+      "id": 406,
+      "name": "Viking Age Inspired Folk"
+    },
+    {
+      "id": 407,
+      "name": "Historical Reenactment Music"
+    },
+    {
+      "id": 408,
+      "name": "Traditional Instrumental"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+MPW v2.2.0 Alpha 11 – Sicherheitsabfragen
+
+Fünf Bestätigungsdialoge wurden auf Deutsch, Englisch, Französisch, Spanisch und Italienisch erweitert:
+- Genre löschen
+- Hardware-Preset überschreiben
+- Hardware-Preset anwenden (mit Warnung vor Ersetzung)
+- Hardware-Preset löschen
+- Farbschema übernehmen
+
+Technik: Ein zentraler Übersetzungskatalog mit benannten Platzhaltern hält gespeicherte Namen und interne IDs unverändert.
+
+Prüfungen: Python AST-Syntax, Formatplatzhalter, ZIP-CRC. Keine Windows-GUI-Abnahme.

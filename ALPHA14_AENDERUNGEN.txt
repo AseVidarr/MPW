@@ -1,0 +1,5 @@
+MPW v2.2.0 Alpha 14
+
+Sechs Backup-Auswahl- und Fehlertexte in de/en/fr/es/it integriert.
+Dateipfade bleiben unverändert; nur die sichtbaren Meldungen werden lokalisiert.
+Syntax- und Archivpruefung automatisiert; Windows-GUI-Test ausstehend.

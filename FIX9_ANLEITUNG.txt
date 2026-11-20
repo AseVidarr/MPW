@@ -1,0 +1,11 @@
+FIX 9 – Update & Startfenster
+1) MPW startet maximiert (showMaximized), nicht im randlosen Kiosk-Vollbild.
+2) Inno Setup nutzt CloseApplications=yes und CloseApplicationsFilter=MPW.exe.
+   Der Windows Restart Manager kann die laufende installierte MPW.exe erkennen
+   und beim Setup vor dem Schliessen nachfragen. Keine erzwungene Beendigung
+   per taskkill; ungespeicherte Aenderungen vor dem Update speichern.
+   Bei nicht erkannten/portable gestarteten Instanzen ist eine Erkennung
+   nicht garantiert. Inno Setup muss auf Windows getestet werden.
+3) Vorhandene Datenverzeichnisse werden durch diese Aenderungen nicht geloescht.
+4) Build: powershell -ExecutionPolicy Bypass -File .\scripts\build.ps1
+5) Neue Build-Ausgabe verwenden (dist nicht aus alten Builds uebernehmen).

@@ -1,0 +1,43 @@
+MPW im Browser – Portable für macOS und Linux
+=============================================
+
+MPW läuft hier als lokale Webanwendung: Ein kleines Programm startet auf diesem Computer
+(nur 127.0.0.1, nicht aus dem Netz erreichbar) und öffnet die Oberfläche im Standardbrowser.
+Alle Daten liegen im Ordner "Data" neben dieser Datei. Beim ersten Start wird dort eine
+neue MPW-Datenbank angelegt.
+
+Starten
+-------
+macOS:  Doppelklick auf "Start-MPW-Web.command" (öffnet ein Terminal-Fenster).
+Linux:  ./start-mpw-web.sh   (oder Doppelklick, falls der Dateimanager Skripte ausführt)
+
+Das Terminal-Fenster offen lassen, solange du mit MPW arbeitest. Beenden: Fenster
+schließen oder Strg+C.
+
+macOS: erster Start (Programm ohne Apple-Signatur)
+-------------------------------------------------
+macOS blockiert aus dem Internet geladene, nicht signierte Programme. Einmalig:
+1. Den MPW-Ordner aus "Downloads" an einen festen Ort verschieben, z. B. "Dokumente".
+   (Direkt aus "Downloads" gestartet, startet macOS das Programm aus einem versteckten,
+   schreibgeschützten Zwischenordner – MPW bricht dann mit einem Hinweis ab.)
+2. Terminal öffnen und eingeben (Pfad anpassen):
+      xattr -dr com.apple.quarantine ~/Dokumente/MPW_Portable_macOS
+3. Danach "Start-MPW-Web.command" doppelklicken.
+Alternativ: Rechtsklick auf "Start-MPW-Web.command" > Öffnen > Öffnen.
+
+Ausführbar machen (falls nötig)
+-------------------------------
+Wurde das Paket mit einem Programm entpackt, das die Rechte nicht übernimmt:
+      chmod +x Start-MPW-Web.command start-mpw-web.sh App/MPW-Web App/MPW-MCP
+
+KI-Verbindungen
+---------------
+Claude Code, Gemini CLI und Codex CLI werden auch in den üblichen Ordnern gesucht
+(~/.local/bin, /opt/homebrew/bin, /usr/local/bin, ~/.npm-global/bin, nvm).
+"App/MPW-MCP" ist der MCP-Server, um MPW-Daten z. B. für Claude Code freizugeben:
+      claude mcp add --scope user mpw -- "<MPW-Ordner>/App/MPW-MCP"
+
+Updates
+-------
+Beim Aktualisieren nur den Ordner "App" und die Startdateien ersetzen. Den Ordner "Data"
+niemals löschen oder überschreiben – dort liegen deine Daten.

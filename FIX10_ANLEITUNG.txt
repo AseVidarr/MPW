@@ -1,0 +1,1 @@
+FIX 10: Mediendateiliste zeigt nur Art · Dateiname mit Erweiterung · Größe. Keine Änderung an Datenbank oder gespeicherten Medien. Baut auf FIX 9 auf.

@@ -1,0 +1,28 @@
+# Build output and caches (created by build.ps1 / scripts/build-unix.sh)
+build/
+dist/
+__pycache__/
+*.pyc
+
+# Packages: published as GitHub release files, not committed
+*.zip
+*.tar.gz
+*.sha256
+
+# MPW user data must never be committed
+Data/
+*.db
+*.db-wal
+*.db-shm
+logs/
+app_configuration.json
+
+# Editors / operating systems
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+# Claude Code: personal local settings
+.claude/settings.local.json

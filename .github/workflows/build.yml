@@ -1,0 +1,140 @@
+# MPW: tests on Windows, macOS and Linux, then the packages for all four scenarios.
+#   1 Windows setup (desktop app + browser GUI)   2 Windows portable (desktop + browser)
+#   3 macOS portable (browser GUI only)           4 Linux portable (browser GUI only)
+# Packages are attached to every run ("Artifacts"). A tag like v2.2.0-rc1 additionally
+# creates a DRAFT release with all packages; publishing it stays a manual decision.
+name: Tests und Pakete
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHON_VERSION: '3.13'
+  PYTHONUTF8: '1'
+
+jobs:
+  test:
+    name: Tests (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    env:
+      QT_QPA_PLATFORM: offscreen
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Qt-Systembibliotheken (nur Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libegl1 libgl1 libxkbcommon0 libfontconfig1 libdbus-1-3
+      - name: Abhängigkeiten
+        run: python -m pip install -r source/requirements.txt
+      - name: Unit-Tests
+        run: python -m unittest discover -s tests -p "test_*.py" -v
+      - name: Testskripte ohne TestCase
+        shell: bash
+        run: |
+          for f in tests/*.py; do
+            if ! grep -q 'unittest.TestCase' "$f"; then
+              echo "== $f"; python "$f"
+            fi
+          done
+      - name: Selbsttests (nur Temp-Daten)
+        shell: bash
+        env:
+          MPW_DATA_ROOT: ${{ runner.temp }}/mpw-selftest
+        run: |
+          python source/workstation.py --self-test
+          python source/mpw_mcp_server.py --self-test
+          python source/mpw_web.py --self-test
+
+  windows:
+    name: Windows Setup und Portable
+    needs: test
+    runs-on: windows-latest
+    env:
+      PY_PYTHON: '3.13'
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Inno Setup
+        run: choco install innosetup -y --no-progress
+      - name: Build (build.ps1)
+        shell: pwsh
+        run: ./build.ps1
+      - uses: actions/upload-artifact@v7
+        with:
+          name: MPW-Windows
+          path: |
+            dist/MPW_Setup_*.exe
+            dist/MPW_Portable_*.zip
+            dist/SHA256SUMS.txt
+          if-no-files-found: error
+
+  unix:
+    name: Portable ${{ matrix.label }} (nur Browser)
+    needs: test
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            label: macOS
+          - os: ubuntu-22.04   # older glibc: runs on more Linux systems
+            label: Linux
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Build (scripts/build-unix.sh)
+        env:
+          PYTHON: python
+        run: sh scripts/build-unix.sh
+      - uses: actions/upload-artifact@v7
+        with:
+          name: MPW-${{ matrix.label }}
+          path: |
+            dist/*.tar.gz
+            dist/*.tar.gz.sha256
+          if-no-files-found: error
+
+  release:
+    name: Release-Entwurf
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [windows, unix]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          path: pakete
+          merge-multiple: true
+      - uses: softprops/action-gh-release@v3
+        with:
+          draft: true
+          files: pakete/*
+          body: |
+            MPW ${{ github.ref_name }} – Release-Entwurf (vor dem Veröffentlichen prüfen).
+            - Windows: Setup (Desktop-App + Browser) und Portable (ZIP)
+            - macOS / Linux: Portable, nur Browser-Oberfläche (tar.gz) – siehe LIESMICH_MAC_LINUX.txt

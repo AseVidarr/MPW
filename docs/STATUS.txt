@@ -1,0 +1,3 @@
+STATUS: BUILD-QUELLPaket, KEIN KOMPILIERTES WINDOWS-RELEASE.
+Source: Release-Kandidat aus Benutzerupload; Windows-Kompilierung und Windows-Abnahme ausstehend.
+Der Versionsstring im Python-Docstring lautet weiterhin v0.5.8 (Alttext); keine Funktion wurde hierfür verändert.

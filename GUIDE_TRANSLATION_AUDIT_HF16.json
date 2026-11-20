@@ -1,0 +1,415 @@
+{
+  "Bands": {
+    "en": {
+      "entries": 15,
+      "missing": [
+        "Bandliste und Kontextmenü",
+        "Band",
+        "Gruppe",
+        "Instrumente / Hardware",
+        "Instrument hinzufügen",
+        "Ausgewählte Hardware speichern",
+        "Ausgewählte Hardware löschen",
+        "Band-Hardware als Preset speichern",
+        "Preset auf Band anwenden",
+        "Preset löschen"
+      ]
+    },
+    "fr": {
+      "entries": 15,
+      "missing": [
+        "Bandliste und Kontextmenü",
+        "Band",
+        "Gruppe",
+        "Instrumente / Hardware",
+        "Instrument hinzufügen",
+        "Ausgewählte Hardware speichern",
+        "Ausgewählte Hardware löschen",
+        "Band-Hardware als Preset speichern",
+        "Preset auf Band anwenden",
+        "Preset löschen"
+      ]
+    },
+    "es": {
+      "entries": 15,
+      "missing": [
+        "Bandliste und Kontextmenü",
+        "Band",
+        "Gruppe",
+        "Instrumente / Hardware",
+        "Instrument hinzufügen",
+        "Ausgewählte Hardware speichern",
+        "Ausgewählte Hardware löschen",
+        "Band-Hardware als Preset speichern",
+        "Preset auf Band anwenden",
+        "Preset löschen"
+      ]
+    },
+    "it": {
+      "entries": 15,
+      "missing": [
+        "Bandliste und Kontextmenü",
+        "Band",
+        "Gruppe",
+        "Instrumente / Hardware",
+        "Instrument hinzufügen",
+        "Ausgewählte Hardware speichern",
+        "Ausgewählte Hardware löschen",
+        "Band-Hardware als Preset speichern",
+        "Preset auf Band anwenden",
+        "Preset löschen"
+      ]
+    }
+  },
+  "Song/Projekte": {
+    "en": {
+      "entries": 11,
+      "missing": []
+    },
+    "fr": {
+      "entries": 11,
+      "missing": []
+    },
+    "es": {
+      "entries": 11,
+      "missing": []
+    },
+    "it": {
+      "entries": 11,
+      "missing": []
+    }
+  },
+  "Genre-Katalog": {
+    "en": {
+      "entries": 5,
+      "missing": []
+    },
+    "fr": {
+      "entries": 5,
+      "missing": []
+    },
+    "es": {
+      "entries": 5,
+      "missing": []
+    },
+    "it": {
+      "entries": 5,
+      "missing": []
+    }
+  },
+  "Songs & Suno": {
+    "en": {
+      "entries": 16,
+      "missing": []
+    },
+    "fr": {
+      "entries": 16,
+      "missing": [
+        "Style – linkes Textfeld",
+        "Lyrics – rechtes Textfeld",
+        "Trennbalken zwischen Style und Lyrics",
+        "Automatische Sicherung bei Versionsübernahme",
+        "Empfohlene Reihenfolge",
+        "Song kann nicht gespeichert werden"
+      ]
+    },
+    "es": {
+      "entries": 16,
+      "missing": [
+        "Style – linkes Textfeld",
+        "Lyrics – rechtes Textfeld",
+        "Trennbalken zwischen Style und Lyrics",
+        "Automatische Sicherung bei Versionsübernahme",
+        "Empfohlene Reihenfolge",
+        "Song kann nicht gespeichert werden"
+      ]
+    },
+    "it": {
+      "entries": 16,
+      "missing": [
+        "Style – linkes Textfeld",
+        "Lyrics – rechtes Textfeld",
+        "Trennbalken zwischen Style und Lyrics",
+        "Automatische Sicherung bei Versionsübernahme",
+        "Empfohlene Reihenfolge",
+        "Song kann nicht gespeichert werden"
+      ]
+    }
+  },
+  "Medien & Player": {
+    "en": {
+      "entries": 21,
+      "missing": []
+    },
+    "fr": {
+      "entries": 21,
+      "missing": [
+        "URL-Eingabe",
+        "Link im Browser öffnen",
+        "Link-Kontextmenü",
+        "Dateidetails",
+        "Empfohlene Reihenfolge",
+        "Keine Wiedergabe",
+        "Link lässt sich nicht importieren"
+      ]
+    },
+    "es": {
+      "entries": 21,
+      "missing": [
+        "URL-Eingabe",
+        "Link im Browser öffnen",
+        "Link-Kontextmenü",
+        "Dateidetails",
+        "Empfohlene Reihenfolge",
+        "Keine Wiedergabe",
+        "Link lässt sich nicht importieren"
+      ]
+    },
+    "it": {
+      "entries": 21,
+      "missing": [
+        "URL-Eingabe",
+        "Link im Browser öffnen",
+        "Link-Kontextmenü",
+        "Dateidetails",
+        "Empfohlene Reihenfolge",
+        "Keine Wiedergabe",
+        "Link lässt sich nicht importieren"
+      ]
+    }
+  },
+  "Medien Explorer": {
+    "en": {
+      "entries": 10,
+      "missing": []
+    },
+    "fr": {
+      "entries": 10,
+      "missing": []
+    },
+    "es": {
+      "entries": 10,
+      "missing": []
+    },
+    "it": {
+      "entries": 10,
+      "missing": []
+    }
+  },
+  "Releases Distri": {
+    "en": {
+      "entries": 19,
+      "missing": [
+        "ISRC-Format",
+        "Mehrfach vorhandene ISRC",
+        "Keine automatische Veröffentlichung",
+        "Empfohlene Reihenfolge",
+        "Release lässt sich nicht speichern",
+        "Plattform lässt sich nicht speichern"
+      ]
+    },
+    "fr": {
+      "entries": 19,
+      "missing": [
+        "ISRC-Format",
+        "Mehrfach vorhandene ISRC",
+        "Keine automatische Veröffentlichung",
+        "Empfohlene Reihenfolge",
+        "Release lässt sich nicht speichern",
+        "Plattform lässt sich nicht speichern"
+      ]
+    },
+    "es": {
+      "entries": 19,
+      "missing": [
+        "ISRC-Format",
+        "Mehrfach vorhandene ISRC",
+        "Keine automatische Veröffentlichung",
+        "Empfohlene Reihenfolge",
+        "Release lässt sich nicht speichern",
+        "Plattform lässt sich nicht speichern"
+      ]
+    },
+    "it": {
+      "entries": 19,
+      "missing": [
+        "ISRC-Format",
+        "Mehrfach vorhandene ISRC",
+        "Keine automatische Veröffentlichung",
+        "Empfohlene Reihenfolge",
+        "Release lässt sich nicht speichern",
+        "Plattform lässt sich nicht speichern"
+      ]
+    }
+  },
+  "Plattensammlung": {
+    "en": {
+      "entries": 8,
+      "missing": []
+    },
+    "fr": {
+      "entries": 8,
+      "missing": []
+    },
+    "es": {
+      "entries": 8,
+      "missing": []
+    },
+    "it": {
+      "entries": 8,
+      "missing": []
+    }
+  },
+  "Album-Details": {
+    "en": {
+      "entries": 8,
+      "missing": []
+    },
+    "fr": {
+      "entries": 8,
+      "missing": []
+    },
+    "es": {
+      "entries": 8,
+      "missing": []
+    },
+    "it": {
+      "entries": 8,
+      "missing": []
+    }
+  },
+  "Album-Druckansicht": {
+    "en": {
+      "entries": 4,
+      "missing": []
+    },
+    "fr": {
+      "entries": 4,
+      "missing": []
+    },
+    "es": {
+      "entries": 4,
+      "missing": []
+    },
+    "it": {
+      "entries": 4,
+      "missing": []
+    }
+  },
+  "Backup – Einstellungen": {
+    "en": {
+      "entries": 8,
+      "missing": []
+    },
+    "fr": {
+      "entries": 8,
+      "missing": []
+    },
+    "es": {
+      "entries": 8,
+      "missing": []
+    },
+    "it": {
+      "entries": 8,
+      "missing": []
+    }
+  },
+  "Backup – Archiv": {
+    "en": {
+      "entries": 12,
+      "missing": []
+    },
+    "fr": {
+      "entries": 12,
+      "missing": []
+    },
+    "es": {
+      "entries": 12,
+      "missing": []
+    },
+    "it": {
+      "entries": 12,
+      "missing": []
+    }
+  },
+  "Konfiguration": {
+    "en": {
+      "entries": 21,
+      "missing": []
+    },
+    "fr": {
+      "entries": 21,
+      "missing": []
+    },
+    "es": {
+      "entries": 21,
+      "missing": []
+    },
+    "it": {
+      "entries": 21,
+      "missing": []
+    }
+  },
+  "System & Diagnose": {
+    "en": {
+      "entries": 20,
+      "missing": [
+        "Diagnose-Zusammenfassung",
+        "Diagnose-Ausgabefeld",
+        "Protokolldatei auswählen",
+        "Im Fehlerprotokoll suchen",
+        "Alle Zeiträume",
+        "Letzte 7 Tage",
+        "Letzte 30 Tage",
+        "Vor Weitergabe kontrollieren",
+        "Empfohlene Fehlersuche",
+        "Keine Protokolle vorhanden"
+      ]
+    },
+    "fr": {
+      "entries": 20,
+      "missing": [
+        "Diagnose-Zusammenfassung",
+        "Diagnose-Ausgabefeld",
+        "Protokolldatei auswählen",
+        "Im Fehlerprotokoll suchen",
+        "Alle Zeiträume",
+        "Letzte 7 Tage",
+        "Letzte 30 Tage",
+        "Vor Weitergabe kontrollieren",
+        "Empfohlene Fehlersuche",
+        "Keine Protokolle vorhanden"
+      ]
+    },
+    "es": {
+      "entries": 20,
+      "missing": [
+        "Diagnose-Zusammenfassung",
+        "Diagnose-Ausgabefeld",
+        "Protokolldatei auswählen",
+        "Im Fehlerprotokoll suchen",
+        "Alle Zeiträume",
+        "Letzte 7 Tage",
+        "Letzte 30 Tage",
+        "Vor Weitergabe kontrollieren",
+        "Empfohlene Fehlersuche",
+        "Keine Protokolle vorhanden"
+      ]
+    },
+    "it": {
+      "entries": 20,
+      "missing": [
+        "Diagnose-Zusammenfassung",
+        "Diagnose-Ausgabefeld",
+        "Protokolldatei auswählen",
+        "Im Fehlerprotokoll suchen",
+        "Alle Zeiträume",
+        "Letzte 7 Tage",
+        "Letzte 30 Tage",
+        "Vor Weitergabe kontrollieren",
+        "Empfohlene Fehlersuche",
+        "Keine Protokolle vorhanden"
+      ]
+    }
+  }
+}

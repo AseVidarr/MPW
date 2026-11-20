@@ -1,0 +1,16 @@
+FIX3 – MPW v2.1.0 Stable
+Änderungen:
+- Diagnoseversion aus zentraler Versionskonstante
+- PySide6/mutagen werden über tatsächlichen Modulimport geprüft
+- RC-Fenstertitel zu Stable geändert
+- Inno Setup 7 Architekturbezeichner aktualisiert
+- Build löscht/überschreibt vorhandene Portable-Ausgaben nicht mehr
+
+WICHTIG:
+- Neue, leere Build-Umgebung verwenden; dist darf keine alte Portable-Ausgabe enthalten.
+- Bestehende Produktivdaten unter F:\Lieder-Texte\MPW NICHT für Tests verwenden.
+- Portable nur über Start-MPW-Portable.cmd starten.
+- Start mit isoliertem Data-Verzeichnis anhand des Diagnosepfades prüfen.
+- Kein vollständiger Windows-Build oder Funktionstest in dieser Umgebung durchgeführt.
+- Das Startskript isoliert den Datenbankpfad, aber externe Dateiverweise in vorhandenen
+  Datensätzen und weitere Anwendungspfade sind nicht vollständig auditiert.
