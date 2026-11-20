@@ -122,11 +122,16 @@ class WebCreatesDatabase(unittest.TestCase):
             saved = core.ROOT, core.DB, mpw_web.MPWWebServer
             core.ROOT, core.DB = Path(folder), Path(folder) / 'workstation.db'
 
+            started = []
+
             class FakeServer:
                 url = 'http://127.0.0.1:1/#t=x'
 
                 def __init__(self, db, port=0):
                     self.db = db
+
+                def start_auto_backup(self):  # due automatic backups also without the desktop app
+                    started.append(True)
 
                 def serve_forever(self):
                     raise KeyboardInterrupt
@@ -136,6 +141,7 @@ class WebCreatesDatabase(unittest.TestCase):
             mpw_web.MPWWebServer = FakeServer
             try:
                 self.assertEqual(mpw_web.main(['--no-browser']), 0)
+                self.assertEqual(started, [True])
                 self.assertTrue(core.DB.is_file())
                 with closing(__import__('sqlite3').connect(core.DB)) as con:
                     tables = {r[0] for r in con.execute("SELECT name FROM sqlite_master WHERE type='table'")}

@@ -834,6 +834,75 @@ def automatic_backup_due(root=None, now=None):
     return interval, last, due
 
 
+AUTO_BACKUP_LOCK = 'MPW_auto_backup.lock'
+AUTO_BACKUP_LOCK_STALE_SECONDS = 3600
+
+
+def _acquire_auto_backup_lock(folder):
+    """Exclusive lock file in the backup folder: only one MPW program makes the automatic backup.
+
+    A lock older than an hour is treated as left over from a crash and replaced.
+    Returns the lock path, or None if another MPW program is backing up right now.
+    """
+    lock = Path(folder) / AUTO_BACKUP_LOCK
+    for _attempt in range(2):
+        try:
+            fd = os.open(lock, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+        except FileExistsError:
+            try:
+                age = datetime.now().timestamp() - lock.stat().st_mtime
+            except OSError:
+                continue  # removed meanwhile: try again
+            if age < AUTO_BACKUP_LOCK_STALE_SECONDS:
+                return None
+            lock.unlink(missing_ok=True)
+            continue
+        with os.fdopen(fd, 'w', encoding='utf-8') as handle:
+            handle.write(f'{os.getpid()} {datetime.now().isoformat(timespec="seconds")}\n')
+        return lock
+    return None
+
+
+def run_due_automatic_backup(con, root=None):
+    """Create the automatic backup if the configured interval has elapsed (desktop start, MPW-Web).
+
+    Returns None when nothing is due (or disabled, or another MPW program is backing up), else
+    {'file': name, 'deleted': [old automatic backups removed by retention]}. Errors are raised.
+    Retention only ever deletes MPW_auto_ backups – never manual or safety backups.
+    """
+    root = Path(root or ROOT)
+    settings = backup_settings(root)
+    interval = settings.get('automatic_interval_days', 0)
+    if not isinstance(interval, int) or isinstance(interval, bool) or interval <= 0:
+        return None
+    folder = backup_directory(root)
+    if not folder.is_dir():
+        raise OSError(f'Backup-Laufwerk nicht erreichbar: {folder}')
+    lock = _acquire_auto_backup_lock(folder)
+    if lock is None:
+        return None
+    try:
+        # Checked again inside the lock: another program may have just made the backup.
+        newest = max((p.stat().st_mtime for p in folder.glob('MPW_auto_*.zip') if p.is_file()), default=None)
+        if newest is not None and (datetime.now().timestamp() - newest) < interval * 86400:
+            return None
+        destination = folder / f'MPW_auto_{datetime.now():%Y%m%d_%H%M%S_%f}.zip'
+        create_backup(con, root, destination)
+        keep = settings.get('automatic_keep_count', 10)
+        if not isinstance(keep, int) or isinstance(keep, bool) or keep < 1:
+            keep = 10
+        backups = sorted((p for p in folder.glob('MPW_auto_*.zip') if p.is_file()),
+                         key=lambda p: p.stat().st_mtime, reverse=True)
+        deleted = []
+        for old in backups[keep:]:
+            if old != destination:
+                old.unlink()
+                deleted.append(old.name)
+        return {'file': destination.name, 'deleted': deleted}
+    finally:
+        lock.unlink(missing_ok=True)
+
+
 def backup_file_in(folder, name):
     """A backup ZIP chosen by plain file name inside the backup folder (no paths, no other files)."""
     if not isinstance(name, str) or not name.lower().endswith('.zip') or Path(name).name != name or name in ('.', '..'):

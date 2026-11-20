@@ -27,6 +27,7 @@ import urllib.request
 import webbrowser
 import zipfile
 from contextlib import closing
+from datetime import datetime
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, quote, urlparse
@@ -766,6 +767,28 @@ def _root(server):
     return server.db_path.parent
 
 
+AUTO_BACKUP_CHECK_SECONDS = 3600
+
+
+def run_auto_backup_check(server):
+    """Create a due automatic backup (same rules and lock as the desktop start); never raises."""
+    status = {'checked': datetime.now().timestamp()}
+    try:
+        with closing(core.open_read(server.db_path)) as con:
+            result = ws.run_due_automatic_backup(con, _root(server))
+        if result:
+            status.update(state='created', file=result['file'], deleted=result['deleted'])
+            print(f'Automatisches Backup erstellt: {result["file"]}', flush=True)
+        else:
+            status.update(state='idle')
+    except (OSError, sqlite3.Error, zipfile.BadZipFile, ValueError) as exc:
+        status.update(state='failed', error=str(exc)[:300])
+        ws.LOGGER.error('MPW-Web: automatisches Backup fehlgeschlagen: %s', exc)
+        print(f'Automatisches Backup fehlgeschlagen: {exc}', file=sys.stderr, flush=True)
+    server.auto_backup = status
+    return status
+
+
 def api_backup_info(server, query, body):
     """Backup folder, automatic settings, inventory and audit-log statistics (read-only)."""
     root = _root(server)
@@ -782,7 +805,8 @@ def api_backup_info(server, query, body):
             'stats': {'ok': sum(e['status'] == 'OK' for e in entries),
                       'failed': sum(e['status'] == 'FEHLER' for e in entries),
                       'latest': entries[-1] if entries else None},
-            'restore_word': RESTORE_CONFIRM_WORD}
+            'restore_word': RESTORE_CONFIRM_WORD,
+            'auto_run': server.auto_backup}  # result of MPW-Web's own last automatic-backup check
 
 
 def _needs_confirm(body):
@@ -1002,6 +1026,27 @@ class MPWWebServer(ThreadingHTTPServer):
         self.ai_jobs = AiJobs()
         self.check_jobs = AiJobs()  # KI-Verbindungen status checks (do not block prompt requests)
         self.backup_jobs = AiJobs()  # backups, checks and restore: one at a time
+        self.auto_backup = None  # last automatic-backup check of this MPW-Web run
+        self._stop_auto_backup = threading.Event()
+
+    def start_auto_backup(self, interval=AUTO_BACKUP_CHECK_SECONDS):
+        """Check for a due automatic backup now and then regularly (MPW-Web may run for days).
+
+        On macOS/Linux MPW-Web is the only MPW program, so without this no automatic backup
+        would ever be made. Desktop app and MPW-Web share a lock file, so they never both back up.
+        """
+        def loop():
+            while True:
+                run_auto_backup_check(self)
+                if self._stop_auto_backup.wait(interval):
+                    return
+        thread = threading.Thread(target=loop, name='mpw-auto-backup', daemon=True)
+        thread.start()
+        return thread
+
+    def server_close(self):
+        self._stop_auto_backup.set()
+        super().server_close()
 
     @property
     def port(self):
@@ -1241,6 +1286,7 @@ def main(argv=None):
     print(f'  Adresse:   {server.url}')
     print(f'  Daten:     {ws.DB}')
     print('  Dieses Fenster offen lassen. Beenden: Fenster schließen oder Strg+C.')
+    server.start_auto_backup()  # due automatic backups also when only the browser version runs
     if not args.no_browser:
         webbrowser.open(server.url)
     try:

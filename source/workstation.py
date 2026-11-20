@@ -7112,32 +7112,12 @@ class Workstation(QMainWindow):
 
         Automatic retention never deletes manual or pre-operation safety backups.
         """
-        settings = self.backup_settings()
-        interval = settings.get('automatic_interval_days', 0)
-        if not isinstance(interval, int) or interval <= 0:
-            return
-        folder = self.backup_directory()
+        # Shared with MPW-Web (mpw_core.run_due_automatic_backup); a lock file in the backup
+        # folder makes sure the desktop app and MPW-Web never back up at the same time.
         try:
-            if not folder.is_dir():
-                raise OSError(f'Backup-Laufwerk nicht erreichbar: {folder}')
-            backups = list(folder.glob('MPW_auto_*.zip'))
-            newest = max((p.stat().st_mtime for p in backups if p.is_file()), default=None)
-            if newest is not None and (datetime.now().timestamp() - newest) < interval * 86400:
-                return
-            destination = self.automatic_backup_path('MPW_auto')
-            create_backup(self.con, ROOT, destination)
-            # Only delete backups made by the automatic scheduler. Never delete
-            # a file that is currently being written or a manual safety backup.
-            keep = settings.get('automatic_keep_count', 10)
-            if not isinstance(keep, int) or keep < 1:
-                keep = 10
-            backups = sorted(
-                (p for p in folder.glob('MPW_auto_*.zip') if p.is_file()),
-                key=lambda p: p.stat().st_mtime, reverse=True)
-            for old in backups[keep:]:
-                old.unlink()
-            self.refresh_backup_history()
-        except (OSError, sqlite3.Error, zipfile.BadZipFile) as exc:
+            if mpw_core.run_due_automatic_backup(self.con, ROOT):
+                self.refresh_backup_history()
+        except (OSError, sqlite3.Error, zipfile.BadZipFile, ValueError) as exc:
             # Backup failures must never prevent the application from starting.
             title, body = self.automatic_backup_failure_text(exc)
             QMessageBox.warning(self, title, body)

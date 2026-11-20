@@ -75,7 +75,7 @@ const I18N = {
     bk_interval: "Sicherungsintervall:",
     bk_keep: "Aufbewahrung:",
     bk_settings_save: "Einstellungen speichern",
-    bk_auto_hint: "Fällige automatische Sicherungen erstellt die Desktop-App beim Programmstart. Nur automatische MPW_auto_-Backups werden nach der gewählten Anzahl gelöscht.",
+    bk_auto_hint: "Fällige automatische Sicherungen erstellt die Desktop-App beim Start und MPW im Browser beim Start und danach stündlich – nie beide gleichzeitig. Nur automatische MPW_auto_-Backups werden nach der gewählten Anzahl gelöscht.",
     bk_folder: "Backup-Ordner",
     bk_folder_save: "Ordner übernehmen …",
     bk_list: "Vorhandene Backups",
@@ -97,7 +97,9 @@ const I18N = {
     bk_last_failed: "LETZTES BACKUP FEHLGESCHLAGEN: {time} · {file}\nGrund: {detail}",
     bk_last_ok: "Letzte erfolgreiche Prüfung: {time} · {file}",
     bk_auto_off: "Automatische Sicherung: deaktiviert",
-    bk_auto_status: "Letzte automatische Sicherung: {last} · Nächste Sicherung: {next} (beim nächsten Start der Desktop-App)",
+    bk_auto_created: "MPW im Browser hat am {time} automatisch gesichert: {file}",
+    bk_auto_failed: "Automatisches Backup durch MPW im Browser fehlgeschlagen ({time}): {detail}\nDie Datenbank wurde nicht verändert.",
+    bk_auto_status: "Letzte automatische Sicherung: {last} · Nächste Sicherung fällig ab: {next}",
     bk_none: "keine",
     bk_type_auto: "automatisch",
     bk_type_other: "manuell / Sicherheit",
@@ -283,7 +285,7 @@ const I18N = {
     bk_interval: "Backup interval:",
     bk_keep: "Retention:",
     bk_settings_save: "Save settings",
-    bk_auto_hint: "Due automatic backups are created by the desktop app at startup. Only automatic MPW_auto_ backups are deleted according to the selected count.",
+    bk_auto_hint: "Due automatic backups are created by the desktop app at startup and by MPW in the browser at startup and then hourly – never both at once. Only automatic MPW_auto_ backups are deleted according to the selected count.",
     bk_folder: "Backup folder",
     bk_folder_save: "Use folder …",
     bk_list: "Existing backups",
@@ -305,7 +307,9 @@ const I18N = {
     bk_last_failed: "LAST BACKUP FAILED: {time} · {file}\nReason: {detail}",
     bk_last_ok: "Last successful verification: {time} · {file}",
     bk_auto_off: "Automatic backup: disabled",
-    bk_auto_status: "Last automatic backup: {last} · Next backup: {next} (at the next start of the desktop app)",
+    bk_auto_created: "MPW in the browser made an automatic backup at {time}: {file}",
+    bk_auto_failed: "Automatic backup by MPW in the browser failed ({time}): {detail}\nThe database was not modified.",
+    bk_auto_status: "Last automatic backup: {last} · Next backup due from: {next}",
     bk_none: "none",
     bk_type_auto: "automatic",
     bk_type_other: "manual / safety",
@@ -491,7 +495,7 @@ const I18N = {
     bk_interval: "Fréquence des sauvegardes :",
     bk_keep: "Conservation :",
     bk_settings_save: "Enregistrer les réglages",
-    bk_auto_hint: "Les sauvegardes automatiques dues sont créées par l’application de bureau au démarrage. Seules les sauvegardes MPW_auto_ sont supprimées selon la limite choisie.",
+    bk_auto_hint: "Les sauvegardes automatiques dues sont créées par l’application de bureau au démarrage et par MPW dans le navigateur au démarrage puis toutes les heures – jamais les deux en même temps. Seules les sauvegardes MPW_auto_ sont supprimées selon la limite choisie.",
     bk_folder: "Dossier de sauvegarde",
     bk_folder_save: "Utiliser ce dossier …",
     bk_list: "Sauvegardes existantes",
@@ -513,7 +517,9 @@ const I18N = {
     bk_last_failed: "DERNIÈRE SAUVEGARDE ÉCHOUÉE : {time} · {file}\nRaison : {detail}",
     bk_last_ok: "Dernière vérification réussie : {time} · {file}",
     bk_auto_off: "Sauvegarde automatique : désactivée",
-    bk_auto_status: "Dernière sauvegarde automatique : {last} · Prochaine : {next} (au prochain démarrage de l’application de bureau)",
+    bk_auto_created: "MPW dans le navigateur a fait une sauvegarde automatique le {time} : {file}",
+    bk_auto_failed: "Échec de la sauvegarde automatique par MPW dans le navigateur ({time}) : {detail}\nLa base n’a pas été modifiée.",
+    bk_auto_status: "Dernière sauvegarde automatique : {last} · Prochaine sauvegarde due à partir du : {next}",
     bk_none: "aucune",
     bk_type_auto: "automatique",
     bk_type_other: "manuelle / sécurité",
@@ -699,7 +705,7 @@ const I18N = {
     bk_interval: "Intervalo de copia:",
     bk_keep: "Conservación:",
     bk_settings_save: "Guardar ajustes",
-    bk_auto_hint: "Las copias automáticas pendientes las crea la aplicación de escritorio al iniciar. Solo se eliminan copias MPW_auto_ según el límite elegido.",
+    bk_auto_hint: "Las copias automáticas pendientes las crea la aplicación de escritorio al iniciar y MPW en el navegador al iniciar y luego cada hora, nunca ambas a la vez. Solo se eliminan copias MPW_auto_ según el límite elegido.",
     bk_folder: "Carpeta de copias",
     bk_folder_save: "Usar esta carpeta …",
     bk_list: "Copias existentes",
@@ -721,7 +727,9 @@ const I18N = {
     bk_last_failed: "ÚLTIMA COPIA FALLIDA: {time} · {file}\nMotivo: {detail}",
     bk_last_ok: "Última verificación correcta: {time} · {file}",
     bk_auto_off: "Copia automática: desactivada",
-    bk_auto_status: "Última copia automática: {last} · Próxima: {next} (al iniciar la aplicación de escritorio)",
+    bk_auto_created: "MPW en el navegador hizo una copia automática el {time}: {file}",
+    bk_auto_failed: "Falló la copia automática de MPW en el navegador ({time}): {detail}\nLa base de datos no se modificó.",
+    bk_auto_status: "Última copia automática: {last} · Próxima copia pendiente desde: {next}",
     bk_none: "ninguna",
     bk_type_auto: "automática",
     bk_type_other: "manual / seguridad",
@@ -907,7 +915,7 @@ const I18N = {
     bk_interval: "Intervallo backup:",
     bk_keep: "Conservazione:",
     bk_settings_save: "Salva impostazioni",
-    bk_auto_hint: "I backup automatici dovuti vengono creati dall’app desktop all’avvio. Vengono eliminati solo i backup MPW_auto_ oltre il numero scelto.",
+    bk_auto_hint: "I backup automatici dovuti vengono creati dall’app desktop all’avvio e da MPW nel browser all’avvio e poi ogni ora, mai entrambi insieme. Vengono eliminati solo i backup MPW_auto_ oltre il numero scelto.",
     bk_folder: "Cartella backup",
     bk_folder_save: "Usa questa cartella …",
     bk_list: "Backup esistenti",
@@ -929,7 +937,9 @@ const I18N = {
     bk_last_failed: "ULTIMO BACKUP NON RIUSCITO: {time} · {file}\nMotivo: {detail}",
     bk_last_ok: "Ultima verifica riuscita: {time} · {file}",
     bk_auto_off: "Backup automatico: disattivato",
-    bk_auto_status: "Ultimo backup automatico: {last} · Prossimo: {next} (al prossimo avvio dell’app desktop)",
+    bk_auto_created: "MPW nel browser ha creato un backup automatico il {time}: {file}",
+    bk_auto_failed: "Backup automatico di MPW nel browser non riuscito ({time}): {detail}\nIl database non è stato modificato.",
+    bk_auto_status: "Ultimo backup automatico: {last} · Prossimo backup previsto da: {next}",
     bk_none: "nessuno",
     bk_type_auto: "automatico",
     bk_type_other: "manuale / sicurezza",
@@ -1606,8 +1616,13 @@ function bkRender() {
   if (latest && latest.status === 'FEHLER') stats += '\n⚠ ' + t('bk_last_failed', { time: latest.timestamp, file: latest.file, detail: latest.details });
   else if (latest) stats += '\n' + t('bk_last_ok', { time: latest.timestamp, file: latest.file });
   $('bk-stats').textContent = stats;
-  $('bk-auto').textContent = !info.interval ? t('bk_auto_off')
+  let auto = !info.interval ? t('bk_auto_off')
     : t('bk_auto_status', { last: info.last_automatic ? bkDate(info.last_automatic) : t('bk_none'), next: bkDate(info.next_due) });
+  const run = info.auto_run;  // MPW-Web's own last check (at start, then hourly)
+  if (run && run.state === 'created') auto += '\n✔ ' + t('bk_auto_created', { time: bkDate(run.checked), file: run.file });
+  else if (run && run.state === 'failed') auto += '\n⚠ ' + t('bk_auto_failed', { time: bkDate(run.checked), detail: run.error });
+  $('bk-auto').textContent = auto;
+  $('bk-auto').className = 'conn-line' + (run && run.state === 'failed' ? ' bk-bad' : '');
   const rows = info.backups.map((backup) => {
     const row = el('li', null, 'link-row');
     const text = el('div', null, 'grow');

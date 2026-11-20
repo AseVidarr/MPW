@@ -355,6 +355,70 @@ class WebServerTests(unittest.TestCase):
             with closing(sqlite3.connect(Path(tmp) / 'workstation.db')) as con:
                 self.assertEqual(con.execute('SELECT COUNT(*) FROM bands').fetchone()[0], 2)
 
+    # --- automatic backup (shared by desktop start and MPW-Web) ---
+    def auto_backup(self):
+        with closing(sqlite3.connect(self.db)) as con:
+            return self.ws.run_due_automatic_backup(con, Path(self.tmp.name))
+
+    def test_automatic_backup_due_lock_and_retention(self):
+        root = Path(self.tmp.name)
+        self.assertIsNone(self.auto_backup())  # disabled by default
+        folder = root / 'Sicherungen'
+        self.ws.save_backup_settings(root, automatic_interval_days=1, automatic_keep_count=3,
+                                     backup_directory=str(folder))
+        with self.assertRaises(OSError):  # backup drive missing: reported, nothing created
+            self.auto_backup()
+        folder.mkdir()
+        first = self.auto_backup()
+        self.assertTrue(first['file'].startswith('MPW_auto_') and (folder / first['file']).is_file())
+        self.assertIsNone(self.auto_backup())  # not due again within the interval
+        self.assertFalse((folder / self.ws.AUTO_BACKUP_LOCK).exists())
+        # older automatic backups beyond the retention count are removed – manual ones never
+        old = time.time() - 10 * 86400
+        for i in range(4):
+            path = folder / f'MPW_auto_2020010{i}_000000_000000.zip'
+            path.write_bytes(b'x')
+            os.utime(path, (old - i * 3600, old - i * 3600))
+        manual = folder / 'MPW_backup_20200101_000000_000000.zip'
+        manual.write_bytes(b'x')
+        os.utime(manual, (old - 99 * 86400,) * 2)
+        os.utime(folder / first['file'], (old + 3600,) * 2)  # make the newest one due again
+        second = self.auto_backup()
+        autos = sorted(p.name for p in folder.glob('MPW_auto_*.zip'))
+        self.assertEqual(len(autos), 3)
+        self.assertIn(second['file'], autos)
+        self.assertEqual(len(second['deleted']), 3)
+        self.assertTrue(manual.is_file())
+        # another MPW program holds the lock: nothing is done; a lock from a crash is replaced
+        os.utime(folder / second['file'], (old,) * 2)
+        lock = folder / self.ws.AUTO_BACKUP_LOCK
+        lock.write_text('123 other program', encoding='utf-8')
+        self.assertIsNone(self.auto_backup())
+        self.assertTrue(lock.exists())
+        os.utime(lock, (old,) * 2)
+        self.assertIsNotNone(self.auto_backup())
+        self.assertFalse(lock.exists())
+
+    def test_mpw_web_runs_due_automatic_backup_and_reports_it(self):
+        root = Path(self.tmp.name)
+        self.ws.save_backup_settings(root, automatic_interval_days=7, backup_directory=str(root / 'fehlt'))
+        status = self.web.run_auto_backup_check(self.server)
+        self.assertEqual(status['state'], 'failed')
+        self.assertEqual(self.json_call('GET', '/api/backup')[1]['auto_run']['state'], 'failed')
+        (root / 'fehlt').mkdir()
+        thread = self.server.start_auto_backup(interval=60)
+        for _ in range(100):
+            if (self.server.auto_backup or {}).get('state') == 'created':
+                break
+            time.sleep(0.05)
+        info = self.json_call('GET', '/api/backup')[1]
+        self.assertEqual(info['auto_run']['state'], 'created')
+        self.assertEqual([b['name'] for b in info['backups']], [info['auto_run']['file']])
+        self.assertIsNotNone(info['last_automatic'])
+        self.server._stop_auto_backup.set()
+        thread.join(5)
+        self.assertFalse(thread.is_alive())
+
     # --- stage 7: Medien & Releases ---
     def test_media_links_add_and_delete_with_confirmation(self):
         body = {'platform': 'Spotify', 'url': 'https://open.spotify.com/track/x', 'label': 'Single'}
