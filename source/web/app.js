@@ -63,6 +63,9 @@ const I18N = {
     band_created: "Band „{name}“ angelegt. Verzeichnis: {folder}",
     band_imported: "Band „{name}“ übernommen. Vorhandenes Verzeichnis: {folder} (nichts verändert).",
     band_prompt_warning: "Der Prompt-Ordner konnte nicht angelegt werden: {detail}",
+    tab_conn: "KI-Verbindungen",
+    conn_manual: "Auf diesem System kann MPW kein Fenster dafür öffnen. Bitte in einem Terminal ausführen:\n{command}",
+    conn_copy_failed: "Kopieren in die Zwischenablage nicht möglich. Bitte diesen Text selbst kopieren:",
     suno_button: "An Suno senden (MCP) …",
     tab_ai: "AI Prompt Launcher",
     band: "Band",
@@ -181,6 +184,9 @@ const I18N = {
     band_created: "Band “{name}” created. Directory: {folder}",
     band_imported: "Band “{name}” imported. Existing directory: {folder} (nothing changed).",
     band_prompt_warning: "The prompt folder could not be created: {detail}",
+    tab_conn: "AI connections",
+    conn_manual: "MPW cannot open a window for this on this system. Please run in a terminal:\n{command}",
+    conn_copy_failed: "Copying to the clipboard is not possible. Please copy this text yourself:",
     suno_button: "Send to Suno (MCP) …",
     tab_ai: "AI Prompt Launcher",
     band: "Band",
@@ -299,6 +305,9 @@ const I18N = {
     band_created: "Groupe « {name} » créé. Dossier : {folder}",
     band_imported: "Groupe « {name} » importé. Dossier existant : {folder} (rien modifié).",
     band_prompt_warning: "Le dossier des prompts n’a pas pu être créé : {detail}",
+    tab_conn: "Connexions IA",
+    conn_manual: "Sur ce système, MPW ne peut pas ouvrir de fenêtre pour cela. Exécutez dans un terminal :\n{command}",
+    conn_copy_failed: "Impossible de copier dans le presse-papiers. Copiez ce texte vous-même :",
     suno_button: "Envoyer à Suno (MCP) …",
     tab_ai: "AI Prompt Launcher",
     band: "Groupe",
@@ -417,6 +426,9 @@ const I18N = {
     band_created: "Banda «{name}» creada. Carpeta: {folder}",
     band_imported: "Banda «{name}» importada. Carpeta existente: {folder} (sin cambios).",
     band_prompt_warning: "No se pudo crear la carpeta de prompts: {detail}",
+    tab_conn: "Conexiones de IA",
+    conn_manual: "En este sistema MPW no puede abrir una ventana para esto. Ejecute en un terminal:\n{command}",
+    conn_copy_failed: "No se puede copiar al portapapeles. Copie usted mismo este texto:",
     suno_button: "Enviar a Suno (MCP) …",
     tab_ai: "AI Prompt Launcher",
     band: "Banda",
@@ -535,6 +547,9 @@ const I18N = {
     band_created: "Gruppo «{name}» creato. Cartella: {folder}",
     band_imported: "Gruppo «{name}» importato. Cartella esistente: {folder} (nessuna modifica).",
     band_prompt_warning: "Impossibile creare la cartella dei prompt: {detail}",
+    tab_conn: "Connessioni IA",
+    conn_manual: "Su questo sistema MPW non può aprire una finestra per questo. Esegui in un terminale:\n{command}",
+    conn_copy_failed: "Impossibile copiare negli appunti. Copia tu stesso questo testo:",
     suno_button: "Invia a Suno (MCP) …",
     tab_ai: "AI Prompt Launcher",
     band: "Gruppo",
@@ -1101,6 +1116,179 @@ $('btn-band-new-cancel').addEventListener('click', hideNewBandForm);
 $('btn-band-create').addEventListener('click', () => bandAction(createBand).catch((error) => newBandMessage(error.message, 'error')));
 $('n-name').addEventListener('keydown', (event) => { if (event.key === 'Enter') $('btn-band-create').click(); });
 
+/* ------------------------------------------------------------------ KI-Verbindungen (stage 6) */
+
+// Same groups, texts and status rules as the desktop window (texts and rules come from the core).
+const connState = { info: null, lines: {}, running: false, busy: false, targets: {} };
+
+function connTexts() { const all = connState.info.texts; return all[state.lang] || all.en; }
+
+function connText(key, values) {
+  let text = connTexts()[key] || key;
+  for (const [k, v] of Object.entries(values || {})) text = text.split('{' + k + '}').join(String(v));
+  return text;
+}
+
+function renderConnLine(line) {  // [key, values]; a value may itself be [key, values]
+  const [key, values] = line;
+  const done = {};
+  for (const [k, v] of Object.entries(values || {})) done[k] = Array.isArray(v) ? renderConnLine(v) : v;
+  return connText(key, done);
+}
+
+function connMessage(text, kind) {
+  const box = $('conn-message');
+  box.textContent = text;
+  box.className = 'message' + (kind ? ' ' + kind : '');
+  box.hidden = !text;
+}
+
+function connGroups() {
+  const info = connState.info;
+  const link = (key, name) => ({ key, link: info.links[name] });
+  const clients = info.clients.map((c) => c.id);
+  return [
+    { key: 'grp_claude', lines: ['claude_path', 'claude_login'],
+      buttons: [link('btn_install', 'claude_install'), { key: 'btn_login', run: () => connLogin('claude') }] },
+    { key: 'grp_cli', lines: ['gemini_path', 'codex_path', 'node'],
+      buttons: [link('btn_gemini', 'gemini_install'), link('btn_codex', 'codex_install'), link('btn_node', 'node_install')] },
+    { key: 'grp_keys', lines: info.providers.map((p) => 'key_' + p), note: 'keys_note',
+      buttons: [link('btn_key_claude', 'anthropic_keys'), link('btn_key_openai', 'openai_keys'), link('btn_key_gemini', 'gemini_keys')] },
+    { key: 'grp_mpw', section: 'mpw', lines: clients.map((c) => 'mcp_mpw_' + c), note: 'mpw_note',
+      buttons: [{ key: 'btn_connect', run: () => connSetup('mpw', 'add', 'confirm_connect') },
+                { key: 'btn_disconnect', run: () => connSetup('mpw', 'remove', 'confirm_disconnect') },
+                { key: 'btn_desktop', run: connCopyDesktop }] },
+    { key: 'grp_suno', section: 'suno', lines: clients.map((c) => 'mcp_suno_' + c), note: 'suno_note',
+      buttons: [{ key: 'btn_suno_add', run: () => connSetup('suno', 'add', 'confirm_suno') },
+                { key: 'btn_suno_login', run: () => connLogin('suno') },
+                { key: 'btn_suno_remove', run: () => connSetup('suno', 'remove', 'confirm_suno_remove') },
+                link('btn_suno_access', 'suno_access')] },
+    { key: 'grp_net', lines: info.hosts.map((h) => 'tls_' + h), hint: 'tls_hint' },
+  ];
+}
+
+function renderConnPage() {
+  $('conn-intro').textContent = connText('intro');
+  $('btn-conn-recheck').textContent = connText('btn_recheck');
+  $('btn-conn-recheck').disabled = connState.running;
+  const groups = connGroups().map((group) => {
+    const box = el('fieldset', null, 'conn-group');
+    box.append(el('legend', connText(group.key)));
+    for (const line of group.lines) {
+      const value = connState.lines[line];
+      box.append(el('div', value ? renderConnLine(value) : (connState.running ? connText('checking') : ''), 'conn-line'));
+    }
+    if (group.hint && connState.intercepted) box.append(el('div', connText(group.hint), 'message warn'));
+    if (group.note) box.append(el('div', connText(group.note), 'hint'));
+    if (group.section) {  // which AI CLI the buttons of this section act on
+      const row = el('label', null, 'conn-target');
+      row.append(el('span', connText('target_label')));
+      const select = el('select');
+      for (const client of connState.info.clients) { const o = el('option', client.name); o.value = client.id; select.append(o); }
+      select.value = connState.targets[group.section] || 'claude';
+      select.addEventListener('change', () => { connState.targets[group.section] = select.value; });
+      row.append(select);
+      box.append(row);
+    }
+    if (group.buttons) {
+      const actions = el('div', null, 'actions');
+      for (const b of group.buttons) {
+        const button = el('button', connText(b.key));
+        if (b.link) button.addEventListener('click', () => window.open(b.link, '_blank', 'noopener'));
+        else button.addEventListener('click', () => connAction(b.run));
+        button.disabled = connState.busy && !b.link;
+        actions.append(button);
+      }
+      box.append(actions);
+    }
+    return box;
+  });
+  $('conn-groups').replaceChildren(...groups);
+}
+
+async function connAction(fn) {
+  if (connState.busy) return;
+  connState.busy = true;
+  renderConnPage();
+  try { await fn(); } catch (error) { connMessage(connErrorText(error), 'error'); }
+  finally { connState.busy = false; renderConnPage(); }
+}
+
+function connErrorText(error) {
+  const data = error.data || {};
+  if (data.error === 'need_cli') return connText('need_cli', { name: data.name });
+  if (data.error === 'need_claude') return connText('need_claude');
+  if (data.error === 'mcp_exe_missing') return connText('mcp_exe_missing', { path: data.path });
+  if (data.error === 'ai_busy') return connText('checking');
+  return error.kind === 'connection' ? error.message : t('error', { detail: error.message });
+}
+
+async function connInit() {
+  connState.info = await api('/api/connections');
+  renderConnPage();
+  await connCheck();
+}
+
+async function connCheck() {
+  if (connState.running) return;
+  connState.running = true;
+  connState.lines = {};
+  connState.intercepted = false;
+  renderConnPage();
+  try {
+    const started = await api('/api/connections/check', { method: 'POST', body: {} });
+    for (;;) {
+      await sleep(1500);
+      const job = await api('/api/connections/jobs/' + started.job);
+      if (job.status === 'running') continue;
+      if (job.status === 'done') { connState.lines = job.lines; connState.intercepted = job.intercepted; }
+      else connMessage(connText('check_failed', { error: (job.error && job.error.detail) || '?' }), 'error');
+      break;
+    }
+  } catch (error) {
+    connMessage(connErrorText(error), 'error');
+  } finally {
+    connState.running = false;
+    renderConnPage();
+  }
+}
+
+function connClient(section) {
+  const id = connState.targets[section] || 'claude';
+  return connState.info.clients.find((c) => c.id === id);
+}
+
+async function connSetup(server, action, confirmKey) {
+  const client = connClient(server);
+  if (!confirm(connText(confirmKey, { name: client.name }))) return;
+  const result = await api('/api/connections/setup', { method: 'POST',
+    body: { server, action, client: client.id, confirm: true } });
+  connMessage(result.ok ? connText('done') : connText('failed', { detail: result.detail }), result.ok ? '' : 'error');
+  connState.busy = false;
+  await connCheck();
+}
+
+async function connLogin(target) {
+  const body = { target };
+  if (target === 'suno') body.client = connClient('suno').id;
+  const result = await api('/api/connections/login', { method: 'POST', body });
+  if (result.started) connMessage(connText(result.message));
+  else if (result.command) connMessage(t('conn_manual', { command: result.command }) + '\n\n' + connText(result.message), 'warn');
+  else connMessage(connText('failed', { detail: result.error || '?' }), 'error');
+}
+
+async function connCopyDesktop() {
+  const result = await api('/api/connections/desktop-config');
+  try {
+    await navigator.clipboard.writeText(result.text);
+    connMessage(connText('desktop_copied'));
+  } catch (e) {
+    connMessage(t('conn_copy_failed') + '\n\n' + result.text, 'warn');
+  }
+}
+
+$('btn-conn-recheck').addEventListener('click', () => connCheck());
+
 /* ------------------------------------------------------------------ An Suno senden (stage 5) */
 
 // Only saved prompts are sent: the server reads the chosen prompt from the database itself.
@@ -1572,6 +1760,8 @@ function switchView(name) {
   $('view-songs').hidden = name !== 'songs';
   $('view-bands').hidden = name !== 'bands';
   $('view-ai').hidden = name !== 'ai';
+  $('view-conn').hidden = name !== 'conn';
+  if (name === 'conn' && !connState.info) connInit().catch((error) => connMessage(connErrorText(error), 'error'));
   if (name === 'bands' && !$('band-list').children.length) loadBandList().catch(fatal);
   if (name === 'ai' && !aiState.options) aiAction(aiInit);
 }

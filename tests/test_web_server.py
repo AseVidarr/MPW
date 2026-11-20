@@ -275,6 +275,77 @@ class WebServerTests(unittest.TestCase):
         self.assertEqual(self.json_call('POST', '/api/songs/1/prompt-versions', {**body, 'lyrics': ' '})[1]['error'], 'empty_field')
         self.assertEqual(self.json_call('POST', '/api/songs/99/prompt-versions', body)[0], 404)
 
+    # --- stage 6: KI-Verbindungen (no real CLI commands: every helper is replaced) ---
+    def patch_ws(self, **replacements):
+        for name, value in replacements.items():
+            self.addCleanup(setattr, self.ws, name, getattr(self.ws, name))
+            setattr(self.ws, name, value)
+
+    def wait_check(self, job_id):
+        for _ in range(100):
+            job = self.json_call('GET', f'/api/connections/jobs/{job_id}')[1]
+            if job['status'] != 'running':
+                return job
+            time.sleep(0.05)
+        self.fail('check did not finish')
+
+    def test_connections_info_and_status_check(self):
+        info = self.json_call('GET', '/api/connections')[1]
+        self.assertEqual([c['id'] for c in info['clients']], ['claude', 'gemini', 'codex'])
+        self.assertEqual(set(info['texts']), {'de', 'en', 'fr', 'es', 'it'})
+        self.assertTrue(all(url.startswith('https://') for url in info['links'].values()))
+        result = {'claude': r'C:\x\claude.exe', 'gemini': None, 'codex': None, 'node': None, 'claude_logged_in': True,
+                  'keys': {'Claude': True, 'ChatGPT': False, 'Gemini': False},
+                  'mcp': {'claude': {'mpw': 'connected', 'suno': 'needs_auth'}},
+                  'tls': {'api.anthropic.com': {'error': None, 'intercepted': 'O=Norton Web/Mail Shield'},
+                          'api.suno.com': {'error': None, 'intercepted': None}}}
+        self.patch_ws(check_ai_connections=lambda: result)
+        job = self.wait_check(self.json_call('POST', '/api/connections/check', {})[1]['job'])
+        self.assertIs(job['intercepted'], True)
+        self.assertEqual(job['lines']['claude_login'], ['logged_in', {}])
+        self.assertEqual(job['lines']['mcp_suno_claude'], ['cli_line', {'name': 'Claude Code', 'status': ['mcp_needs_auth', {}]}])
+        self.assertEqual(job['lines']['key_ChatGPT'], ['key_missing', {'env': 'OPENAI_API_KEY'}])
+        # the same lines render to the desktop texts
+        de = self.ws.AI_CONNECTION_TEXTS['de']
+        self.assertEqual(self.ws.render_ai_connection_line(de, job['lines']['mcp_mpw_claude']), 'Claude Code: ✔ verbunden')
+
+    def test_connections_setup_needs_confirmation_and_runs_fixed_commands(self):
+        ran = []
+        self.patch_ws(find_cli=lambda c: f'C:\\bin\\{c}.exe' if c != 'codex' else None,
+                      run_helper_tool=lambda args, timeout=90, cwd=None: (ran.append(args), (0, 'ok'))[1])
+        body = {'server': 'suno', 'action': 'add', 'client': 'claude'}
+        self.assertEqual(self.json_call('POST', '/api/connections/setup', body)[1]['error'], 'confirm_required')
+        self.assertEqual(ran, [])
+        self.assertIs(self.json_call('POST', '/api/connections/setup', {**body, 'confirm': True})[1]['ok'], True)
+        self.assertEqual(ran[-1], ['C:\\bin\\claude.exe', 'mcp', 'add', '--scope', 'user', '--transport', 'http',
+                                   'suno', 'https://api.suno.com/mcp'])
+        status, result = self.json_call('POST', '/api/connections/setup', {**body, 'client': 'codex', 'confirm': True})
+        self.assertEqual((status, result['error'], result['name']), (400, 'need_cli', 'Codex CLI'))
+        self.assertEqual(self.json_call('POST', '/api/connections/setup', {**body, 'client': 'evil', 'confirm': True})[0], 400)
+        self.assertEqual(self.json_call('POST', '/api/connections/setup', {**body, 'server': 'x', 'confirm': True})[0], 400)
+        self.patch_ws(mpw_mcp_server_command=lambda: ['C:\\nowhere\\MPW-MCP.exe'])
+        result = self.json_call('POST', '/api/connections/setup', {'server': 'mpw', 'action': 'add', 'client': 'gemini',
+                                                                   'confirm': True})[1]
+        self.assertEqual(result['error'], 'mcp_exe_missing')
+        self.patch_ws(run_helper_tool=lambda args, timeout=90, cwd=None: (1, 'boom'))
+        result = self.json_call('POST', '/api/connections/setup', {**body, 'action': 'remove', 'confirm': True})[1]
+        self.assertEqual((result['ok'], result['detail']), (False, 'boom'))
+
+    def test_connections_login_and_desktop_config(self):
+        self.patch_ws(find_cli=lambda c: None)
+        self.assertEqual(self.json_call('POST', '/api/connections/login', {'target': 'claude'})[1]['error'], 'need_claude')
+        self.patch_ws(find_cli=lambda c: f'/usr/bin/{c}')
+        with mock.patch('subprocess.Popen') as popen, mock.patch.object(self.web.sys, 'platform', 'linux'):
+            result = self.json_call('POST', '/api/connections/login', {'target': 'suno', 'client': 'codex'})[1]
+        popen.assert_not_called()  # no console elsewhere: the command is shown instead
+        self.assertEqual((result['started'], result['command']), (False, '/usr/bin/codex mcp login suno'))
+        with mock.patch('subprocess.Popen') as popen, mock.patch.object(self.web.sys, 'platform', 'win32'):
+            result = self.json_call('POST', '/api/connections/login', {'target': 'claude'})[1]
+        self.assertEqual((result['started'], result['message']), (True, 'login_started'))
+        self.assertEqual(popen.call_args[0][0], ['/usr/bin/claude', 'auth', 'login'])
+        text = self.json_call('GET', '/api/connections/desktop-config')[1]['text']
+        self.assertIn('"mpw"', text)
+
     # --- stage 5: An Suno senden (no Claude Code, no credits: the send is replaced) ---
     def fake_suno(self, clips=None, change=None, error=None):
         sent = []

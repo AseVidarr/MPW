@@ -13,6 +13,7 @@
     <button class="tab active" data-view="songs" role="tab" data-i18n="tab_songs">Songs &amp; Suno</button>
     <button class="tab" data-view="bands" role="tab" data-i18n="tab_bands">Bands</button>
     <button class="tab" data-view="ai" role="tab" data-i18n="tab_ai">AI Prompt Launcher</button>
+    <button class="tab" data-view="conn" role="tab" data-i18n="tab_conn">KI-Verbindungen</button>
   </nav>
   <div class="meta" id="meta"></div>
 </header>
@@ -123,6 +124,18 @@
         <ul id="band-projects" class="list"></ul>
       </div>
       <datalist id="genre-options"></datalist>
+    </div>
+  </section>
+
+  <!-- KI-Verbindungen (built from the shared texts, same groups as the desktop window) -->
+  <section id="view-conn" class="view" hidden>
+    <div class="editor">
+      <div id="conn-body">
+        <p class="hint" id="conn-intro"></p>
+        <div id="conn-message" class="message" hidden></div>
+        <div id="conn-groups"></div>
+        <div class="actions"><button id="btn-conn-recheck" class="primary"></button></div>
+      </div>
     </div>
   </section>
 

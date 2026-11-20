@@ -561,7 +561,101 @@ def ui_language_or(body):
     return lang if lang in LANGUAGES else 'de'
 
 
+# --------------------------------------------------------------------------- KI-Verbindungen (stage 6)
+
+def api_connections_info(server, query, body):
+    """Texts, links and the AI CLIs of the KI-Verbindungen page (same as the desktop window)."""
+    return {'texts': ws.AI_CONNECTION_TEXTS, 'links': ws.AI_CONNECTION_LINKS,
+            'clients': [{'id': c, 'name': ws.MCP_CLIENT_NAMES[c]} for c in ws.MCP_CLIENTS],
+            'providers': list(ws.API_KEY_ENV), 'hosts': list(ws.AI_CONNECTION_TLS_HOSTS),
+            'windows': sys.platform.startswith('win')}
+
+
+def api_connections_check(server, query, body):
+    """Read-only status check in the background (CLIs, sign-in, keys set yes/no, MCP, TLS)."""
+    def finish(result):
+        lines, intercepted = ws.ai_connection_status(result)
+        return {'status': 'done', 'lines': lines, 'intercepted': intercepted}
+    return {'job': server.check_jobs.start('check', ws.check_ai_connections, finish=finish)}
+
+
+def api_connections_job(server, query, body, job_id):
+    job = server.check_jobs.get(job_id)
+    if job is None:
+        raise ApiError(404, 'job_missing')
+    return job
+
+
+def _connection_client(body):
+    client = _body_text(body, 'client')
+    if client not in ws.MCP_CLIENTS:
+        raise ApiError(400, 'invalid_field', {'field': 'client'})
+    exe = ws.find_cli(client)
+    if not exe:
+        raise ApiError(400, 'need_cli', {'name': ws.MCP_CLIENT_NAMES[client]})
+    return client, exe
+
+
+def api_connections_setup(server, query, body):
+    """Add/remove the MPW (read-only) or Suno MCP server for one AI CLI – only after a yes."""
+    if not (isinstance(body, dict) and body.get('confirm') is True):  # changes the user's AI set-up
+        raise ApiError(400, 'confirm_required')
+    target, action = _body_text(body, 'server'), _body_text(body, 'action')
+    if target not in ('mpw', 'suno') or action not in ('add', 'remove'):
+        raise ApiError(400, 'invalid_field', {'field': 'server'})
+    client, exe = _connection_client(body)
+    command = None
+    if target == 'mpw' and action == 'add':
+        command = ws.mpw_mcp_server_command()
+        if not Path(command[-1]).is_file():
+            raise ApiError(400, 'mcp_exe_missing', {'path': command[-1]})
+    code, text = ws.run_helper_tool(ws.mcp_setup_command(client, action, target, exe, command),
+                                    timeout=120, cwd=str(Path.home()))
+    if code != 0:
+        ws.LOGGER.error('KI-Verbindung (Browser): Befehl fehlgeschlagen (%s): %s', code, text)
+    return {'ok': code == 0, 'detail': (text or str(code))[-600:] if code != 0 else ''}
+
+
+def api_connections_login(server, query, body):
+    """Interactive sign-in (Claude Code, or Suno for one AI CLI) in its own console window.
+
+    Only on Windows a console can be opened for the user; elsewhere the command is returned
+    so it can be run in a terminal.
+    """
+    target = _body_text(body, 'target')
+    if target == 'claude':
+        exe = ws.find_cli('claude')
+        if not exe:
+            raise ApiError(400, 'need_claude')
+        args, message = [exe, 'auth', 'login'], 'login_started'
+    elif target == 'suno':
+        client, exe = _connection_client(body)
+        args, message = ws.mcp_login_console_command(client, exe), f'suno_login_started_{client}'
+    else:
+        raise ApiError(400, 'invalid_field', {'field': 'target'})
+    if not sys.platform.startswith('win'):
+        import shlex
+        return {'started': False, 'command': ' '.join(shlex.quote(a) for a in args), 'message': message}
+    try:
+        import subprocess
+        subprocess.Popen(args, cwd=str(Path.home()), creationflags=getattr(subprocess, 'CREATE_NEW_CONSOLE', 0))
+    except OSError as exc:
+        return {'started': False, 'error': str(exc)}
+    return {'started': True, 'message': message}
+
+
+def api_connections_desktop_config(server, query, body):
+    """JSON block for Claude Desktop (read-only MPW server); the browser copies it."""
+    return {'text': ws.claude_desktop_config_snippet(ws.mpw_mcp_server_command())}
+
+
 ROUTES = [
+    ('GET', re.compile(r'^/api/connections$'), api_connections_info),
+    ('POST', re.compile(r'^/api/connections/check$'), api_connections_check),
+    ('GET', re.compile(r'^/api/connections/jobs/([0-9a-f]{16})$'), api_connections_job),
+    ('POST', re.compile(r'^/api/connections/setup$'), api_connections_setup),
+    ('POST', re.compile(r'^/api/connections/login$'), api_connections_login),
+    ('GET', re.compile(r'^/api/connections/desktop-config$'), api_connections_desktop_config),
     ('GET', re.compile(r'^/api/songs/(\d+)/suno$'), api_suno_info),
     ('POST', re.compile(r'^/api/songs/(\d+)/suno/send$'), api_suno_send),
     ('POST', re.compile(r'^/api/songs/(\d+)/suno/links$'), api_suno_links),
@@ -608,6 +702,7 @@ class MPWWebServer(ThreadingHTTPServer):
         self.token = token or secrets.token_urlsafe(24)
         self.static_dir = Path(static_dir or web_directory())
         self.ai_jobs = AiJobs()
+        self.check_jobs = AiJobs()  # KI-Verbindungen status checks (do not block prompt requests)
 
     @property
     def port(self):

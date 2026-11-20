@@ -31,9 +31,13 @@ FN = load()
 
 
 def class_constant(name):
+    """Literal texts: in the shared core (module level) or still in the Workstation class."""
     cls = next(n for n in TREE.body if isinstance(n, ast.ClassDef) and n.name == 'Workstation')
-    node = next(n for n in cls.body if isinstance(n, ast.Assign) and getattr(n.targets[0], 'id', '') == name)
-    return ast.literal_eval(node.value)
+    for body in (TREE.body, cls.body):
+        for n in body:
+            if isinstance(n, ast.Assign) and getattr(n.targets[0], 'id', '') == name and isinstance(n.value, ast.Dict):
+                return ast.literal_eval(n.value)
+    raise KeyError(name)
 
 
 class StatusParsing(unittest.TestCase):

@@ -88,6 +88,13 @@ button.danger:hover:not(:disabled) { background: #7f3a3a; }
 #ai-paste-box { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 6px 10px; }
 #ai-paste-box summary { cursor: pointer; color: var(--muted); }
 #ai-paste-box textarea { width: 100%; margin: 8px 0; resize: vertical; font-family: Consolas, "Cascadia Mono", monospace; font-size: 12px; }
+#view-conn { grid-template-columns: 1fr; }
+#conn-body { display: flex; flex-direction: column; gap: 12px; max-width: 980px; }
+.conn-group { border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 14px; background: var(--panel); }
+.conn-group legend { font-weight: 600; padding: 0 6px; }
+.conn-line { margin: 3px 0; white-space: pre-line; word-break: break-word; }
+.conn-target { display: flex; align-items: center; gap: 8px; margin: 8px 0 4px; color: var(--muted); font-size: 12px; }
+.conn-group .actions { flex-wrap: wrap; margin-top: 8px; }
 .dialog { width: min(900px, 94vw); max-height: 92vh; background: var(--panel); color: var(--text);
   border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px; }
 .dialog[open] { display: flex; flex-direction: column; gap: 10px; }
