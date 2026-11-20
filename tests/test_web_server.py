@@ -359,8 +359,12 @@ class WebServerTests(unittest.TestCase):
         covers = list((Path(self.tmp.name) / 'media' / 'album_covers').iterdir())
         self.assertEqual(len(covers), 1)
         self.assertTrue(covers[0].name.startswith(f'album_{aid}_') and covers[0].suffix == '.png')
-        status, _ = upload(b'\x89PNG\r\n\x1a\n' + b'\x00' * (12_000_001))
-        self.assertEqual(status, 413)
+        # too large -> clean 413 answer (limit lowered for the test: same rule, no 12 MB transfer)
+        limits = self.web.RAW_BODY_LIMITS
+        self.addCleanup(limits.__setitem__, self.web.api_album_cover, limits[self.web.api_album_cover])
+        limits[self.web.api_album_cover] = 1000
+        self.assertEqual(upload(b'\x89PNG\r\n\x1a\n' + b'\x00' * 2000), (413, {'error': 'too_large'}))
+        self.assertEqual(len(list((Path(self.tmp.name) / 'media' / 'album_covers').iterdir())), 1)  # nothing stored
 
     # --- stage 8: Backup (temp data only) ---
     def wait_backup(self, job_id):

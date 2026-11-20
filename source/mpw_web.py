@@ -1290,7 +1290,17 @@ class MPWRequestHandler(BaseHTTPRequestHandler):
     def _raw_body(self, limit):
         length = int(self.headers.get('Content-Length') or 0)
         if length > limit:
-            self.close_connection = True
+            # Read and discard a moderately oversized upload, so the client gets the clean
+            # 413 answer instead of a broken connection; only huge uploads are cut off.
+            if length <= 4 * limit:
+                remaining = length
+                while remaining > 0:
+                    block = self.rfile.read(min(1024 * 1024, remaining))
+                    if not block:
+                        break
+                    remaining -= len(block)
+            else:
+                self.close_connection = True
             raise ApiError(413, 'too_large')
         return self.rfile.read(length)
 
