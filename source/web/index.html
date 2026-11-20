@@ -65,10 +65,26 @@
   <!-- Bands -->
   <section id="view-bands" class="view" hidden>
     <aside class="sidebar">
+      <button id="btn-band-new" class="primary sidebar-action" data-i18n="band_new">+ Neue Band</button>
       <ul id="band-list" class="list"></ul>
     </aside>
     <div class="editor">
       <div class="empty" id="band-empty" data-i18n="no_band">Bitte links eine Band auswählen.</div>
+      <div id="band-new" hidden>
+        <h1 data-i18n="band_new_title">Neue Band anlegen</h1>
+        <div class="fields">
+          <label><span data-i18n="band_name">Bandname</span><input id="n-name" maxlength="120" autocomplete="off"></label>
+          <label><span data-i18n="genre_main">Hauptgenre</span><input id="n-genre" list="genre-options" maxlength="200"></label>
+          <label><span data-i18n="genre_second">Zweitgenre</span><input id="n-second" list="genre-options" maxlength="200"></label>
+          <label><span data-i18n="persona">Persona</span><select id="n-persona"></select></label>
+        </div>
+        <div class="actions">
+          <button id="btn-band-create" class="primary" data-i18n="band_create">Band anlegen</button>
+          <button id="btn-band-new-cancel" data-i18n="cancel">Abbrechen</button>
+        </div>
+        <div class="hint" data-i18n="band_new_hint">Legt den Band-Ordner und den Prompt-Ordner an. Projekt-Unterordner entstehen erst beim Anlegen eines Projekts.</div>
+        <div id="band-new-message" class="message" hidden></div>
+      </div>
       <div id="band-body" hidden>
         <h1 id="band-name"></h1>
         <div class="fields">
@@ -76,7 +92,6 @@
           <label><span data-i18n="genre_second">Zweitgenre</span><input id="b-second" list="genre-options" maxlength="200"></label>
           <label><span data-i18n="persona">Persona</span><select id="b-persona"></select></label>
         </div>
-        <datalist id="genre-options"></datalist>
         <div class="actions">
           <button id="btn-band-save" class="primary" data-i18n="band_save">Bandprofil speichern</button>
           <span class="hint" data-i18n="band_name_hint">Der Bandname wird in der Desktop-App geändert (Band-Ordner).</span>
@@ -105,6 +120,7 @@
         <h2 data-i18n="projects">Song/Projekte</h2>
         <ul id="band-projects" class="list"></ul>
       </div>
+      <datalist id="genre-options"></datalist>
     </div>
   </section>
 </main>

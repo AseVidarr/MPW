@@ -167,10 +167,14 @@ def _write(server, func, *args):
         with closing(core.open_write(server.db_path)) as con:
             return func(con, *args)
     except ws.BandDataError as exc:
-        status = 404 if exc.code.endswith('_missing') else 409 if exc.code == 'preset_exists' else 400
+        status = (404 if exc.code.endswith('_missing') else
+                  409 if exc.code in ('preset_exists', 'band_exists', 'folder_exists') else
+                  500 if exc.code == 'folder_error' else 400)
         raise ApiError(status, exc.code, exc.values) from exc
     except core.ToolError as exc:
         raise ApiError(404, str(exc)) from exc
+    except sqlite3.IntegrityError as exc:  # e.g. the same band created at the same moment elsewhere
+        raise ApiError(409, 'band_exists', {}) from exc
     except sqlite3.OperationalError as exc:
         raise ApiError(503, 'database_busy', {'detail': str(exc)}) from exc
 
@@ -186,6 +190,13 @@ def api_band_full(server, query, body, band_id):
     return _read(server, read, {'band_id': int(band_id)})
 
 
+def api_band_options(server, query, body):
+    """Genre catalog and personas for the „Neue Band“ form."""
+    return _read(server, lambda con, _args: {
+        'genres': [r[0] for r in con.execute('SELECT name FROM genre_catalog ORDER BY name COLLATE NOCASE')],
+        'personas': list(ws.PERSONAS)}, {})
+
+
 def api_hardware_choices(server, query, body):
     category = query.get('category', [''])[0][:200]
     return _read(server, lambda con, _args: dict(zip(('groups', 'details'), ws.saved_hardware_choices(con, category))), {})
@@ -199,6 +210,14 @@ def _body_text(body, key):
     if not isinstance(body, dict):
         raise ApiError(400, 'invalid_body')
     return body.get(key, '')
+
+
+def api_create_band(server, query, body):
+    """Create a band (folder + database + prompt folder) like the desktop „Band anlegen“."""
+    import_existing = bool(isinstance(body, dict) and body.get('import_existing') is True)
+    return _write(server, ws.create_band, _body_text(body, 'name'), _body_text(body, 'genre'),
+                  _body_text(body, 'second_genre'), _body_text(body, 'persona') or 'Keep Current',
+                  ws.band_root_directory(server.db_path.parent), import_existing)
 
 
 def api_update_band(server, query, body, band_id):
@@ -241,7 +260,9 @@ def api_transfer_preset(server, query, body, preset_id):
 ROUTES = [
     ('GET', re.compile(r'^/api/bands/(\d+)/full$'), api_band_full),
     ('GET', re.compile(r'^/api/hardware/choices$'), api_hardware_choices),
+    ('GET', re.compile(r'^/api/band-options$'), api_band_options),
     ('GET', re.compile(r'^/api/presets$'), api_presets),
+    ('POST', re.compile(r'^/api/bands$'), api_create_band),
     ('POST', re.compile(r'^/api/bands/(\d+)$'), api_update_band),
     ('POST', re.compile(r'^/api/bands/(\d+)/instruments$'), api_add_instrument),
     ('POST', re.compile(r'^/api/instruments/(\d+)$'), api_update_instrument),

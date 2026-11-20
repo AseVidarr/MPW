@@ -149,7 +149,58 @@ class WebServerTests(unittest.TestCase):
         self.assertEqual(self.json_call('POST', '/api/songs/1', self.payload(), content_type='text/plain')[0], 415)
         self.assertEqual(self.json_call('POST', '/api/songs/1', self.payload(), token=False)[0], 403)
         self.assertEqual(self.json_call('POST', '/api/songs/99', self.payload())[0], 404)
-        self.assertEqual(self.json_call('POST', '/api/bands', {})[0], 405)
+        self.assertEqual(self.json_call('POST', '/api/info', {})[0], 405)
+
+    # --- stage 3: create bands (folder logic like the desktop app) ---
+    def test_create_band_makes_folder_prompt_folder_and_row(self):
+        bands_dir = Path(self.tmp.name) / 'Bands'
+        status, result = self.json_call('POST', '/api/bands', {'name': ' Neon Harbour ', 'genre': 'Synthwave',
+                                                               'second_genre': '', 'persona': 'Keine'})
+        self.assertEqual(status, 200)
+        self.assertIs(result['created'], True)
+        self.assertIsNone(result['prompt_warning'])
+        self.assertTrue((bands_dir / 'Neon Harbour').is_dir())
+        self.assertTrue((bands_dir / 'Neon Harbour' / self.ws.BAND_PROMPT_FOLDER).is_dir())
+        # project subfolders are only created with a project
+        self.assertEqual(sorted(p.name for p in (bands_dir / 'Neon Harbour').iterdir()), [self.ws.BAND_PROMPT_FOLDER])
+        band = self.json_call('GET', f"/api/bands/{result['id']}/full")[1]
+        self.assertEqual((band['name'], band['genre'], band['persona']), ('Neon Harbour', 'Synthwave', 'Keine'))
+        self.assertIn('Synthwave', self.json_call('GET', '/api/band-options')[1]['genres'])
+        # same name in other case -> existing band, nothing new
+        status, again = self.json_call('POST', '/api/bands', {'name': 'neon harbour'})
+        self.assertEqual((status, again['error'], again['id']), (409, 'band_exists', result['id']))
+        self.assertEqual(self.json_call('POST', '/api/bands', {'name': 'iron delta'})[1]['error'], 'band_exists')
+
+    def test_create_band_takes_over_existing_folder_only_after_confirmation(self):
+        folder = Path(self.tmp.name) / 'Bands' / 'Altes Projekt'
+        (folder / 'Song A').mkdir(parents=True)
+        (folder / 'notiz.txt').write_text('bleibt', encoding='utf-8')
+        status, result = self.json_call('POST', '/api/bands', {'name': 'altes projekt'})
+        self.assertEqual((status, result['error'], result['folder']), (409, 'folder_exists', 'Altes Projekt'))
+        with closing(sqlite3.connect(self.db)) as con:
+            self.assertEqual(con.execute('SELECT COUNT(*) FROM bands').fetchone()[0], 1)
+        status, result = self.json_call('POST', '/api/bands', {'name': 'altes projekt', 'import_existing': True})
+        self.assertEqual(status, 200)
+        self.assertIs(result['created'], False)
+        self.assertEqual(result['name'], 'Altes Projekt')  # band name follows the folder's spelling
+        self.assertEqual((folder / 'notiz.txt').read_text(encoding='utf-8'), 'bleibt')
+        self.assertTrue((folder / 'Song A').is_dir())
+
+    def test_create_band_rejects_bad_names_without_touching_disk(self):
+        bands_dir = Path(self.tmp.name) / 'Bands'
+        for name in ('', '   ', 'a/b', 'x:y', 'CON', 'Ende.', '..', 'Tab\there'):
+            status, result = self.json_call('POST', '/api/bands', {'name': name})
+            self.assertEqual(status, 400, name)
+            self.assertIn(result['error'], ('empty_field', 'invalid_name'), name)
+        self.assertEqual(self.json_call('POST', '/api/bands', {'name': 'x' * 121})[1]['error'], 'too_long')
+        self.assertEqual(self.json_call('POST', '/api/bands', {'name': 'Gut', 'persona': 'Boss'})[1]['error'], 'invalid_persona')
+        self.assertEqual(self.json_call('POST', '/api/bands', {'name': 5})[1]['error'], 'invalid_field')
+        self.assertFalse(bands_dir.exists() and any(bands_dir.iterdir()))
+        (bands_dir).mkdir(exist_ok=True)
+        (bands_dir / 'Datei').write_text('x', encoding='utf-8')  # name taken by a file
+        self.assertEqual(self.json_call('POST', '/api/bands', {'name': 'datei'})[0], 500)
+        with closing(sqlite3.connect(self.db)) as con:
+            self.assertEqual(con.execute('SELECT COUNT(*) FROM bands').fetchone()[0], 1)
 
     # --- stage 2: bands editing ---
     def test_band_profile_update_keeps_name_and_fills_genre_catalog(self):

@@ -1555,6 +1555,82 @@ def _clean_text(value, field, limit=HARDWARE_TEXT_LIMIT, required=True):
     return value
 
 
+_RESERVED_FOLDER_NAMES = {'CON', 'PRN', 'AUX', 'NUL',
+                          *(f'COM{i}' for i in range(1, 10)), *(f'LPT{i}' for i in range(1, 10))}
+BAND_NAME_LIMIT = 120
+
+
+def validate_folder_name(name):
+    """Same rule as the desktop app: the name must be a valid folder name on every system."""
+    if (not name or name in ('.', '..') or any(ch in name for ch in '<>:"/\\|?*')
+            or any(ord(ch) < 32 for ch in name)
+            or name.endswith(('.', ' ')) or name.split('.')[0].upper() in _RESERVED_FOLDER_NAMES):
+        raise ValueError('Der Name ist als Windows-Ordnername nicht zulässig.')
+
+
+def create_band(con, name, genre='', second_genre='', persona='Keep Current',
+                band_root=None, import_existing=False):
+    """Create a band like the desktop „Band anlegen“: band folder + database row + prompt folder.
+
+    An existing folder with the same name is only taken over with ``import_existing=True``
+    (never changed); otherwise ``BandDataError('folder_exists')``. Project subfolders are
+    created later, when a project is added. Returns id, created flag, folder and an optional
+    prompt-folder warning (the band itself is created in that case).
+    """
+    name = _clean_text(name, 'name', BAND_NAME_LIMIT)
+    try:
+        validate_folder_name(name)
+    except ValueError as exc:
+        raise BandDataError('invalid_name') from exc
+    genre = _clean_text(genre, 'genre', 200, required=False)
+    second_genre = _clean_text(second_genre, 'second_genre', 200, required=False)
+    if persona not in PERSONAS:
+        raise BandDataError('invalid_persona')
+    match = con.execute('SELECT id FROM bands WHERE name=? COLLATE NOCASE', (name,)).fetchone()
+    if match is not None:
+        raise BandDataError('band_exists', id=match[0])
+
+    base = Path(band_root) if band_root else band_root_directory()
+    try:
+        existing = existing_named_folder(base, name)
+        if existing is not None:
+            if existing.is_symlink():
+                raise OSError('Der Bandordner darf kein symbolischer Link sein.')
+            if not import_existing:
+                raise BandDataError('folder_exists', folder=existing.name)
+            # keep the folder's own spelling, so band name and folder stay identical
+            target, created, name = existing, False, existing.name
+        else:
+            base.mkdir(parents=True, exist_ok=True)
+            target = base / name
+            target.mkdir(exist_ok=False)
+            created = True
+    except OSError as exc:
+        raise BandDataError('folder_error', detail=str(exc)) from exc
+
+    try:
+        with con:
+            new_id = con.execute('INSERT INTO bands(name,genre,second_genre,persona) VALUES(?,?,?,?)',
+                                 (name, genre, second_genre, persona)).lastrowid
+            for value in (genre, second_genre):
+                if value:
+                    con.execute('INSERT OR IGNORE INTO genre_catalog(name) VALUES(?)', (value,))
+    except sqlite3.Error:
+        if created:
+            try:
+                target.rmdir()  # only the empty folder created just now
+            except OSError:
+                pass
+        raise
+
+    warning = None
+    try:
+        band_prompt_directory(target.name, base)
+    except (OSError, ValueError) as exc:
+        warning = str(exc)
+    return {'id': new_id, 'name': name, 'created': created, 'folder': str(target), 'prompt_warning': warning}
+
+
 def update_band_profile(con, band_id, genre, second_genre, persona):
     """Genres and persona of an existing band (the name stays: band folders depend on it)."""
     genre = _clean_text(genre, 'genre', 200, required=False)

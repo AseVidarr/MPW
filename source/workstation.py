@@ -12718,15 +12718,7 @@ th{{background-color:#eef1f4;color:#17212b;font-weight:bold;}}
 
     STANDARD_PROJECT_FOLDERS = ('Bilder', 'Dokumente', 'Musik', 'OLD', 'Video')
 
-    @staticmethod
-    def validate_folder_name(name):
-        reserved = {'CON', 'PRN', 'AUX', 'NUL',
-                    *(f'COM{i}' for i in range(1, 10)),
-                    *(f'LPT{i}' for i in range(1, 10))}
-        if (not name or name in ('.', '..') or any(ch in name for ch in '<>:"/\\|?*')
-                or any(ord(ch) < 32 for ch in name)
-                or name.endswith(('.', ' ')) or name.split('.')[0].upper() in reserved):
-            raise ValueError('Der Name ist als Windows-Ordnername nicht zulässig.')
+    validate_folder_name = staticmethod(mpw_core.validate_folder_name)
 
     def band_root_directory(self):
         return Path(self.app_configuration().get('band_root_directory') or (ROOT / 'Bands'))

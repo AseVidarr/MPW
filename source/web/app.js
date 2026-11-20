@@ -49,6 +49,20 @@ const I18N = {
     err_no_hardware: "Diese Band hat noch keine Hardware-Einträge.",
     err_preset_damaged: "Das Preset ist beschädigt und kann nicht verwendet werden.",
     err_missing: "Der Eintrag existiert nicht mehr. Bitte neu laden.",
+    band_new: "+ Neue Band",
+    band_new_title: "Neue Band anlegen",
+    band_name: "Bandname",
+    band_create: "Band anlegen",
+    band_new_hint: "Legt den Band-Ordner und den Prompt-Ordner an. Projekt-Unterordner entstehen erst beim Anlegen eines Projekts.",
+    err_band_name_empty: "Bitte einen Bandnamen eingeben.",
+    err_band_name: "Der Name ist als Ordnername nicht zulässig (keine Zeichen wie < > : \" / \\ | ? *, nicht mit Punkt oder Leerzeichen enden).",
+    err_band_folder: "Der Band-Ordner konnte nicht angelegt werden: {detail}",
+    confirm_import_folder: "Ein Ordner „{folder}“ ist bereits vorhanden, aber noch keine Band dazu.\n\nOrdner als Band übernehmen? Vorhandene Dateien und Ordner werden nicht verändert.",
+    band_exists: "Die Band „{name}“ gibt es bereits – sie wurde ausgewählt.",
+    band_exists_plain: "Die Band „{name}“ gibt es bereits.",
+    band_created: "Band „{name}“ angelegt. Verzeichnis: {folder}",
+    band_imported: "Band „{name}“ übernommen. Vorhandenes Verzeichnis: {folder} (nichts verändert).",
+    band_prompt_warning: "Der Prompt-Ordner konnte nicht angelegt werden: {detail}",
   },
   en: {
     app_sub: 'in the browser', tab_songs: 'Songs & Suno', tab_bands: 'Bands', all_bands: 'All Bands',
@@ -96,6 +110,20 @@ const I18N = {
     err_no_hardware: "This band has no hardware entries yet.",
     err_preset_damaged: "The preset is damaged and cannot be used.",
     err_missing: "The entry no longer exists. Please reload.",
+    band_new: "+ New band",
+    band_new_title: "Create new band",
+    band_name: "Band name",
+    band_create: "Create band",
+    band_new_hint: "Creates the band folder and the prompt folder. Project subfolders are created only when a project is added.",
+    err_band_name_empty: "Please enter a band name.",
+    err_band_name: "This name is not allowed as a folder name (no characters like < > : \" / \\ | ? *, must not end with a dot or space).",
+    err_band_folder: "The band folder could not be created: {detail}",
+    confirm_import_folder: "A folder “{folder}” already exists, but there is no band for it yet.\n\nTake the folder over as a band? Existing files and folders are not changed.",
+    band_exists: "The band “{name}” already exists – it has been selected.",
+    band_exists_plain: "The band “{name}” already exists.",
+    band_created: "Band “{name}” created. Directory: {folder}",
+    band_imported: "Band “{name}” imported. Existing directory: {folder} (nothing changed).",
+    band_prompt_warning: "The prompt folder could not be created: {detail}",
   },
   fr: {
     app_sub: 'dans le navigateur', tab_songs: 'Songs & Suno', tab_bands: 'Groupes', all_bands: 'Tous les groupes',
@@ -143,6 +171,20 @@ const I18N = {
     err_no_hardware: "Ce groupe n’a pas encore de matériel.",
     err_preset_damaged: "Le préréglage est endommagé et inutilisable.",
     err_missing: "L’élément n’existe plus. Veuillez recharger.",
+    band_new: "+ Nouveau groupe",
+    band_new_title: "Créer un groupe",
+    band_name: "Nom du groupe",
+    band_create: "Créer le groupe",
+    band_new_hint: "Crée le dossier du groupe et le dossier des prompts. Les sous-dossiers de projet sont créés lors de la création d’un projet.",
+    err_band_name_empty: "Veuillez saisir un nom de groupe.",
+    err_band_name: "Ce nom n’est pas autorisé comme nom de dossier (pas de caractères < > : \" / \\ | ? *, ni de point ou d’espace final).",
+    err_band_folder: "Le dossier du groupe n’a pas pu être créé : {detail}",
+    confirm_import_folder: "Un dossier « {folder} » existe déjà, mais aucun groupe ne lui correspond.\n\nReprendre ce dossier comme groupe ? Les fichiers et dossiers existants ne sont pas modifiés.",
+    band_exists: "Le groupe « {name} » existe déjà – il a été sélectionné.",
+    band_exists_plain: "Le groupe « {name} » existe déjà.",
+    band_created: "Groupe « {name} » créé. Dossier : {folder}",
+    band_imported: "Groupe « {name} » importé. Dossier existant : {folder} (rien modifié).",
+    band_prompt_warning: "Le dossier des prompts n’a pas pu être créé : {detail}",
   },
   es: {
     app_sub: 'en el navegador', tab_songs: 'Songs & Suno', tab_bands: 'Bandas', all_bands: 'Todas las bandas',
@@ -190,6 +232,20 @@ const I18N = {
     err_no_hardware: "Esta banda aún no tiene equipo.",
     err_preset_damaged: "El ajuste está dañado y no se puede usar.",
     err_missing: "La entrada ya no existe. Vuelva a cargar.",
+    band_new: "+ Nueva banda",
+    band_new_title: "Crear banda",
+    band_name: "Nombre de la banda",
+    band_create: "Crear banda",
+    band_new_hint: "Crea la carpeta de la banda y la carpeta de prompts. Las subcarpetas se crean al añadir un proyecto.",
+    err_band_name_empty: "Introduzca un nombre de banda.",
+    err_band_name: "El nombre no es válido como nombre de carpeta (sin caracteres como < > : \" / \\ | ? *, sin punto ni espacio final).",
+    err_band_folder: "No se pudo crear la carpeta de la banda: {detail}",
+    confirm_import_folder: "Ya existe una carpeta «{folder}», pero aún no hay banda para ella.\n\n¿Usar la carpeta como banda? Los archivos y carpetas existentes no se modifican.",
+    band_exists: "La banda «{name}» ya existe; se ha seleccionado.",
+    band_exists_plain: "La banda «{name}» ya existe.",
+    band_created: "Banda «{name}» creada. Carpeta: {folder}",
+    band_imported: "Banda «{name}» importada. Carpeta existente: {folder} (sin cambios).",
+    band_prompt_warning: "No se pudo crear la carpeta de prompts: {detail}",
   },
   it: {
     app_sub: 'nel browser', tab_songs: 'Songs & Suno', tab_bands: 'Band', all_bands: 'Tutte le band',
@@ -237,6 +293,20 @@ const I18N = {
     err_no_hardware: "Questo gruppo non ha ancora hardware.",
     err_preset_damaged: "Il preset è danneggiato e non può essere usato.",
     err_missing: "L’elemento non esiste più. Ricarica.",
+    band_new: "+ Nuovo gruppo",
+    band_new_title: "Crea gruppo",
+    band_name: "Nome del gruppo",
+    band_create: "Crea gruppo",
+    band_new_hint: "Crea la cartella del gruppo e la cartella dei prompt. Le sottocartelle vengono create quando si aggiunge un progetto.",
+    err_band_name_empty: "Inserisci il nome del gruppo.",
+    err_band_name: "Il nome non è valido come nome di cartella (niente caratteri come < > : \" / \\ | ? *, non terminare con punto o spazio).",
+    err_band_folder: "Impossibile creare la cartella del gruppo: {detail}",
+    confirm_import_folder: "Esiste già una cartella «{folder}», ma non ancora un gruppo.\n\nUsare la cartella come gruppo? File e cartelle esistenti non vengono modificati.",
+    band_exists: "Il gruppo «{name}» esiste già ed è stato selezionato.",
+    band_exists_plain: "Il gruppo «{name}» esiste già.",
+    band_created: "Gruppo «{name}» creato. Cartella: {folder}",
+    band_imported: "Gruppo «{name}» importato. Cartella esistente: {folder} (nessuna modifica).",
+    band_prompt_warning: "Impossibile creare la cartella dei prompt: {detail}",
   },
 };
 
@@ -532,8 +602,76 @@ async function selectBand(id, item) {
   resetHardwareForm();
   renderProjects(id, band.projects);
   $('band-empty').hidden = true;
+  $('band-new').hidden = true;
   $('band-body').hidden = false;
   await Promise.all([refreshHardwareChoices(), loadPresets()]);
+}
+
+/* „Neue Band“: same rules as the desktop app (folder + database + prompt folder). */
+
+function newBandMessage(text, kind) {
+  const box = $('band-new-message');
+  box.textContent = text;
+  box.className = 'message' + (kind ? ' ' + kind : '');
+  box.hidden = !text;
+}
+
+async function showNewBandForm() {
+  const options = await api('/api/band-options');
+  fillOptions($('genre-options'), options.genres);
+  $('n-persona').replaceChildren(...options.personas.map((p) => { const o = el('option', p); o.value = p; return o; }));
+  for (const id of ['n-name', 'n-genre', 'n-second']) $(id).value = '';
+  newBandMessage('');
+  document.querySelectorAll('#band-list li').forEach((li) => li.classList.remove('active'));
+  $('band-empty').hidden = true;
+  $('band-body').hidden = true;
+  $('band-new').hidden = false;
+  $('n-name').focus();
+}
+
+function hideNewBandForm() {
+  $('band-new').hidden = true;
+  if (bandState.band && bandState.item && bandState.item.isConnected) {  // back to the band shown before
+    bandState.item.classList.add('active');
+    $('band-body').hidden = false;
+  } else $('band-empty').hidden = false;
+}
+
+async function createBand() {
+  const body = { name: $('n-name').value.trim(), genre: $('n-genre').value,
+                 second_genre: $('n-second').value, persona: $('n-persona').value };
+  if (!body.name) { newBandMessage(t('err_band_name_empty'), 'error'); return; }
+  let result;
+  try {
+    try {
+      result = await api('/api/bands', { method: 'POST', body });
+    } catch (error) {
+      const code = error.data && error.data.error;
+      if (code !== 'folder_exists') throw error;
+      // A folder with this name exists but no band profile: take it over unchanged only on a clear yes.
+      if (!confirm(t('confirm_import_folder', { folder: error.data.folder || body.name }))) return;
+      result = await api('/api/bands', { method: 'POST', body: { ...body, import_existing: true } });
+    }
+  } catch (error) {
+    const code = error.data && error.data.error;
+    if (code === 'band_exists' && error.data.id) {
+      bandState.band = { id: error.data.id };
+      await reloadBand();
+      bandMessage(t('band_exists', { name: bandState.band.name }));
+      return;
+    }
+    const map = { invalid_name: 'err_band_name', too_long: 'err_too_long', empty_field: 'err_band_name_empty',
+                  band_exists: 'band_exists_plain' };
+    if (code === 'folder_error') newBandMessage(t('err_band_folder', { detail: error.data.detail || '' }), 'error');
+    else newBandMessage(map[code] ? t(map[code], { name: body.name })
+      : (error.kind === 'connection' ? error.message : t('error', { detail: error.message })), 'error');
+    return;
+  }
+  bandState.band = { id: result.id };
+  let text = t(result.created ? 'band_created' : 'band_imported', { name: result.name, folder: result.folder });
+  if (result.prompt_warning) text += ' ' + t('band_prompt_warning', { detail: result.prompt_warning });
+  await reloadBand(text);
+  await loadBandsFilter();  // the new band also appears in the Songs filter
 }
 
 function renderHardware() {
@@ -673,6 +811,10 @@ $('btn-hw-cancel').addEventListener('click', () => { resetHardwareForm(); render
 $('btn-preset-add').addEventListener('click', () => bandAction(() => transferPreset('add')));
 $('btn-preset-replace').addEventListener('click', () => bandAction(() => transferPreset('replace')));
 $('btn-preset-save').addEventListener('click', () => bandAction(saveAsPreset));
+$('btn-band-new').addEventListener('click', () => bandAction(showNewBandForm).catch(bandError));
+$('btn-band-new-cancel').addEventListener('click', hideNewBandForm);
+$('btn-band-create').addEventListener('click', () => bandAction(createBand).catch((error) => newBandMessage(error.message, 'error')));
+$('n-name').addEventListener('keydown', (event) => { if (event.key === 'Enter') $('btn-band-create').click(); });
 
 /* ------------------------------------------------------------------ start */
 
