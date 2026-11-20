@@ -171,7 +171,8 @@ def _write(server, func, *args):
             return func(con, *args)
     except ws.BandDataError as exc:
         status = (404 if exc.code.endswith('_missing') else
-                  409 if exc.code in ('preset_exists', 'band_exists', 'folder_exists', 'link_exists', 'isrc_exists') else
+                  409 if exc.code in ('preset_exists', 'band_exists', 'folder_exists', 'link_exists', 'isrc_exists',
+                                      'track_exists') else
                   500 if exc.code == 'folder_error' else 400)
         raise ApiError(status, exc.code, exc.values) from exc
     except core.ToolError as exc:
@@ -954,7 +955,134 @@ def api_backup_restore(server, query, body):
     return _backup_job(server, run)
 
 
+# --------------------------------------------------------------------------- Plattensammlung (stage 9)
+
+ALBUM_FILE_ROUTE = re.compile(r'^/(album-cover|album-print)/(\d+)/([0-9a-f]{32})$')
+COVER_TYPES = {'.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.bmp': 'image/bmp'}
+PRINT_CSP = "default-src 'none'; style-src 'unsafe-inline'; img-src data:; frame-ancestors 'none'; base-uri 'none'"
+
+
+def _album_key(server, kind, aid):
+    return hmac.new(server.token.encode(), f'{kind}:{aid}'.encode(), 'sha256').hexdigest()[:32]
+
+
+def api_albums(server, query, body):
+    def read(con, _args):
+        return {'albums': ws.list_albums(con),
+                'bands': [{'id': r[0], 'name': r[1]} for r in con.execute('SELECT id,name FROM bands ORDER BY name COLLATE NOCASE')],
+                'genres': [r[0] for r in con.execute('SELECT name FROM genre_catalog ORDER BY name COLLATE NOCASE')]}
+    return _read(server, read, {})
+
+
+def api_create_album(server, query, body):
+    band_id = _optional_int(body, 'band_id')
+    if band_id is None:
+        raise ApiError(400, 'band_missing')
+    return {'id': _write(server, ws.create_album, _body_text(body, 'title'), band_id)}
+
+
+def api_delete_album(server, query, body, aid):
+    _needs_confirm(body)
+    _write(server, ws.delete_album, int(aid))
+    return {'deleted': True}
+
+
+def api_album(server, query, body, aid):
+    aid = int(aid)
+    root = _root(server)
+
+    def read(con, _args):
+        try:
+            detail = ws.album_detail(con, aid)
+        except ws.BandDataError as exc:
+            raise ApiError(404, exc.code) from exc
+        summary = ws.album_summary(con, root, aid)
+        detail['summary'] = {**summary, 'duration': ws.format_duration(summary['seconds']) if summary['known'] else ''}
+        detail['cover_url'] = (f'/album-cover/{aid}/{_album_key(server, "album-cover", aid)}'
+                               if ws.album_cover_file(con, root, aid) else None)
+        detail['print_url'] = f'/album-print/{aid}/{_album_key(server, "album-print", aid)}'
+        return detail
+    return _read(server, read, {})
+
+
+def api_album_songs(server, query, body, aid):
+    all_artists = query.get('all', ['0'])[0] == '1'
+
+    def read(con, _args):
+        try:
+            return ws.album_song_choices(con, int(aid), all_artists)
+        except ws.BandDataError as exc:
+            raise ApiError(404, exc.code) from exc
+    return _read(server, read, {})
+
+
+def api_add_album_track(server, query, body, aid):
+    song_id = _optional_int(body, 'song_id')
+    if song_id is None:
+        raise ApiError(400, 'song_missing')
+    _write(server, ws.add_album_track, int(aid), song_id)
+    return {'added': True}
+
+
+def api_remove_album_track(server, query, body, aid, sid):
+    _write(server, ws.remove_album_track, int(aid), int(sid))
+    return {'removed': True}
+
+
+def api_move_album_track(server, query, body, aid, sid):
+    direction = body.get('direction') if isinstance(body, dict) else None
+    return {'moved': _write(server, ws.move_album_track, int(aid), int(sid), direction)}
+
+
+def api_album_metadata(server, query, body, aid):
+    if not isinstance(body, dict):
+        raise ApiError(400, 'invalid_body')
+    _write(server, ws.save_album_metadata, int(aid), body.get('release_date') or '', body.get('genre', ''),
+           body.get('label', ''), body.get('upc', ''))
+    return {'saved': True}
+
+
+def api_album_cover(server, query, body, aid):
+    """Upload a cover: raw image bytes (PNG, JPEG, WEBP, BMP – checked by content), max. 12 MB."""
+    try:
+        with closing(core.open_write(server.db_path)) as con:
+            ws.set_album_cover(con, _root(server), int(aid), body)
+    except ws.BandDataError as exc:
+        raise ApiError(404 if exc.code.endswith('_missing') else 400, exc.code) from exc
+    except OSError as exc:
+        raise ApiError(500, 'cover_failed', {'detail': str(exc)[:300]}) from exc
+    return {'saved': True}
+
+
+def api_album_tracklist(server, query, body, aid):
+    """CSV text of the track list (the browser saves it as a file); nothing is written on the PC."""
+    import csv
+    import io
+    try:
+        rows = _read(server, lambda con, _args: ws.album_tracklist_rows(con, int(aid)), {})
+    except ws.BandDataError as exc:
+        raise ApiError(404, exc.code) from exc
+    buffer = io.StringIO()
+    csv.writer(buffer, delimiter=';', lineterminator='\r\n').writerows(rows)
+    title = re.sub(r'[^\w. -]+', '_', rows[1][0] if len(rows) > 1 else 'Album').strip(' ._') or 'Album'
+    return {'csv': buffer.getvalue(), 'filename': f'{title}_Trackliste.csv'}
+
+
+RAW_BODY_LIMITS = {api_album_cover: ws.ALBUM_COVER_LIMIT}  # routes that receive raw bytes instead of JSON
+
+
 ROUTES = [
+    ('GET', re.compile(r'^/api/albums$'), api_albums),
+    ('POST', re.compile(r'^/api/albums$'), api_create_album),
+    ('GET', re.compile(r'^/api/albums/(\d+)$'), api_album),
+    ('POST', re.compile(r'^/api/albums/(\d+)/delete$'), api_delete_album),
+    ('GET', re.compile(r'^/api/albums/(\d+)/songs$'), api_album_songs),
+    ('POST', re.compile(r'^/api/albums/(\d+)/tracks$'), api_add_album_track),
+    ('POST', re.compile(r'^/api/albums/(\d+)/tracks/(\d+)/delete$'), api_remove_album_track),
+    ('POST', re.compile(r'^/api/albums/(\d+)/tracks/(\d+)/move$'), api_move_album_track),
+    ('POST', re.compile(r'^/api/albums/(\d+)/metadata$'), api_album_metadata),
+    ('POST', re.compile(r'^/api/albums/(\d+)/cover$'), api_album_cover),
+    ('GET', re.compile(r'^/api/albums/(\d+)/tracklist$'), api_album_tracklist),
     ('GET', re.compile(r'^/api/backup$'), api_backup_info),
     ('POST', re.compile(r'^/api/backup/create$'), api_backup_create),
     ('POST', re.compile(r'^/api/backup/validate$'), api_backup_validate),
@@ -1159,6 +1287,42 @@ class MPWRequestHandler(BaseHTTPRequestHandler):
         except (ValueError, UnicodeDecodeError) as exc:
             raise ApiError(400, 'invalid_json') from exc
 
+    def _raw_body(self, limit):
+        length = int(self.headers.get('Content-Length') or 0)
+        if length > limit:
+            self.close_connection = True
+            raise ApiError(413, 'too_large')
+        return self.rfile.read(length)
+
+    def _serve_album_file(self, kind, aid, key):
+        """Album cover image or printable overview; the key is an HMAC with this start's secret token."""
+        if not hmac.compare_digest(key, _album_key(self.server, kind, aid)):
+            return self._send(404, {'error': 'not_found'})
+        root = self.server.db_path.parent
+        try:
+            with closing(core.open_read(self.server.db_path)) as con:
+                if kind == 'album-print':
+                    document = ws.album_print_html(con, root, aid)
+                    if document is None:
+                        return self._send(404, {'error': 'not_found'})
+                    data, content_type, csp = document.encode('utf-8'), 'text/html; charset=utf-8', PRINT_CSP
+                else:
+                    path = ws.album_cover_file(con, root, aid)
+                    content_type = COVER_TYPES.get(path.suffix.lower()) if path else None
+                    if not content_type:
+                        return self._send(404, {'error': 'not_found'})
+                    data, csp = path.read_bytes(), "default-src 'none'; sandbox"
+        except (sqlite3.Error, OSError):
+            return self._send(404, {'error': 'not_found'})
+        self.send_response(200)
+        self.send_header('Content-Type', content_type)
+        self.send_header('Content-Length', str(len(data)))
+        for key_, value in MEDIA_SECURITY_HEADERS.items():
+            self.send_header(key_, value)
+        self.send_header('Content-Security-Policy', csp)
+        self.end_headers()
+        self.wfile.write(data)
+
     def _dispatch(self, method):
         if not self._host_ok():
             return self._send(403, {'error': 'host_not_allowed'})
@@ -1173,6 +1337,9 @@ class MPWRequestHandler(BaseHTTPRequestHandler):
         media = MEDIA_ROUTE.match(parsed.path) if method == 'GET' else None
         if media:  # the file id itself is the key: an HMAC of the path with this start's secret token
             return self._serve_media(int(media.group(1)), media.group(2))
+        album_file = ALBUM_FILE_ROUTE.match(parsed.path) if method == 'GET' else None
+        if album_file:
+            return self._serve_album_file(album_file.group(1), int(album_file.group(2)), album_file.group(3))
         if not parsed.path.startswith('/api/'):
             return self._send(404, {'error': 'not_found'})
         if not self._token_ok():
@@ -1181,7 +1348,12 @@ class MPWRequestHandler(BaseHTTPRequestHandler):
             match = pattern.match(parsed.path)
             if match and route_method == method:
                 try:
-                    body = self._body() if method == 'POST' else None
+                    if method != 'POST':
+                        body = None
+                    elif handler in RAW_BODY_LIMITS:
+                        body = self._raw_body(RAW_BODY_LIMITS[handler])
+                    else:
+                        body = self._body()
                     result = handler(self.server, parse_qs(parsed.query), body, *match.groups())
                     return self._send(200, result)
                 except ApiError as exc:

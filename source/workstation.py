@@ -7528,60 +7528,8 @@ class Workstation(QMainWindow):
         aid = self.current_album_id()
         if aid is None:
             return None
-        row = self.con.execute('''SELECT title,artist,release_date,genre,label,upc,cover_path
-                                  FROM albums WHERE id=?''', (aid,)).fetchone()
-        if not row:
-            return None
-        title, artist, release_date, genre, label, upc, cover_path = row
-        tracks = self.con.execute('''SELECT t.position,s.title,COALESCE(b.name,''),
-                                      COALESCE(s.status,'')
-                                      FROM album_tracks t
-                                      JOIN songs s ON s.id=t.song_id
-                                      LEFT JOIN projects p ON p.id=s.project_id
-                                      LEFT JOIN bands b ON b.id=p.band_id
-                                      WHERE t.album_id=? ORDER BY t.position,t.song_id''',
-                                  (aid,)).fetchall()
-        esc = lambda value: html.escape(str(value or ''), quote=True)
-        cover = ''
-        if cover_path:
-            candidate = (ROOT / cover_path).resolve()
-            media_root = (ROOT / 'media').resolve()
-            if candidate.is_relative_to(media_root) and candidate.is_file() and candidate.stat().st_size <= 12_000_000:
-                mime = mimetypes.guess_type(candidate.name)[0]
-                if mime in ('image/png', 'image/jpeg', 'image/webp', 'image/bmp'):
-                    encoded = base64.b64encode(candidate.read_bytes()).decode('ascii')
-                    cover = f'<img class="cover" alt="Albumcover" src="data:{mime};base64,{encoded}">'
-        rows = ''.join('<tr><td class="number">{}</td><td>{}</td><td>{}</td><td>{}</td></tr>'.format(
-            esc(pos), esc(song_title), esc(song_artist or artist), esc(status))
-            for pos, song_title, song_artist, status in tracks)
-        date_display = ''
-        if release_date:
-            try:
-                date_display = datetime.strptime(release_date, '%Y-%m-%d').strftime('%d.%m.%Y')
-            except ValueError:
-                date_display = release_date
-        details = [('Veröffentlichung', date_display), ('Genre', genre), ('Label', label), ('UPC / EAN', upc)]
-        metadata = ''.join(f'<div><strong>{esc(k)}:</strong> {esc(v)}</div>' for k,v in details if v)
-        return f'''<!doctype html><html lang="de"><head><meta charset="utf-8">
-<title>{esc(title)} – Albumübersicht</title><style>
-html,body{{background-color:#ffffff;color:#17212b;}}
-body{{font-family:Arial,Helvetica,sans-serif;max-width:850px;margin:36px auto;padding:0 24px;}}
-header{{display:flex;gap:26px;align-items:flex-start;margin-bottom:30px;}}
-.cover{{width:210px;height:210px;object-fit:contain;border:1px solid #ddd;}}
-h1,h2,strong,section,div,span{{color:#17212b;}}
-h1{{margin:0 0 8px;font-size:30px;}}h2{{font-size:19px;}}
-.artist{{font-size:20px;margin-bottom:22px;}}.meta div{{margin:6px 0;}}
-table{{width:100%;border-collapse:collapse;margin-top:12px;background-color:#ffffff;color:#17212b;}}
-tr,td{{background-color:#ffffff;color:#17212b;}}
-th,td{{padding:11px 9px;text-align:left;border-bottom:1px solid #dce1e5;}}
-th{{background-color:#eef1f4;color:#17212b;font-weight:bold;}}
-.number{{width:55px;}}.count{{color:#344454;}}
-@media print{{body{{margin:0;max-width:none;}}@page{{size:A4;margin:15mm;}}tr{{break-inside:avoid;}}}}
-</style></head><body><header>{cover}<section><h1>{esc(title)}</h1>
-<div class="artist">{esc(artist)}</div><div class="meta">{metadata}</div></section></header>
-<h2>Trackliste <span class="count">({len(tracks)} Songs)</span></h2>
-<table><thead><tr><th>Nr.</th><th>Titel</th><th>Interpret</th><th>Status</th></tr></thead>
-<tbody>{rows}</tbody></table></body></html>'''
+        # Same print view as the browser GUI (mpw_core.album_print_html).
+        return mpw_core.album_print_html(self.con, ROOT, aid)
 
     def refresh_album_print(self):
         try:
@@ -7624,20 +7572,12 @@ th{{background-color:#eef1f4;color:#17212b;font-weight:bold;}}
         aid = self.current_album_id()
         if aid is None:
             return self.error('Bitte zuerst eine Platte auswählen.')
-        album = self.con.execute(
-            'SELECT title,artist,release_date,genre,label,upc FROM albums WHERE id=?', (aid,)
-        ).fetchone()
-        if album is None:
+        try:  # same rows as the browser GUI's CSV export (mpw_core.album_tracklist_rows)
+            csv_rows = mpw_core.album_tracklist_rows(self.con, aid)
+        except mpw_core.BandDataError:
             return self.error('Die ausgewählte Platte existiert nicht mehr.')
-        title, artist, release_date, genre, label, upc = album
-        tracks = self.con.execute('''SELECT t.position, s.title, COALESCE(b.name, ''),
-                                         COALESCE(p.name, ''), s.status
-                                  FROM album_tracks t
-                                  JOIN songs s ON s.id=t.song_id
-                                  LEFT JOIN projects p ON p.id=s.project_id
-                                  LEFT JOIN bands b ON b.id=p.band_id
-                                  WHERE t.album_id=?
-                                  ORDER BY t.position, t.song_id''', (aid,)).fetchall()
+        title = csv_rows[1][0] if len(csv_rows) > 1 else self.con.execute(
+            'SELECT title FROM albums WHERE id=?', (aid,)).fetchone()[0]
         suggested = re.sub(r'[^\w. -]+', '_', title, flags=re.UNICODE).strip(' ._') or 'Album'
         path, _ = QFileDialog.getSaveFileName(
             self, 'Album-Trackliste exportieren', f'{suggested}_Trackliste.csv',
@@ -7647,16 +7587,9 @@ th{{background-color:#eef1f4;color:#17212b;font-weight:bold;}}
             return
         try:
             with open(path, 'w', encoding='utf-8-sig', newline='') as output:
-                writer = csv.writer(output, delimiter=';')
-                writer.writerow(['Albumtitel', 'Albuminterpret', 'Veröffentlichungsdatum',
-                                 'Albumgenre', 'Label', 'UPC/EAN', 'Tracknummer',
-                                 'Songtitel', 'Songinterpret', 'Projekt', 'Songstatus'])
-                for position, song_title, song_artist, project, status in tracks:
-                    writer.writerow([title, artist, release_date or '', genre or '',
-                                     label or '', upc or '', position, song_title,
-                                     song_artist, project, status or ''])
+                csv.writer(output, delimiter=';').writerows(csv_rows)
             QMessageBox.information(self, 'CSV-Export',
-                f'{len(tracks)} Tracks erfolgreich exportiert:\n{path}')
+                f'{len(csv_rows) - 1} Tracks erfolgreich exportiert:\n{path}')
         except (OSError, UnicodeError) as exc:
             self.error(f'CSV-Export fehlgeschlagen: {exc}')
 
@@ -7738,63 +7671,12 @@ th{{background-color:#eef1f4;color:#17212b;font-weight:bold;}}
 
     def update_album_summary(self, aid):
         """Summarize album without altering songs or release records."""
-        rows = self.con.execute('''SELECT s.id, COALESCE(s.status,''),
-                              EXISTS(SELECT 1 FROM releases r WHERE r.song_id=s.id),
-                              EXISTS(SELECT 1 FROM releases r
-                                     JOIN release_platforms rp ON rp.release_id=r.id
-                                     WHERE r.song_id=s.id AND rp.status='Veröffentlicht')
-                              FROM album_tracks t JOIN songs s ON s.id=t.song_id
-                              WHERE t.album_id=?''', (aid,)).fetchall()
-        count = len(rows)
-        published = sum(bool(row[3]) for row in rows)
-        prepared = sum(bool(row[2]) for row in rows)
-        if not count:
-            release_text = 'Keine Tracks'
-        elif published == count:
-            release_text = 'Alle Tracks veröffentlicht'
-        elif published:
-            release_text = f'{published}/{count} Tracks veröffentlicht'
-        elif prepared:
-            release_text = f'{prepared}/{count} Tracks mit Release-Datensatz'
-        else:
-            release_text = 'Keine Releases erfasst'
-
-        # Prefer metadata-based durations (MP3, FLAC, M4A, OGG, AIFF, WAV).
-        # Only count one readable audio asset per track, newest first.
-        seconds = 0.0
-        known = 0
-        for song_id, *_ in rows:
-            assets = self.con.execute('''SELECT relative_path FROM media_assets
-                                         WHERE song_id=? AND kind='Audio'
-                                         ORDER BY id DESC''', (song_id,)).fetchall()
-            for (relative_path,) in assets:
-                path = ROOT / relative_path
-                if not path.is_file():
-                    continue
-                length = None
-                if mutagen_file is not None:
-                    try:
-                        metadata = mutagen_file(str(path))
-                        if metadata is not None and metadata.info is not None:
-                            length = float(metadata.info.length)
-                    except (OSError, ValueError, TypeError, AttributeError):
-                        pass
-                if length is None and path.suffix.lower() == '.wav':
-                    try:
-                        with wave.open(str(path), 'rb') as audio:
-                            rate = audio.getframerate()
-                            if rate > 0:
-                                length = audio.getnframes() / rate
-                    except (OSError, EOFError, ValueError, wave.Error):
-                        pass
-                if length is not None and 0 < length < 86400 * 7:
-                    seconds += length
-                    known += 1
-                    break
+        # Same rules as the browser GUI (mpw_core.album_summary).
+        summary = mpw_core.album_summary(self.con, ROOT, aid)
+        count, known = summary['count'], summary['known']
+        release_text = mpw_core.album_release_text(summary)
         if known:
-            minutes, secs = divmod(round(seconds), 60)
-            hours, minutes = divmod(minutes, 60)
-            duration = f'{hours:d}:{minutes:02d}:{secs:02d}' if hours else f'{minutes:d}:{secs:02d}'
+            duration = mpw_core.format_duration(summary['seconds'])
             if known != count:
                 duration += self.album_duration_partial_hf11(known, count)
         else:

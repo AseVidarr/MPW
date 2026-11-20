@@ -275,6 +275,93 @@ class WebServerTests(unittest.TestCase):
         self.assertEqual(self.json_call('POST', '/api/songs/1/prompt-versions', {**body, 'lyrics': ' '})[1]['error'], 'empty_field')
         self.assertEqual(self.json_call('POST', '/api/songs/99/prompt-versions', body)[0], 404)
 
+    # --- stage 9: Plattensammlung ---
+    def album_setup(self):
+        with closing(sqlite3.connect(self.db)) as con, con:
+            con.execute("INSERT INTO projects(band_id,name) VALUES (1,'Steel River')")
+            con.execute("INSERT INTO songs(project_id,title) VALUES (2,'Steel River')")
+            con.execute("INSERT INTO bands(name) VALUES ('Gastband')")
+            con.execute("INSERT INTO projects(band_id,name) VALUES (2,'Feature')")
+            con.execute("INSERT INTO songs(project_id,title) VALUES (3,'Feature')")
+        self.assertEqual(self.json_call('POST', '/api/albums', {'title': ' ', 'band_id': 1})[1]['error'], 'empty_field')
+        self.assertEqual(self.json_call('POST', '/api/albums', {'title': 'X', 'band_id': 99})[0], 404)
+        status, created = self.json_call('POST', '/api/albums', {'title': 'Delta <Nights>', 'band_id': 1})
+        self.assertEqual(status, 200)
+        return created['id']
+
+    def test_albums_tracks_order_and_metadata(self):
+        aid = self.album_setup()
+        data = self.json_call('GET', '/api/albums')[1]
+        self.assertEqual([(a['title'], a['artist']) for a in data['albums']], [('Delta <Nights>', 'Iron Delta')])
+        self.assertEqual([b['name'] for b in data['bands']], ['Gastband', 'Iron Delta'])
+        own = self.json_call('GET', f'/api/albums/{aid}/songs')[1]
+        self.assertEqual([s['title'] for s in own], ['Rain Song', 'Steel River'])  # only the album artist
+        self.assertEqual(len(self.json_call('GET', f'/api/albums/{aid}/songs?all=1')[1]), 3)  # sampler
+        for sid in (1, 2, 3):
+            self.assertEqual(self.json_call('POST', f'/api/albums/{aid}/tracks', {'song_id': sid})[0], 200)
+        self.assertEqual(self.json_call('POST', f'/api/albums/{aid}/tracks', {'song_id': 1})[1]['error'], 'track_exists')
+        self.assertEqual(self.json_call('POST', f'/api/albums/{aid}/tracks/3/move', {'direction': -1})[1]['moved'], True)
+        self.assertEqual(self.json_call('POST', f'/api/albums/{aid}/tracks/1/move', {'direction': -1})[1]['moved'], False)
+        self.assertEqual(self.json_call('POST', f'/api/albums/{aid}/tracks/1/move', {'direction': 5})[0], 400)
+        album = self.json_call('GET', f'/api/albums/{aid}')[1]
+        self.assertEqual([(t['position'], t['title']) for t in album['tracks']],
+                         [(1, 'Rain Song'), (2, 'Feature'), (3, 'Steel River')])
+        self.assertEqual(self.json_call('POST', f'/api/albums/{aid}/tracks/1/delete', {})[0], 200)
+        album = self.json_call('GET', f'/api/albums/{aid}')[1]
+        self.assertEqual([(t['position'], t['song_id']) for t in album['tracks']], [(1, 3), (2, 2)])  # renumbered
+        self.assertEqual((album['summary']['count'], album['summary']['known'], album['cover_url']), (2, 0, None))
+        body = {'release_date': '2026-12-24', 'genre': 'Blues', 'label': 'Delta Records', 'upc': '4006381333931'}
+        self.assertEqual(self.json_call('POST', f'/api/albums/{aid}/metadata', {**body, 'upc': '123'})[1]['error'], 'invalid_upc')
+        self.assertEqual(self.json_call('POST', f'/api/albums/{aid}/metadata', {**body, 'release_date': '24.12.'})[1]['error'],
+                         'invalid_date')
+        self.assertEqual(self.json_call('POST', f'/api/albums/{aid}/metadata', body)[0], 200)
+        album = self.json_call('GET', f'/api/albums/{aid}')[1]
+        self.assertEqual((album['release_date'], album['label'], album['upc']), ('2026-12-24', 'Delta Records', '4006381333931'))
+        csv_text = self.json_call('GET', f'/api/albums/{aid}/tracklist')[1]
+        self.assertEqual(csv_text['filename'], 'Delta _Nights_Trackliste.csv')
+        lines = csv_text['csv'].splitlines()
+        self.assertTrue(lines[0].startswith('Albumtitel;Albuminterpret'))
+        self.assertIn('Delta <Nights>;Iron Delta;2026-12-24;Blues;Delta Records;4006381333931;1;Feature;Gastband', lines[1])
+        # print view: own address with key, escaped content, restrictive CSP
+        status, headers, raw = self.call('GET', album['print_url'], token=False)
+        self.assertEqual(status, 200)
+        self.assertIn('Delta &lt;Nights&gt;', raw.decode('utf-8'))
+        self.assertIn("default-src 'none'", headers['Content-Security-Policy'])
+        self.assertEqual(self.call('GET', album['print_url'][:-1] + ('0' if album['print_url'][-1] != '0' else '1'),
+                                   token=False)[0], 404)
+        self.assertEqual(self.json_call('POST', f'/api/albums/{aid}/delete', {})[1]['error'], 'confirm_required')
+        self.assertEqual(self.json_call('POST', f'/api/albums/{aid}/delete', {'confirm': True})[0], 200)
+        with closing(sqlite3.connect(self.db)) as con:  # songs stay, track list is gone
+            self.assertEqual(con.execute('SELECT COUNT(*) FROM songs').fetchone()[0], 3)
+            self.assertEqual(con.execute('SELECT COUNT(*) FROM album_tracks').fetchone()[0], 0)
+
+    def test_album_cover_upload_checks_content_and_size(self):
+        aid = self.album_setup()
+
+        def upload(data, content_type='application/octet-stream'):
+            request = urllib.request.Request(f'http://127.0.0.1:{self.server.port}/api/albums/{aid}/cover', method='POST',
+                                             data=data, headers={'X-MPW-Token': self.server.token, 'Content-Type': content_type})
+            try:
+                with urllib.request.urlopen(request, timeout=10) as response:
+                    return response.status, json.loads(response.read())
+            except urllib.error.HTTPError as exc:
+                try:
+                    return exc.code, json.loads(exc.read() or b'{}')
+                finally:
+                    exc.close()
+        self.assertEqual(upload(b'<svg onload=alert(1)>'), (400, {'error': 'invalid_cover'}))
+        self.assertEqual(upload(b'')[1]['error'], 'invalid_cover')
+        png = b'\x89PNG\r\n\x1a\n' + b'\x00' * 64
+        self.assertEqual(upload(png)[0], 200)
+        album = self.json_call('GET', f'/api/albums/{aid}')[1]
+        status, headers, raw = self.call('GET', album['cover_url'], token=False)
+        self.assertEqual((status, headers['Content-Type'], raw), (200, 'image/png', png))
+        covers = list((Path(self.tmp.name) / 'media' / 'album_covers').iterdir())
+        self.assertEqual(len(covers), 1)
+        self.assertTrue(covers[0].name.startswith(f'album_{aid}_') and covers[0].suffix == '.png')
+        status, _ = upload(b'\x89PNG\r\n\x1a\n' + b'\x00' * (12_000_001))
+        self.assertEqual(status, 413)
+
     # --- stage 8: Backup (temp data only) ---
     def wait_backup(self, job_id):
         for _ in range(200):

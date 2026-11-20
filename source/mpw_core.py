@@ -2741,6 +2741,297 @@ def save_release_platform(con, release_id, platform, status, url=''):
 
 
 # ---------------------------------------------------------------------------
+# Plattensammlung / Album-Details: shared rules (desktop tabs and browser GUI).
+# ---------------------------------------------------------------------------
+ALBUM_COVER_TYPES = {b'\x89PNG\r\n\x1a\n': '.png', b'\xff\xd8\xff': '.jpg', b'BM': '.bmp'}
+ALBUM_COVER_LIMIT = 12_000_000
+
+
+def list_albums(con):
+    return [{'id': r[0], 'title': r[1], 'artist': r[2] or ''} for r in con.execute(
+        'SELECT id,title,artist FROM albums ORDER BY id DESC')]
+
+
+def _album_exists(con, aid):
+    if con.execute('SELECT 1 FROM albums WHERE id=?', (aid,)).fetchone() is None:
+        raise BandDataError('album_missing')
+
+
+def create_album(con, title, band_id):
+    """New record; the artist is one of the bands (like the desktop „Neue Platte anlegen“)."""
+    title = _clean_text(title, 'title', 300)
+    band = con.execute('SELECT name FROM bands WHERE id=?', (band_id,)).fetchone()
+    if band is None:
+        raise BandDataError('band_missing')
+    with con:
+        return con.execute('INSERT INTO albums(title,artist) VALUES(?,?)', (title, band[0])).lastrowid
+
+
+def delete_album(con, aid):
+    """Delete a record and its track list; the songs themselves stay."""
+    with con:
+        if con.execute('DELETE FROM albums WHERE id=?', (aid,)).rowcount != 1:
+            raise BandDataError('album_missing')
+
+
+def album_detail(con, aid):
+    row = con.execute('SELECT id,title,artist,release_date,genre,label,upc,cover_path FROM albums WHERE id=?',
+                      (aid,)).fetchone()
+    if row is None:
+        raise BandDataError('album_missing')
+    tracks = [{'song_id': r[0], 'position': r[1], 'title': r[2], 'band': r[3] or '', 'status': r[4] or ''}
+              for r in con.execute('''SELECT s.id, t.position, s.title, b.name, s.status FROM album_tracks t
+                                      JOIN songs s ON s.id=t.song_id LEFT JOIN projects p ON p.id=s.project_id
+                                      LEFT JOIN bands b ON b.id=p.band_id
+                                      WHERE t.album_id=? ORDER BY t.position,t.song_id''', (aid,))]
+    keys = ('id', 'title', 'artist', 'release_date', 'genre', 'label', 'upc')
+    detail = {k: (v if v is not None else '') for k, v in zip(keys, row[:7])}
+    detail['tracks'] = tracks
+    return detail
+
+
+def album_song_choices(con, aid, all_artists=False):
+    """Songs of the album artist – or of all bands for samplers/guest appearances."""
+    artist = con.execute('SELECT artist FROM albums WHERE id=?', (aid,)).fetchone()
+    if artist is None:
+        raise BandDataError('album_missing')
+    sql = 'SELECT s.id, s.title, b.name FROM songs s JOIN projects p ON s.project_id=p.id JOIN bands b ON p.band_id=b.id'
+    params = ()
+    if not all_artists:
+        sql += ' WHERE b.name = ? COLLATE NOCASE'
+        params = (artist[0],)
+    sql += ' ORDER BY b.name COLLATE NOCASE, s.title COLLATE NOCASE'
+    return [{'id': r[0], 'title': r[1], 'band': r[2]} for r in con.execute(sql, params)]
+
+
+def _normalize_album_tracks(con, aid):
+    ids = [r[0] for r in con.execute('SELECT song_id FROM album_tracks WHERE album_id=? ORDER BY position,song_id', (aid,))]
+    for pos, sid in enumerate(ids, 1):
+        con.execute('UPDATE album_tracks SET position=? WHERE album_id=? AND song_id=?', (pos, aid, sid))
+
+
+def add_album_track(con, aid, sid):
+    """A song can appear on several records, but only once per record."""
+    _album_exists(con, aid)
+    if con.execute('SELECT 1 FROM songs WHERE id=?', (sid,)).fetchone() is None:
+        raise BandDataError('song_missing')
+    if con.execute('SELECT 1 FROM album_tracks WHERE album_id=? AND song_id=?', (aid, sid)).fetchone():
+        raise BandDataError('track_exists')
+    with con:
+        pos = con.execute('SELECT COALESCE(MAX(position),0)+1 FROM album_tracks WHERE album_id=?', (aid,)).fetchone()[0]
+        con.execute('INSERT INTO album_tracks(album_id,song_id,position) VALUES(?,?,?)', (aid, sid, pos))
+
+
+def remove_album_track(con, aid, sid):
+    with con:
+        if con.execute('DELETE FROM album_tracks WHERE album_id=? AND song_id=?', (aid, sid)).rowcount != 1:
+            raise BandDataError('track_missing')
+        _normalize_album_tracks(con, aid)
+
+
+def move_album_track(con, aid, sid, direction):
+    """Swap a track with its neighbour (direction -1 = up, +1 = down); positions stay 1..n."""
+    if direction not in (-1, 1):
+        raise BandDataError('invalid_direction')
+    ids = [r[0] for r in con.execute('SELECT song_id FROM album_tracks WHERE album_id=? ORDER BY position,song_id', (aid,))]
+    if sid not in ids:
+        raise BandDataError('track_missing')
+    row = ids.index(sid)
+    if not 0 <= row + direction < len(ids):
+        return False
+    ids[row], ids[row + direction] = ids[row + direction], ids[row]
+    with con:
+        for pos, song in enumerate(ids, 1):
+            con.execute('UPDATE album_tracks SET position=? WHERE album_id=? AND song_id=?', (pos, aid, song))
+    return True
+
+
+def save_album_metadata(con, aid, release_date, genre, label, upc):
+    upc = _clean_text(upc, 'upc', 20, required=False)
+    if upc and (not upc.isascii() or not upc.isdecimal() or len(upc) not in (12, 13)):
+        raise BandDataError('invalid_upc')
+    release_date = _clean_text(release_date, 'release_date', 10, required=False)
+    if release_date:
+        try:
+            datetime.strptime(release_date, '%Y-%m-%d')
+        except ValueError as exc:
+            raise BandDataError('invalid_date') from exc
+    genre = _clean_text(genre, 'genre', 200, required=False)
+    label = _clean_text(label, 'label', 300, required=False)
+    with con:
+        if con.execute('UPDATE albums SET release_date=?,genre=?,label=?,upc=? WHERE id=?',
+                       (release_date, genre, label, upc, aid)).rowcount != 1:
+            raise BandDataError('album_missing')
+
+
+def album_summary(con, root, aid):
+    """Track count, release state and running time (from readable audio files) – read-only.
+
+    Returns {'count', 'published', 'prepared', 'seconds', 'known'}; durations come from mutagen
+    (MP3, FLAC, M4A, OGG, AIFF, WAV) or the wave module, one audio file per track, newest first.
+    """
+    root = Path(root or ROOT)
+    rows = con.execute('''SELECT s.id,
+                          EXISTS(SELECT 1 FROM releases r WHERE r.song_id=s.id),
+                          EXISTS(SELECT 1 FROM releases r JOIN release_platforms rp ON rp.release_id=r.id
+                                 WHERE r.song_id=s.id AND rp.status='Veröffentlicht')
+                          FROM album_tracks t JOIN songs s ON s.id=t.song_id WHERE t.album_id=?''', (aid,)).fetchall()
+    seconds, known = 0.0, 0
+    for song_id, _prepared, _published in rows:
+        for (relative_path,) in con.execute("SELECT relative_path FROM media_assets WHERE song_id=? AND kind='Audio' "
+                                            'ORDER BY id DESC', (song_id,)).fetchall():
+            path = root / relative_path
+            if not path.is_file():
+                continue
+            length = None
+            if mutagen_file is not None:
+                try:
+                    metadata = mutagen_file(str(path))
+                    if metadata is not None and metadata.info is not None:
+                        length = float(metadata.info.length)
+                except (OSError, ValueError, TypeError, AttributeError):
+                    pass
+            if length is None and path.suffix.lower() == '.wav':
+                try:
+                    with wave.open(str(path), 'rb') as audio:
+                        rate = audio.getframerate()
+                        if rate > 0:
+                            length = audio.getnframes() / rate
+                except (OSError, EOFError, ValueError, wave.Error):
+                    pass
+            if length is not None and 0 < length < 86400 * 7:
+                seconds += length
+                known += 1
+                break
+    return {'count': len(rows), 'published': sum(bool(r[2]) for r in rows), 'prepared': sum(bool(r[1]) for r in rows),
+            'seconds': seconds, 'known': known}
+
+
+def format_duration(seconds):
+    minutes, secs = divmod(round(seconds), 60)
+    hours, minutes = divmod(minutes, 60)
+    return f'{hours:d}:{minutes:02d}:{secs:02d}' if hours else f'{minutes:d}:{secs:02d}'
+
+
+def album_release_text(summary):
+    """German status text of the desktop summary line (translated by the GUIs where needed)."""
+    count, published, prepared = summary['count'], summary['published'], summary['prepared']
+    if not count:
+        return 'Keine Tracks'
+    if published == count:
+        return 'Alle Tracks veröffentlicht'
+    if published:
+        return f'{published}/{count} Tracks veröffentlicht'
+    if prepared:
+        return f'{prepared}/{count} Tracks mit Release-Datensatz'
+    return 'Keine Releases erfasst'
+
+
+def album_cover_file(con, root, aid):
+    """The record's cover file if it exists inside <data>/media (never any other path)."""
+    row = con.execute('SELECT cover_path FROM albums WHERE id=?', (aid,)).fetchone()
+    if not row or not row[0]:
+        return None
+    root = Path(root or ROOT)
+    candidate = (root / row[0]).resolve()
+    if candidate.is_relative_to((root / 'media').resolve()) and candidate.is_file():
+        return candidate
+    return None
+
+
+def set_album_cover(con, root, aid, data):
+    """Store an uploaded cover (PNG, JPEG, WEBP, BMP; checked by content, max. 12 MB) for a record."""
+    _album_exists(con, aid)
+    if not data or len(data) > ALBUM_COVER_LIMIT:
+        raise BandDataError('invalid_cover')
+    suffix = next((s for magic, s in ALBUM_COVER_TYPES.items() if data.startswith(magic)), None)
+    if suffix is None and data[:4] == b'RIFF' and data[8:12] == b'WEBP':
+        suffix = '.webp'
+    if suffix is None:
+        raise BandDataError('invalid_cover')
+    root = Path(root or ROOT)
+    folder = root / 'media' / 'album_covers'
+    folder.mkdir(parents=True, exist_ok=True)
+    dest = folder / f'album_{aid}_{datetime.now():%Y%m%d%H%M%S%f}{suffix}'
+    with dest.open('xb') as handle:  # never overwrite
+        handle.write(data)
+    with con:
+        con.execute('UPDATE albums SET cover_path=? WHERE id=?', (dest.relative_to(root).as_posix(), aid))
+    return dest
+
+
+def album_tracklist_rows(con, aid):
+    """CSV rows of the „Trackliste als CSV exportieren“ export (header first)."""
+    album = con.execute('SELECT title,artist,release_date,genre,label,upc FROM albums WHERE id=?', (aid,)).fetchone()
+    if album is None:
+        raise BandDataError('album_missing')
+    title, artist, release_date, genre, label, upc = album
+    rows = [['Albumtitel', 'Albuminterpret', 'Veröffentlichungsdatum', 'Albumgenre', 'Label', 'UPC/EAN',
+             'Tracknummer', 'Songtitel', 'Songinterpret', 'Projekt', 'Songstatus']]
+    for position, song_title, song_artist, project, status in con.execute(
+            '''SELECT t.position, s.title, COALESCE(b.name, ''), COALESCE(p.name, ''), s.status FROM album_tracks t
+               JOIN songs s ON s.id=t.song_id LEFT JOIN projects p ON p.id=s.project_id
+               LEFT JOIN bands b ON b.id=p.band_id WHERE t.album_id=? ORDER BY t.position, t.song_id''', (aid,)):
+        rows.append([title, artist, release_date or '', genre or '', label or '', upc or '', position,
+                     song_title, song_artist, project, status or ''])
+    return rows
+
+
+def album_print_html(con, root, aid):
+    """Printable HTML overview of a record (cover embedded); None if the record does not exist."""
+    row = con.execute('SELECT title,artist,release_date,genre,label,upc,cover_path FROM albums WHERE id=?', (aid,)).fetchone()
+    if not row:
+        return None
+    title, artist, release_date, genre, label, upc, cover_path = row
+    root = Path(root or ROOT)
+    tracks = con.execute('''SELECT t.position,s.title,COALESCE(b.name,''),COALESCE(s.status,'')
+                            FROM album_tracks t JOIN songs s ON s.id=t.song_id
+                            LEFT JOIN projects p ON p.id=s.project_id LEFT JOIN bands b ON b.id=p.band_id
+                            WHERE t.album_id=? ORDER BY t.position,t.song_id''', (aid,)).fetchall()
+    esc = lambda value: html.escape(str(value or ''), quote=True)
+    cover = ''
+    if cover_path:
+        candidate = (root / cover_path).resolve()
+        media_root = (root / 'media').resolve()
+        if candidate.is_relative_to(media_root) and candidate.is_file() and candidate.stat().st_size <= ALBUM_COVER_LIMIT:
+            mime = mimetypes.guess_type(candidate.name)[0]
+            if mime in ('image/png', 'image/jpeg', 'image/webp', 'image/bmp'):
+                encoded = base64.b64encode(candidate.read_bytes()).decode('ascii')
+                cover = f'<img class="cover" alt="Albumcover" src="data:{mime};base64,{encoded}">'
+    rows = ''.join('<tr><td class="number">{}</td><td>{}</td><td>{}</td><td>{}</td></tr>'.format(
+        esc(pos), esc(song_title), esc(song_artist or artist), esc(status))
+        for pos, song_title, song_artist, status in tracks)
+    date_display = ''
+    if release_date:
+        try:
+            date_display = datetime.strptime(release_date, '%Y-%m-%d').strftime('%d.%m.%Y')
+        except ValueError:
+            date_display = release_date
+    details = [('Veröffentlichung', date_display), ('Genre', genre), ('Label', label), ('UPC / EAN', upc)]
+    metadata = ''.join(f'<div><strong>{esc(k)}:</strong> {esc(v)}</div>' for k, v in details if v)
+    return f'''<!doctype html><html lang="de"><head><meta charset="utf-8">
+<title>{esc(title)} – Albumübersicht</title><style>
+html,body{{background-color:#ffffff;color:#17212b;}}
+body{{font-family:Arial,Helvetica,sans-serif;max-width:850px;margin:36px auto;padding:0 24px;}}
+header{{display:flex;gap:26px;align-items:flex-start;margin-bottom:30px;}}
+.cover{{width:210px;height:210px;object-fit:contain;border:1px solid #ddd;}}
+h1,h2,strong,section,div,span{{color:#17212b;}}
+h1{{margin:0 0 8px;font-size:30px;}}h2{{font-size:19px;}}
+.artist{{font-size:20px;margin-bottom:22px;}}.meta div{{margin:6px 0;}}
+table{{width:100%;border-collapse:collapse;margin-top:12px;background-color:#ffffff;color:#17212b;}}
+tr,td{{background-color:#ffffff;color:#17212b;}}
+th,td{{padding:11px 9px;text-align:left;border-bottom:1px solid #dce1e5;}}
+th{{background-color:#eef1f4;color:#17212b;font-weight:bold;}}
+.number{{width:55px;}}.count{{color:#344454;}}
+@media print{{body{{margin:0;max-width:none;}}@page{{size:A4;margin:15mm;}}tr{{break-inside:avoid;}}}}
+</style></head><body><header>{cover}<section><h1>{esc(title)}</h1>
+<div class="artist">{esc(artist)}</div><div class="meta">{metadata}</div></section></header>
+<h2>Trackliste <span class="count">({len(tracks)} Songs)</span></h2>
+<table><thead><tr><th>Nr.</th><th>Titel</th><th>Interpret</th><th>Status</th></tr></thead>
+<tbody>{rows}</tbody></table></body></html>'''
+
+
+# ---------------------------------------------------------------------------
 # Bands tab: profile, instruments/hardware and hardware presets (database only).
 # Same rules as the desktop app; shared with the browser GUI (mpw_web.py).
 # ---------------------------------------------------------------------------

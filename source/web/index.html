@@ -13,6 +13,7 @@
     <button class="tab active" data-view="songs" role="tab" data-i18n="tab_songs">Songs &amp; Suno</button>
     <button class="tab" data-view="bands" role="tab" data-i18n="tab_bands">Bands</button>
     <button class="tab" data-view="media" role="tab" data-i18n="tab_media">Medien &amp; Releases</button>
+    <button class="tab" data-view="albums" role="tab" data-i18n="tab_albums">Plattensammlung</button>
     <button class="tab" data-view="ai" role="tab" data-i18n="tab_ai">AI Prompt Launcher</button>
     <button class="tab" data-view="conn" role="tab" data-i18n="tab_conn">KI-Verbindungen</button>
     <button class="tab" data-view="backup" role="tab" data-i18n="tab_backup">Backup</button>
@@ -126,6 +127,62 @@
         <ul id="band-projects" class="list"></ul>
       </div>
       <datalist id="genre-options"></datalist>
+    </div>
+  </section>
+
+  <!-- Plattensammlung + Album-Details -->
+  <section id="view-albums" class="view" hidden>
+    <aside class="sidebar">
+      <input id="al-new-title" maxlength="300" data-i18n-placeholder="al_title_ph" autocomplete="off">
+      <select id="al-new-band" aria-label="Band"></select>
+      <button id="btn-al-create" class="primary" data-i18n="al_create">Neue Platte anlegen</button>
+      <ul id="al-list" class="list"></ul>
+    </aside>
+    <div class="editor">
+      <div id="al-message" class="message al-message" hidden></div>
+      <div class="empty" id="al-empty" data-i18n="al_choose">Bitte links eine Platte auswählen oder anlegen.</div>
+      <div id="al-body" hidden>
+        <div class="al-head">
+          <div class="al-cover-box">
+            <img id="al-cover" alt="" hidden>
+            <div id="al-no-cover" class="hint" data-i18n="al_no_cover">Kein Cover</div>
+            <button id="btn-al-cover" data-i18n="al_cover">Cover auswählen / ändern …</button>
+            <input id="al-cover-file" type="file" accept="image/png,image/jpeg,image/webp,image/bmp" hidden>
+          </div>
+          <div class="al-info">
+            <h1 id="al-title"></h1>
+            <div class="song-path" id="al-artist"></div>
+            <div id="al-summary" class="conn-line"></div>
+            <div class="actions wrap">
+              <button id="btn-al-csv" data-i18n="al_csv">Trackliste als CSV exportieren</button>
+              <a id="al-print" class="button-link" target="_blank" rel="noopener noreferrer" data-i18n="al_print">Album-Druckansicht öffnen</a>
+              <button id="btn-al-delete" class="danger" data-i18n="al_delete">Platte löschen …</button>
+            </div>
+          </div>
+        </div>
+        <div class="mr-columns">
+          <div class="mr-col">
+            <h2 data-i18n="al_tracks">Trackliste · Reihenfolge festlegen</h2>
+            <ul id="al-tracks" class="plain-list"></ul>
+            <div class="hw-form">
+              <select id="al-song"></select>
+              <button id="btn-al-add" data-i18n="al_add">Song hinzufügen</button>
+            </div>
+            <label class="conn-target"><input id="al-all" type="checkbox"> <span data-i18n="al_all">Auch Songs anderer Interpreten anzeigen (Sampler / Gastbeiträge)</span></label>
+          </div>
+          <div class="mr-col">
+            <h2 data-i18n="al_meta">Album-Metadaten</h2>
+            <div class="fields two">
+              <label><span data-i18n="al_release">Veröffentlichung</span><input id="al-date" type="date"></label>
+              <label><span>Genre</span><input id="al-genre" list="al-genres" maxlength="200"></label>
+              <label><span>Label</span><input id="al-label" maxlength="300" data-i18n-placeholder="al_label_ph"></label>
+              <label><span>UPC / EAN</span><input id="al-upc" maxlength="20" autocomplete="off"></label>
+            </div>
+            <datalist id="al-genres"></datalist>
+            <div class="actions"><button id="btn-al-meta" class="primary" data-i18n="al_meta_save">Album-Metadaten speichern</button></div>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 

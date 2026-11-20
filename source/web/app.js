@@ -63,6 +63,47 @@ const I18N = {
     band_created: "Band „{name}“ angelegt. Verzeichnis: {folder}",
     band_imported: "Band „{name}“ übernommen. Vorhandenes Verzeichnis: {folder} (nichts verändert).",
     band_prompt_warning: "Der Prompt-Ordner konnte nicht angelegt werden: {detail}",
+    tab_albums: "Plattensammlung",
+    al_title_ph: "Albumtitel",
+    al_create: "Neue Platte anlegen",
+    al_choose: "Bitte links eine Platte auswählen oder anlegen.",
+    al_no_cover: "Kein Cover",
+    al_cover: "Cover auswählen / ändern …",
+    al_csv: "Trackliste als CSV exportieren",
+    al_print: "Album-Druckansicht öffnen",
+    al_delete: "Platte löschen …",
+    al_tracks: "Trackliste · Reihenfolge festlegen",
+    al_add: "Song hinzufügen",
+    al_all: "Auch Songs anderer Interpreten anzeigen (Sampler / Gastbeiträge)",
+    al_meta: "Album-Metadaten",
+    al_release: "Veröffentlichung",
+    al_label_ph: "Plattenlabel (optional)",
+    al_meta_save: "Album-Metadaten speichern",
+    al_err_title: "Bitte einen Albumtitel eingeben.",
+    al_err_band: "Bitte zuerst eine Band im Reiter „Bands“ anlegen und als Interpret auswählen.",
+    al_err_track_exists: "Dieser Song ist bereits auf dieser Platte.",
+    al_err_upc: "UPC muss 12 Ziffern, EAN muss 13 Ziffern enthalten.",
+    al_err_cover: "Bitte eine PNG-, JPG-, WEBP- oder BMP-Bilddatei bis 12 MB wählen.",
+    al_unknown: "Unbekannt",
+    al_none: "Noch keine Platten angelegt.",
+    al_rel_none_tracks: "Keine Tracks",
+    al_rel_all: "Alle Tracks veröffentlicht",
+    al_rel_published: "{n}/{count} Tracks veröffentlicht",
+    al_rel_prepared: "{n}/{count} Tracks mit Release-Datensatz",
+    al_rel_none: "Keine Releases erfasst",
+    al_duration_partial: "ermittelt für {known}/{count} Tracks",
+    al_duration_unknown: "nicht ermittelbar (keine lesbaren Audiodateien)",
+    al_summary: "Tracks: {count} · Laufzeit: {duration} · Veröffentlichung: {release}",
+    al_up: "Nach oben",
+    al_down: "Nach unten",
+    al_remove: "Entfernen",
+    al_no_tracks: "Noch keine Songs auf dieser Platte.",
+    al_no_songs: "Keine weiteren passenden Songs",
+    al_created: "Platte „{title}“ angelegt.",
+    al_meta_saved: "Album-Metadaten gespeichert.",
+    al_cover_saved: "Cover gespeichert.",
+    al_csv_done: "Trackliste exportiert: {file}",
+    al_confirm_delete: "Die Platte „{title}“ und ihre Trackliste löschen?\n\nDie Songs selbst bleiben erhalten.",
     tab_backup: "Backup",
     bk_intro: "Vollbackup sichert ausschließlich die MPW-Datenbank – keine Medien oder Band-/Projektdateien. Jede Sicherung wird auf ZIP- und SQLite-Integrität geprüft und im Prüfprotokoll vermerkt.",
     bk_status: "Status",
@@ -273,6 +314,47 @@ const I18N = {
     band_created: "Band “{name}” created. Directory: {folder}",
     band_imported: "Band “{name}” imported. Existing directory: {folder} (nothing changed).",
     band_prompt_warning: "The prompt folder could not be created: {detail}",
+    tab_albums: "Record collection",
+    al_title_ph: "Album title",
+    al_create: "Create new record",
+    al_choose: "Please select or create a record on the left.",
+    al_no_cover: "No cover",
+    al_cover: "Choose / change cover …",
+    al_csv: "Export track list as CSV",
+    al_print: "Open album print view",
+    al_delete: "Delete record …",
+    al_tracks: "Track list · set the order",
+    al_add: "Add song",
+    al_all: "Also show songs by other artists (samplers / guest appearances)",
+    al_meta: "Album metadata",
+    al_release: "Release",
+    al_label_ph: "Record label (optional)",
+    al_meta_save: "Save album metadata",
+    al_err_title: "Please enter an album title.",
+    al_err_band: "Please create a band in the “Bands” tab first and choose it as the artist.",
+    al_err_track_exists: "This song is already on this record.",
+    al_err_upc: "A UPC must have 12 digits, an EAN 13 digits.",
+    al_err_cover: "Please choose a PNG, JPG, WEBP or BMP image up to 12 MB.",
+    al_unknown: "Unknown",
+    al_none: "No records yet.",
+    al_rel_none_tracks: "No tracks",
+    al_rel_all: "All tracks released",
+    al_rel_published: "{n}/{count} tracks released",
+    al_rel_prepared: "{n}/{count} tracks with a release record",
+    al_rel_none: "No releases recorded",
+    al_duration_partial: "measured for {known}/{count} tracks",
+    al_duration_unknown: "unavailable (no readable audio files)",
+    al_summary: "Tracks: {count} · Duration: {duration} · Release: {release}",
+    al_up: "Move up",
+    al_down: "Move down",
+    al_remove: "Remove",
+    al_no_tracks: "No songs on this record yet.",
+    al_no_songs: "No further matching songs",
+    al_created: "Record “{title}” created.",
+    al_meta_saved: "Album metadata saved.",
+    al_cover_saved: "Cover saved.",
+    al_csv_done: "Track list exported: {file}",
+    al_confirm_delete: "Delete the record “{title}” and its track list?\n\nThe songs themselves are kept.",
     tab_backup: "Backup",
     bk_intro: "A full backup saves only the MPW database – not media or band/project files. Every backup is checked for ZIP and SQLite integrity and recorded in the audit log.",
     bk_status: "Status",
@@ -483,6 +565,47 @@ const I18N = {
     band_created: "Groupe « {name} » créé. Dossier : {folder}",
     band_imported: "Groupe « {name} » importé. Dossier existant : {folder} (rien modifié).",
     band_prompt_warning: "Le dossier des prompts n’a pas pu être créé : {detail}",
+    tab_albums: "Collection de disques",
+    al_title_ph: "Titre de l’album",
+    al_create: "Créer un disque",
+    al_choose: "Sélectionnez ou créez un disque à gauche.",
+    al_no_cover: "Pas de pochette",
+    al_cover: "Choisir / changer la pochette …",
+    al_csv: "Exporter la liste des titres en CSV",
+    al_print: "Ouvrir l’aperçu d’impression",
+    al_delete: "Supprimer le disque …",
+    al_tracks: "Liste des titres · définir l’ordre",
+    al_add: "Ajouter un titre",
+    al_all: "Afficher aussi les titres d’autres artistes (compilations / invités)",
+    al_meta: "Métadonnées de l’album",
+    al_release: "Sortie",
+    al_label_ph: "Label (facultatif)",
+    al_meta_save: "Enregistrer les métadonnées",
+    al_err_title: "Saisissez un titre d’album.",
+    al_err_band: "Créez d’abord un groupe dans l’onglet « Bands » et choisissez-le comme artiste.",
+    al_err_track_exists: "Ce titre figure déjà sur ce disque.",
+    al_err_upc: "Un UPC doit comporter 12 chiffres, un EAN 13.",
+    al_err_cover: "Choisissez une image PNG, JPG, WEBP ou BMP de 12 Mo maximum.",
+    al_unknown: "Inconnu",
+    al_none: "Aucun disque.",
+    al_rel_none_tracks: "Aucun titre",
+    al_rel_all: "Tous les titres publiés",
+    al_rel_published: "{n}/{count} titres publiés",
+    al_rel_prepared: "{n}/{count} titres avec fiche de sortie",
+    al_rel_none: "Aucune sortie enregistrée",
+    al_duration_partial: "mesurée pour {known}/{count} titres",
+    al_duration_unknown: "indisponible (aucun fichier audio lisible)",
+    al_summary: "Titres : {count} · Durée : {duration} · Sortie : {release}",
+    al_up: "Monter",
+    al_down: "Descendre",
+    al_remove: "Retirer",
+    al_no_tracks: "Aucun titre sur ce disque.",
+    al_no_songs: "Aucun autre titre correspondant",
+    al_created: "Disque « {title} » créé.",
+    al_meta_saved: "Métadonnées enregistrées.",
+    al_cover_saved: "Pochette enregistrée.",
+    al_csv_done: "Liste exportée : {file}",
+    al_confirm_delete: "Supprimer le disque « {title} » et sa liste de titres ?\n\nLes titres eux-mêmes sont conservés.",
     tab_backup: "Sauvegarde",
     bk_intro: "Une sauvegarde complète enregistre uniquement la base MPW – sans médias ni fichiers de groupes/projets. Chaque sauvegarde est vérifiée (ZIP et SQLite) et consignée dans le journal.",
     bk_status: "État",
@@ -693,6 +816,47 @@ const I18N = {
     band_created: "Banda «{name}» creada. Carpeta: {folder}",
     band_imported: "Banda «{name}» importada. Carpeta existente: {folder} (sin cambios).",
     band_prompt_warning: "No se pudo crear la carpeta de prompts: {detail}",
+    tab_albums: "Colección de discos",
+    al_title_ph: "Título del álbum",
+    al_create: "Crear disco nuevo",
+    al_choose: "Seleccione o cree un disco a la izquierda.",
+    al_no_cover: "Sin portada",
+    al_cover: "Elegir / cambiar portada …",
+    al_csv: "Exportar lista de pistas como CSV",
+    al_print: "Abrir vista de impresión",
+    al_delete: "Eliminar disco …",
+    al_tracks: "Lista de pistas · definir el orden",
+    al_add: "Añadir canción",
+    al_all: "Mostrar también canciones de otros artistas (recopilatorios / colaboraciones)",
+    al_meta: "Metadatos del álbum",
+    al_release: "Lanzamiento",
+    al_label_ph: "Sello (opcional)",
+    al_meta_save: "Guardar metadatos",
+    al_err_title: "Introduzca un título de álbum.",
+    al_err_band: "Cree primero una banda en la pestaña «Bands» y elíjala como artista.",
+    al_err_track_exists: "Esta canción ya está en este disco.",
+    al_err_upc: "Un UPC debe tener 12 dígitos y un EAN 13.",
+    al_err_cover: "Elija una imagen PNG, JPG, WEBP o BMP de hasta 12 MB.",
+    al_unknown: "Desconocido",
+    al_none: "Aún no hay discos.",
+    al_rel_none_tracks: "Sin pistas",
+    al_rel_all: "Todas las pistas publicadas",
+    al_rel_published: "{n}/{count} pistas publicadas",
+    al_rel_prepared: "{n}/{count} pistas con registro de lanzamiento",
+    al_rel_none: "Sin lanzamientos registrados",
+    al_duration_partial: "calculada para {known}/{count} pistas",
+    al_duration_unknown: "no disponible (sin archivos de audio legibles)",
+    al_summary: "Pistas: {count} · Duración: {duration} · Lanzamiento: {release}",
+    al_up: "Subir",
+    al_down: "Bajar",
+    al_remove: "Quitar",
+    al_no_tracks: "Aún no hay canciones en este disco.",
+    al_no_songs: "No hay más canciones adecuadas",
+    al_created: "Disco «{title}» creado.",
+    al_meta_saved: "Metadatos guardados.",
+    al_cover_saved: "Portada guardada.",
+    al_csv_done: "Lista exportada: {file}",
+    al_confirm_delete: "¿Eliminar el disco «{title}» y su lista de pistas?\n\nLas canciones se conservan.",
     tab_backup: "Copia de seguridad",
     bk_intro: "La copia completa guarda solo la base de datos MPW, sin medios ni archivos de bandas/proyectos. Cada copia se comprueba (ZIP y SQLite) y se anota en el registro.",
     bk_status: "Estado",
@@ -903,6 +1067,47 @@ const I18N = {
     band_created: "Gruppo «{name}» creato. Cartella: {folder}",
     band_imported: "Gruppo «{name}» importato. Cartella esistente: {folder} (nessuna modifica).",
     band_prompt_warning: "Impossibile creare la cartella dei prompt: {detail}",
+    tab_albums: "Collezione dischi",
+    al_title_ph: "Titolo dell’album",
+    al_create: "Crea nuovo disco",
+    al_choose: "Seleziona o crea un disco a sinistra.",
+    al_no_cover: "Nessuna copertina",
+    al_cover: "Scegli / cambia copertina …",
+    al_csv: "Esporta tracklist come CSV",
+    al_print: "Apri vista di stampa",
+    al_delete: "Elimina disco …",
+    al_tracks: "Tracklist · imposta l’ordine",
+    al_add: "Aggiungi brano",
+    al_all: "Mostra anche brani di altri artisti (compilation / ospiti)",
+    al_meta: "Metadati dell’album",
+    al_release: "Pubblicazione",
+    al_label_ph: "Etichetta (facoltativa)",
+    al_meta_save: "Salva metadati",
+    al_err_title: "Inserisci un titolo per l’album.",
+    al_err_band: "Crea prima un gruppo nella scheda «Bands» e sceglilo come artista.",
+    al_err_track_exists: "Questo brano è già su questo disco.",
+    al_err_upc: "Un UPC deve avere 12 cifre, un EAN 13.",
+    al_err_cover: "Scegli un’immagine PNG, JPG, WEBP o BMP fino a 12 MB.",
+    al_unknown: "Sconosciuto",
+    al_none: "Nessun disco.",
+    al_rel_none_tracks: "Nessuna traccia",
+    al_rel_all: "Tutte le tracce pubblicate",
+    al_rel_published: "{n}/{count} tracce pubblicate",
+    al_rel_prepared: "{n}/{count} tracce con scheda di pubblicazione",
+    al_rel_none: "Nessuna pubblicazione registrata",
+    al_duration_partial: "calcolata per {known}/{count} tracce",
+    al_duration_unknown: "non disponibile (nessun file audio leggibile)",
+    al_summary: "Tracce: {count} · Durata: {duration} · Pubblicazione: {release}",
+    al_up: "Sposta su",
+    al_down: "Sposta giù",
+    al_remove: "Rimuovi",
+    al_no_tracks: "Nessun brano su questo disco.",
+    al_no_songs: "Nessun altro brano adatto",
+    al_created: "Disco «{title}» creato.",
+    al_meta_saved: "Metadati salvati.",
+    al_cover_saved: "Copertina salvata.",
+    al_csv_done: "Tracklist esportata: {file}",
+    al_confirm_delete: "Eliminare il disco «{title}» e la sua tracklist?\n\nI brani vengono conservati.",
     tab_backup: "Backup",
     bk_intro: "Il backup completo salva solo il database MPW, senza media o file di gruppi/progetti. Ogni backup viene verificato (ZIP e SQLite) e registrato nel protocollo.",
     bk_status: "Stato",
@@ -1560,6 +1765,197 @@ $('btn-band-new').addEventListener('click', () => bandAction(showNewBandForm).ca
 $('btn-band-new-cancel').addEventListener('click', hideNewBandForm);
 $('btn-band-create').addEventListener('click', () => bandAction(createBand).catch((error) => newBandMessage(error.message, 'error')));
 $('n-name').addEventListener('keydown', (event) => { if (event.key === 'Enter') $('btn-band-create').click(); });
+
+/* ------------------------------------------------------------------ Plattensammlung (stage 9) */
+
+const alState = { list: null, album: null, busy: false };
+
+function alMessage(text, kind) {
+  const box = $('al-message');
+  box.textContent = text;
+  box.className = 'message' + (kind ? ' ' + kind : '');
+  box.hidden = !text;
+}
+
+function alErrorText(error) {
+  const code = (error.data || {}).error;
+  const map = { empty_field: 'al_err_title', band_missing: 'al_err_band', track_exists: 'al_err_track_exists',
+                invalid_upc: 'al_err_upc', invalid_date: 'err_invalid_date', invalid_cover: 'al_err_cover',
+                too_large: 'al_err_cover', album_missing: 'err_missing', song_missing: 'err_missing',
+                track_missing: 'err_missing', too_long: 'err_too_long' };
+  if (map[code]) return t(map[code]);
+  return error.kind === 'connection' ? error.message : t('error', { detail: error.message });
+}
+
+async function alAction(fn) {
+  if (alState.busy) return;
+  alState.busy = true;
+  try { await fn(); } catch (error) { alMessage(alErrorText(error), 'error'); }
+  finally { alState.busy = false; }
+}
+
+async function alLoadList(selectId) {
+  const data = await api('/api/albums');
+  alState.list = data;
+  const bandSelect = $('al-new-band');
+  const previousBand = bandSelect.value;
+  bandSelect.replaceChildren(...data.bands.map((b) => { const o = el('option', b.name); o.value = b.id; return o; }));
+  if (previousBand) bandSelect.value = previousBand;
+  fillOptions($('al-genres'), data.genres);
+  $('al-list').replaceChildren(...data.albums.map((album) => {
+    const item = el('li');
+    item.append(el('span', album.title), el('span', album.artist || t('al_unknown'), 'sub'));
+    item.classList.toggle('active', alState.album && alState.album.id === album.id);
+    item.addEventListener('click', () => alAction(() => alSelect(album.id)));
+    return item;
+  }));
+  if (!data.albums.length) $('al-list').replaceChildren(el('li', t('al_none'), 'hint'));
+  if (selectId) await alSelect(selectId);
+}
+
+async function alSelect(id) {
+  const album = await api('/api/albums/' + id);
+  alState.album = album;
+  document.querySelectorAll('#al-list li').forEach((li, i) => {
+    const entry = alState.list.albums[i];
+    li.classList.toggle('active', !!entry && entry.id === id);
+  });
+  $('al-empty').hidden = true;
+  $('al-body').hidden = false;
+  $('al-title').textContent = album.title;
+  $('al-artist').textContent = album.artist;
+  $('al-cover').hidden = !album.cover_url;
+  $('al-no-cover').hidden = !!album.cover_url;
+  if (album.cover_url) $('al-cover').src = album.cover_url + '?v=' + Date.now();
+  $('al-print').href = album.print_url;
+  const s = album.summary;
+  const release = !s.count ? t('al_rel_none_tracks') : s.published === s.count ? t('al_rel_all')
+    : s.published ? t('al_rel_published', { n: s.published, count: s.count })
+    : s.prepared ? t('al_rel_prepared', { n: s.prepared, count: s.count }) : t('al_rel_none');
+  const duration = s.known ? s.duration + (s.known !== s.count ? ' (' + t('al_duration_partial', { known: s.known, count: s.count }) + ')' : '')
+    : t('al_duration_unknown');
+  $('al-summary').textContent = t('al_summary', { count: s.count, duration, release });
+  $('al-date').value = album.release_date || '';
+  $('al-genre').value = album.genre || '';
+  $('al-label').value = album.label || '';
+  $('al-upc').value = album.upc || '';
+  alRenderTracks();
+  await alLoadSongs();
+}
+
+function alRenderTracks() {
+  const tracks = alState.album.tracks;
+  const rows = tracks.map((track, index) => {
+    const row = el('li', null, 'link-row track-row');
+    row.append(el('span', String(track.position).padStart(2, '0') + '.', 'num'));
+    const text = el('div', null, 'grow');
+    text.append(el('div', track.title), el('div', track.band + (track.status ? ' · ' + track.status : ''), 'hint'));
+    const up = el('button', '↑'); up.title = t('al_up'); up.disabled = index === 0;
+    const down = el('button', '↓'); down.title = t('al_down'); down.disabled = index === tracks.length - 1;
+    const remove = el('button', t('al_remove'), 'danger');
+    up.addEventListener('click', () => alAction(() => alMove(track, -1)));
+    down.addEventListener('click', () => alAction(() => alMove(track, 1)));
+    remove.addEventListener('click', () => alAction(() => alRemove(track)));
+    row.append(text, up, down, remove);
+    return row;
+  });
+  $('al-tracks').replaceChildren(...(rows.length ? rows : [el('li', t('al_no_tracks'), 'hint')]));
+}
+
+async function alLoadSongs() {
+  const songs = await api('/api/albums/' + alState.album.id + '/songs' + ($('al-all').checked ? '?all=1' : ''));
+  const onAlbum = new Set(alState.album.tracks.map((tr) => tr.song_id));
+  const options = songs.filter((s) => !onAlbum.has(s.id)).map((s) => { const o = el('option', s.band + ' – ' + s.title); o.value = s.id; return o; });
+  $('al-song').replaceChildren(...options);
+  $('al-song').disabled = $('btn-al-add').disabled = !options.length;
+  if (!options.length) $('al-song').replaceChildren(el('option', t('al_no_songs')));
+}
+
+async function alCreate() {
+  const title = $('al-new-title').value.trim();
+  if (!title) { alMessage(t('al_err_title'), 'error'); return; }
+  if (!$('al-new-band').value) { alMessage(t('al_err_band'), 'error'); return; }
+  const result = await api('/api/albums', { method: 'POST', body: { title, band_id: Number($('al-new-band').value) } });
+  $('al-new-title').value = '';
+  await alLoadList(result.id);
+  alMessage(t('al_created', { title }));
+}
+
+async function alAdd() {
+  await api('/api/albums/' + alState.album.id + '/tracks', { method: 'POST', body: { song_id: Number($('al-song').value) } });
+  alMessage('');
+  await alSelect(alState.album.id);
+}
+
+async function alMove(track, direction) {
+  await api('/api/albums/' + alState.album.id + '/tracks/' + track.song_id + '/move', { method: 'POST', body: { direction } });
+  await alSelect(alState.album.id);
+}
+
+async function alRemove(track) {
+  await api('/api/albums/' + alState.album.id + '/tracks/' + track.song_id + '/delete', { method: 'POST', body: {} });
+  await alSelect(alState.album.id);
+}
+
+async function alSaveMeta() {
+  await api('/api/albums/' + alState.album.id + '/metadata', { method: 'POST',
+    body: { release_date: $('al-date').value, genre: $('al-genre').value, label: $('al-label').value, upc: $('al-upc').value } });
+  alMessage(t('al_meta_saved'));
+  await alSelect(alState.album.id);
+}
+
+async function alUploadCover(file) {
+  if (file.size > 12000000) { alMessage(t('al_err_cover'), 'error'); return; }
+  let response;
+  try {
+    response = await fetch('/api/albums/' + alState.album.id + '/cover', { method: 'POST',
+      headers: { 'X-MPW-Token': TOKEN, 'Content-Type': 'application/octet-stream' }, body: file });
+  } catch (e) {
+    throw Object.assign(new Error(t('connection')), { kind: 'connection' });
+  }
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw Object.assign(new Error(data.error || response.status), { data, status: response.status });
+  alMessage(t('al_cover_saved'));
+  await alSelect(alState.album.id);
+}
+
+async function alExportCsv() {
+  const result = await api('/api/albums/' + alState.album.id + '/tracklist');
+  // UTF-8 with BOM so that Excel shows umlauts correctly (same as the desktop export)
+  const blob = new Blob(['﻿' + result.csv], { type: 'text/csv;charset=utf-8' });
+  const link = el('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = result.filename;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(link.href), 5000);
+  alMessage(t('al_csv_done', { file: result.filename }));
+}
+
+async function alDelete() {
+  if (!confirm(t('al_confirm_delete', { title: alState.album.title }))) return;
+  await api('/api/albums/' + alState.album.id + '/delete', { method: 'POST', body: { confirm: true } });
+  alState.album = null;
+  $('al-body').hidden = true;
+  $('al-empty').hidden = false;
+  await alLoadList();
+  alMessage('');
+}
+
+$('btn-al-create').addEventListener('click', () => alAction(alCreate));
+$('al-new-title').addEventListener('keydown', (event) => { if (event.key === 'Enter') $('btn-al-create').click(); });
+$('btn-al-add').addEventListener('click', () => alAction(alAdd));
+$('al-all').addEventListener('change', () => alAction(alLoadSongs));
+$('btn-al-meta').addEventListener('click', () => alAction(alSaveMeta));
+$('btn-al-cover').addEventListener('click', () => $('al-cover-file').click());
+$('al-cover-file').addEventListener('change', () => {
+  const file = $('al-cover-file').files[0];
+  $('al-cover-file').value = '';
+  if (file) alAction(() => alUploadCover(file));
+});
+$('btn-al-csv').addEventListener('click', () => alAction(alExportCsv));
+$('btn-al-delete').addEventListener('click', () => alAction(alDelete));
 
 /* ------------------------------------------------------------------ Backup (stage 8) */
 
@@ -2626,6 +3022,8 @@ function switchView(name) {
   $('view-conn').hidden = name !== 'conn';
   $('view-media').hidden = name !== 'media';
   $('view-backup').hidden = name !== 'backup';
+  $('view-albums').hidden = name !== 'albums';
+  if (name === 'albums' && !alState.list) alAction(() => alLoadList());
   if (name === 'backup' && !bkState.info) bkAction(bkLoad);
   if (name === 'media' && !$('mr-band').options.length) mrInit().catch((error) => mrMessage('rl-message', mrErrorText(error), 'error'));
   if (name === 'conn' && !connState.info) connInit().catch((error) => connMessage(connErrorText(error), 'error'));
