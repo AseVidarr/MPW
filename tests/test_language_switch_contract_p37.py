@@ -8,10 +8,16 @@ TREE = ast.parse(SOURCE.read_text(encoding="utf-8"))
 APP = next(n for n in TREE.body if isinstance(n, ast.ClassDef) and n.name == "Workstation")
 LANGS = ("de", "en", "fr", "es", "it")
 
+CORE_TREE = ast.parse((SOURCE.parent / "mpw_core.py").read_text(encoding="utf-8"))
+
+
 def constant(name):
-    for n in APP.body:
-        if isinstance(n, ast.Assign) and any(isinstance(t, ast.Name) and t.id == name for t in n.targets):
-            return ast.literal_eval(n.value)
+    """Translation table: a literal in the Workstation class or in the shared core (mpw_core.py)."""
+    for body in (APP.body, CORE_TREE.body):
+        for n in body:
+            if (isinstance(n, ast.Assign) and any(isinstance(t, ast.Name) and t.id == name for t in n.targets)
+                    and not isinstance(n.value, ast.Attribute)):
+                return ast.literal_eval(n.value)
     raise AssertionError("missing class translation table: " + name)
 
 def method(name):

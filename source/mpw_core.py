@@ -2344,6 +2344,220 @@ def save_prompt_text_file(con, sid, version_id, style, lyrics, band_root=None):
 
 
 # ---------------------------------------------------------------------------
+# Medien & Player and Releases Distri: shared rules (desktop tabs and browser GUI).
+# ---------------------------------------------------------------------------
+MEDIA_LINK_PLATFORMS = ('ChatGPT', 'Gemini', 'Claude', 'Suno', 'Direktdatei', 'Spotify', 'SoundCloud', 'YouTube', 'Andere')
+ISRC_PATTERN = re.compile(r'[A-Z]{2}[A-Z0-9]{3}[0-9]{7}')
+_ISRC_SQL = "UPPER(REPLACE(REPLACE(TRIM(COALESCE(isrc,'')), '-', ''), ' ', ''))"
+
+
+def valid_web_link(url):
+    """http(s) link with a host and without user/password in it."""
+    parsed = urlparse(url or '')
+    return parsed.scheme in ('http', 'https') and bool(parsed.netloc) and not parsed.username and not parsed.password
+
+
+def song_media_links(con, sid):
+    return [{'id': r[0], 'platform': r[1], 'url': r[2], 'label': r[3] or ''} for r in con.execute(
+        'SELECT id,platform,url,label FROM media_links WHERE song_id=? ORDER BY id DESC', (sid,))]
+
+
+def add_media_link(con, sid, platform, url, label=''):
+    """Store a platform link with a song (Medien & Player); the same link is kept only once."""
+    platform = _clean_text(platform, 'platform', 60)
+    url = _clean_text(url, 'url', 2000)
+    label = _clean_text(label, 'label', 300, required=False)
+    if not valid_web_link(url):
+        raise BandDataError('invalid_url')
+    if con.execute('SELECT 1 FROM songs WHERE id=?', (sid,)).fetchone() is None:
+        raise BandDataError('song_missing')
+    try:
+        with con:
+            return con.execute('INSERT INTO media_links(song_id,platform,url,label) VALUES(?,?,?,?)',
+                               (sid, platform, url, label)).lastrowid
+    except sqlite3.IntegrityError as exc:
+        raise BandDataError('link_exists') from exc
+
+
+def delete_media_link(con, sid, link_id):
+    """Remove a link from the song only; the file on the platform stays unchanged."""
+    with con:
+        if con.execute('DELETE FROM media_links WHERE id=? AND song_id=?', (link_id, sid)).rowcount != 1:
+            raise BandDataError('link_missing')
+
+
+def song_media_files(con, root, sid, band_root=None):
+    """Media files of a song: shared project media folders plus legacy media_assets that still exist.
+
+    Only paths inside the MPW data folder or the band folder are returned (same rule as the desktop).
+    """
+    root = Path(root)
+    rows = list(filesystem_song_assets(con, root, sid, band_root))
+    for kind, label, name, size, rel in con.execute(
+            'SELECT kind,label,original_name,bytes,relative_path FROM media_assets WHERE song_id=? ORDER BY id DESC', (sid,)):
+        legacy = root / rel
+        if legacy.is_file():
+            rows.append((kind, label + ' [Altbestand]', name, size, str(legacy)))
+    allowed = [root.resolve()] + ([Path(band_root).resolve()] if band_root else [])
+    files = []
+    for kind, label, name, size, path in rows:
+        try:
+            resolved = Path(path).resolve()
+        except OSError:
+            continue
+        if any(resolved.is_relative_to(base) for base in allowed):
+            files.append({'kind': kind, 'label': label, 'name': name, 'bytes': size, 'path': str(resolved)})
+    return files
+
+
+def normalize_isrc(value):
+    return re.sub(r'[\s-]+', '', value or '').upper()
+
+
+def upc_check_digit_ok(upc):
+    digits = [int(c) for c in upc]
+    checksum = (10 - sum(d * (3 if (len(digits) - 1 - i) % 2 else 1) for i, d in enumerate(digits[:-1])) % 10) % 10
+    return checksum == digits[-1]
+
+
+# Texts shared by the desktop tabs and the browser GUI (5 languages).
+MEDIA_CONFIRM_I18N = {
+    'de': {'delete': 'Soll dieser Plattform-Link aus dem Song entfernt werden?\nDie Mediendatei auf der Plattform bleibt unverändert.', 'import': 'Nur eigene oder freigegebene Dateien herunterladen.\nDatei importieren (maximal 200 MB)?'},
+    'en': {'delete': 'Remove this platform link from the song?\nThe media file on the platform will remain unchanged.', 'import': 'Only download files you own or are authorized to use.\nImport the file (maximum 200 MB)?'},
+    'fr': {'delete': 'Supprimer ce lien de plateforme du titre ?\nLe fichier multimédia sur la plateforme restera inchangé.', 'import': 'Téléchargez uniquement les fichiers qui vous appartiennent ou pour lesquels vous avez une autorisation.\nImporter le fichier (200 Mo maximum) ?'},
+    'es': {'delete': '¿Eliminar este enlace de plataforma de la canción?\nEl archivo multimedia en la plataforma no se modificará.', 'import': 'Descargue solo archivos propios o autorizados.\n¿Importar el archivo (máximo 200 MB)?'},
+    'it': {'delete': 'Rimuovere questo collegamento alla piattaforma dal brano?\nIl file multimediale sulla piattaforma rimarrà invariato.', 'import': 'Scaricare solo file propri o per cui si dispone di autorizzazione.\nImportare il file (massimo 200 MB)?'},
+}
+RELEASE_PREFLIGHT_I18N = {'en': {'Song auswählen.': 'Select a song.', 'Song ausgewählt.': 'Song selected.', 'Distributor angegeben.': 'Distributor specified.', 'Distributor fehlt.': 'Distributor missing.', 'Veröffentlichungsdatum angegeben: ': 'Release date specified: ', 'Ungültiges Veröffentlichungsdatum.': 'Invalid release date.', 'Veröffentlichungsdatum noch nicht festgelegt (optional bei Planung).': 'Release date not set yet (optional during planning).', 'ISRC fehlt; vor Distributor-Abgabe prüfen.': 'ISRC missing; check before submitting to distributor.', 'ISRC hat kein gültiges 12-stelliges Format.': 'ISRC must have a valid 12-character format.', 'ISRC-Format plausibel (keine Registrierungsprüfung).': 'ISRC format plausible (registration not verified).', 'ISRC bereits in {matches} Release-Datensatz/Datensätzen vorhanden: vor dem Speichern Zuordnung prüfen.': 'ISRC already used in {matches} release record(s); check assignment before saving.', 'UPC/EAN fehlt; für die Distribution ggf. erforderlich.': 'UPC/EAN missing; may be required for distribution.', 'UPC/EAN muss 12 oder 13 Ziffern enthalten.': 'UPC/EAN must contain 12 or 13 digits.', 'UPC/EAN-Prüfziffer korrekt (keine Registrierungsprüfung).': 'UPC/EAN check digit correct (registration not verified).', 'UPC/EAN-Prüfziffer stimmt nicht.': 'UPC/EAN check digit incorrect.', 'RELEASE-CHECKLISTE (nur Hinweis, keine Speicherung)': 'RELEASE CHECKLIST (advisory only, not saved)', 'Zusätzlich vor Veröffentlichung prüfen: finale Audiodatei, Cover, Rechte, Credits, Metadaten und Distributor-Vorgaben.': 'Also check before release: final audio file, cover, rights, credits, metadata and distributor requirements.', 'MPW führt keine Veröffentlichung und keine externe Kennungsprüfung durch.': 'MPW does not publish releases or externally verify identifiers.'}, 'fr': {'Song auswählen.': 'Sélectionnez un titre.', 'Song ausgewählt.': 'Titre sélectionné.', 'Distributor angegeben.': 'Distributeur renseigné.', 'Distributor fehlt.': 'Distributeur manquant.', 'Veröffentlichungsdatum angegeben: ': 'Date de sortie indiquée : ', 'Ungültiges Veröffentlichungsdatum.': 'Date de sortie invalide.', 'Veröffentlichungsdatum noch nicht festgelegt (optional bei Planung).': 'Date de sortie non définie (facultatif pendant la préparation).', 'ISRC fehlt; vor Distributor-Abgabe prüfen.': 'ISRC manquant ; vérifier avant la livraison au distributeur.', 'ISRC hat kein gültiges 12-stelliges Format.': 'Le format ISRC à 12 caractères est invalide.', 'ISRC-Format plausibel (keine Registrierungsprüfung).': 'Format ISRC plausible (enregistrement non vérifié).', 'ISRC bereits in {matches} Release-Datensatz/Datensätzen vorhanden: vor dem Speichern Zuordnung prüfen.': 'ISRC déjà présent dans {matches} fiche(s) de sortie ; vérifier avant enregistrement.', 'UPC/EAN fehlt; für die Distribution ggf. erforderlich.': 'UPC/EAN manquant ; peut être exigé pour la distribution.', 'UPC/EAN muss 12 oder 13 Ziffern enthalten.': 'UPC/EAN doit comporter 12 ou 13 chiffres.', 'UPC/EAN-Prüfziffer korrekt (keine Registrierungsprüfung).': 'Chiffre de contrôle UPC/EAN correct (enregistrement non vérifié).', 'UPC/EAN-Prüfziffer stimmt nicht.': 'Chiffre de contrôle UPC/EAN incorrect.', 'RELEASE-CHECKLISTE (nur Hinweis, keine Speicherung)': 'LISTE DE CONTRÔLE SORTIE (indicative, non enregistrée)', 'Zusätzlich vor Veröffentlichung prüfen: finale Audiodatei, Cover, Rechte, Credits, Metadaten und Distributor-Vorgaben.': 'Avant la sortie, vérifier aussi : audio final, pochette, droits, crédits, métadonnées et exigences du distributeur.', 'MPW führt keine Veröffentlichung und keine externe Kennungsprüfung durch.': 'MPW ne publie pas de titres et ne vérifie pas les identifiants auprès de services externes.'}, 'es': {'Song auswählen.': 'Seleccione una canción.', 'Song ausgewählt.': 'Canción seleccionada.', 'Distributor angegeben.': 'Distribuidor indicado.', 'Distributor fehlt.': 'Falta el distribuidor.', 'Veröffentlichungsdatum angegeben: ': 'Fecha de lanzamiento indicada: ', 'Ungültiges Veröffentlichungsdatum.': 'Fecha de lanzamiento no válida.', 'Veröffentlichungsdatum noch nicht festgelegt (optional bei Planung).': 'Fecha de lanzamiento aún no definida (opcional durante la planificación).', 'ISRC fehlt; vor Distributor-Abgabe prüfen.': 'Falta el ISRC; compruébelo antes de enviarlo al distribuidor.', 'ISRC hat kein gültiges 12-stelliges Format.': 'El ISRC no tiene un formato válido de 12 caracteres.', 'ISRC-Format plausibel (keine Registrierungsprüfung).': 'Formato ISRC plausible (registro no verificado).', 'ISRC bereits in {matches} Release-Datensatz/Datensätzen vorhanden: vor dem Speichern Zuordnung prüfen.': 'El ISRC ya figura en {matches} lanzamiento(s); compruebe la asignación antes de guardar.', 'UPC/EAN fehlt; für die Distribution ggf. erforderlich.': 'Falta el UPC/EAN; puede ser necesario para distribuir.', 'UPC/EAN muss 12 oder 13 Ziffern enthalten.': 'El UPC/EAN debe contener 12 o 13 dígitos.', 'UPC/EAN-Prüfziffer korrekt (keine Registrierungsprüfung).': 'Dígito de control UPC/EAN correcto (registro no verificado).', 'UPC/EAN-Prüfziffer stimmt nicht.': 'Dígito de control UPC/EAN incorrecto.', 'RELEASE-CHECKLISTE (nur Hinweis, keine Speicherung)': 'LISTA DE COMPROBACIÓN DEL LANZAMIENTO (orientativa, no se guarda)', 'Zusätzlich vor Veröffentlichung prüfen: finale Audiodatei, Cover, Rechte, Credits, Metadaten und Distributor-Vorgaben.': 'Antes de publicar, compruebe también: audio final, portada, derechos, créditos, metadatos y requisitos del distribuidor.', 'MPW führt keine Veröffentlichung und keine externe Kennungsprüfung durch.': 'MPW no publica lanzamientos ni verifica identificadores externamente.'}, 'it': {'Song auswählen.': 'Seleziona un brano.', 'Song ausgewählt.': 'Brano selezionato.', 'Distributor angegeben.': 'Distributore indicato.', 'Distributor fehlt.': 'Distributore mancante.', 'Veröffentlichungsdatum angegeben: ': 'Data di uscita indicata: ', 'Ungültiges Veröffentlichungsdatum.': 'Data di uscita non valida.', 'Veröffentlichungsdatum noch nicht festgelegt (optional bei Planung).': 'Data di uscita non ancora impostata (facoltativa in fase di pianificazione).', 'ISRC fehlt; vor Distributor-Abgabe prüfen.': 'ISRC mancante; verificare prima della consegna al distributore.', 'ISRC hat kein gültiges 12-stelliges Format.': 'ISRC non valido: formato richiesto di 12 caratteri.', 'ISRC-Format plausibel (keine Registrierungsprüfung).': 'Formato ISRC plausibile (registrazione non verificata).', 'ISRC bereits in {matches} Release-Datensatz/Datensätzen vorhanden: vor dem Speichern Zuordnung prüfen.': 'ISRC già presente in {matches} pubblicazione/i; controllare prima di salvare.', 'UPC/EAN fehlt; für die Distribution ggf. erforderlich.': 'UPC/EAN mancante; potrebbe essere richiesto per la distribuzione.', 'UPC/EAN muss 12 oder 13 Ziffern enthalten.': 'UPC/EAN deve contenere 12 o 13 cifre.', 'UPC/EAN-Prüfziffer korrekt (keine Registrierungsprüfung).': 'Cifra di controllo UPC/EAN corretta (registrazione non verificata).', 'UPC/EAN-Prüfziffer stimmt nicht.': 'Cifra di controllo UPC/EAN errata.', 'RELEASE-CHECKLISTE (nur Hinweis, keine Speicherung)': 'LISTA DI CONTROLLO PUBBLICAZIONE (solo indicativa, non salvata)', 'Zusätzlich vor Veröffentlichung prüfen: finale Audiodatei, Cover, Rechte, Credits, Metadaten und Distributor-Vorgaben.': 'Prima della pubblicazione verificare anche: audio finale, copertina, diritti, crediti, metadati e requisiti del distributore.', 'MPW führt keine Veröffentlichung und keine externe Kennungsprüfung durch.': 'MPW non pubblica brani né verifica gli identificativi tramite servizi esterni.'}}
+RELEASE_EDIT_TEXTS = {
+    'en': ('Song and distributor are required.', 'Invalid ISRC. Expected 12 characters, e.g. DEABC2600001.', 'without date', 'ISRC match – select record', 'This ISRC appears more than once. Which record should be changed?', 'Change record', 'Change this record – Yes or No?', 'Yes: Update the existing record.', 'No: Leave it unchanged.', 'Record updated', 'Record #{rid} was updated.', 'no link', 'Select a release first.', 'Enter a valid HTTP(S) link.'),
+    'fr': ('Le titre et le distributeur sont obligatoires.', 'ISRC invalide. 12 caractères attendus, par ex. DEABC2600001.', 'sans date', 'Correspondance ISRC – choisir une fiche', 'Cet ISRC existe plusieurs fois. Quelle fiche modifier ?', 'Modifier la fiche', 'Modifier cette fiche – Oui ou Non ?', 'Oui : mettre à jour la fiche existante.', 'Non : ne rien modifier.', 'Fiche mise à jour', 'La fiche n°{rid} a été mise à jour.', 'aucun lien', 'Sélectionnez d’abord une sortie.', 'Saisissez un lien HTTP(S) valide.'),
+    'es': ('La canción y el distribuidor son obligatorios.', 'ISRC no válido. Se esperan 12 caracteres, p. ej. DEABC2600001.', 'sin fecha', 'Coincidencia de ISRC – seleccionar registro', 'Este ISRC aparece varias veces. ¿Qué registro desea modificar?', 'Modificar registro', '¿Modificar este registro – Sí o No?', 'Sí: actualizar el registro existente.', 'No: no realizar cambios.', 'Registro actualizado', 'Se actualizó el registro #{rid}.', 'sin enlace', 'Seleccione primero un lanzamiento.', 'Introduzca un enlace HTTP(S) válido.'),
+    'it': ('Brano e distributore sono obbligatori.', 'ISRC non valido. Sono richiesti 12 caratteri, ad es. DEABC2600001.', 'senza data', 'Corrispondenza ISRC – seleziona record', 'Questo ISRC è presente più volte. Quale record modificare?', 'Modifica record', 'Modificare questo record – Sì o No?', 'Sì: aggiorna il record esistente.', 'No: non apportare modifiche.', 'Record aggiornato', 'Il record #{rid} è stato aggiornato.', 'nessun link', 'Seleziona prima una pubblicazione.', 'Inserisci un link HTTP(S) valido.'),
+}
+RELEASE_EDIT_DE = ('Song und Distributor sind erforderlich.', 'Ungültige ISRC. Erwartet werden 12 Zeichen, z. B. DEABC2600001.', 'ohne Datum', 'ISRC-Abgleich – Datensatz auswählen', 'Diese ISRC ist mehrfach vorhanden. Welcher Datensatz soll geändert werden?', 'Datensatz ändern', 'Datensatz ändern – Ja oder Nein?', 'Ja: Vorhandenen Datensatz aktualisieren.', 'Nein: Keine Änderung vornehmen.', 'Datensatz aktualisiert', 'Datensatz #{rid} wurde aktualisiert.', 'kein Link', 'Zuerst ein Release auswählen.', 'Bitte einen gültigen HTTP(S)-Link angeben.')
+PLATFORM_STATUS_LABELS = {
+    'en': ('Planned', 'Submitted', 'Under review', 'Published', 'Failed'),
+    'fr': ('Planifié', 'Soumis', 'En cours de vérification', 'Publié', 'Échec'),
+    'es': ('Planificado', 'Enviado', 'En revisión', 'Publicado', 'Fallido'),
+    'it': ('Pianificato', 'Inviato', 'In verifica', 'Pubblicato', 'Non riuscito'),
+}
+
+
+def release_checklist(con, sid, distributor, release_date, isrc, upc):
+    """Advisory release check (no writes, no external calls): [('ok'|'issue', German text key, values)].
+
+    The German texts are the keys of the desktop's RELEASE_PREFLIGHT_I18N translations.
+    """
+    items = []
+    items.append(('issue', 'Song auswählen.', {}) if sid is None else ('ok', 'Song ausgewählt.', {}))
+    items.append(('ok', 'Distributor angegeben.', {}) if (distributor or '').strip() else ('issue', 'Distributor fehlt.', {}))
+    if release_date:
+        try:
+            shown = datetime.strptime(release_date, '%Y-%m-%d').strftime('%d.%m.%Y')
+            items.append(('ok', 'Veröffentlichungsdatum angegeben: ', {'date': shown}))
+        except ValueError:
+            items.append(('issue', 'Ungültiges Veröffentlichungsdatum.', {}))
+    else:
+        items.append(('issue', 'Veröffentlichungsdatum noch nicht festgelegt (optional bei Planung).', {}))
+    code = normalize_isrc(isrc)
+    if not code:
+        items.append(('issue', 'ISRC fehlt; vor Distributor-Abgabe prüfen.', {}))
+    elif not ISRC_PATTERN.fullmatch(code):
+        items.append(('issue', 'ISRC hat kein gültiges 12-stelliges Format.', {}))
+    else:
+        items.append(('ok', 'ISRC-Format plausibel (keine Registrierungsprüfung).', {}))
+        matches = con.execute(f'SELECT COUNT(*) FROM releases WHERE {_ISRC_SQL} = ?', (code,)).fetchone()[0]
+        if matches:
+            items.append(('issue', 'ISRC bereits in {matches} Release-Datensatz/Datensätzen vorhanden: vor dem Speichern Zuordnung prüfen.',
+                          {'matches': matches}))
+    upc = (upc or '').strip()
+    if not upc:
+        items.append(('issue', 'UPC/EAN fehlt; für die Distribution ggf. erforderlich.', {}))
+    elif not upc.isascii() or not upc.isdecimal() or len(upc) not in (12, 13):
+        items.append(('issue', 'UPC/EAN muss 12 oder 13 Ziffern enthalten.', {}))
+    elif upc_check_digit_ok(upc):
+        items.append(('ok', 'UPC/EAN-Prüfziffer korrekt (keine Registrierungsprüfung).', {}))
+    else:
+        items.append(('issue', 'UPC/EAN-Prüfziffer stimmt nicht.', {}))
+    return items
+
+
+def isrc_matches(con, isrc):
+    """Existing releases with the same ISRC (ignoring spaces/dashes and case)."""
+    code = normalize_isrc(isrc)
+    if not code:
+        return []
+    return [{'id': r[0], 'song_id': r[1], 'title': r[2], 'distributor': r[3], 'release_date': r[4], 'upc': r[5]}
+            for r in con.execute(f'''SELECT r.id, r.song_id, s.title, r.distributor, r.release_date, r.upc
+                FROM releases r JOIN songs s ON s.id = r.song_id WHERE {_ISRC_SQL.replace('isrc', 'r.isrc')} = ?
+                ORDER BY r.id''', (code,))]
+
+
+def save_release(con, sid, distributor, release_date, isrc, upc, update_id=None):
+    """„Release speichern / ISRC abgleichen“: new release, or update the release chosen for a known ISRC.
+
+    Without update_id an ISRC that already exists raises BandDataError('isrc_exists', matches=[…]),
+    so the user decides which record changes (like the desktop dialog).
+    """
+    distributor = _clean_text(distributor, 'distributor', 200)
+    code = normalize_isrc(_clean_text(isrc, 'isrc', 40, required=False))
+    if code and not ISRC_PATTERN.fullmatch(code):
+        raise BandDataError('invalid_isrc')
+    upc = _clean_text(upc, 'upc', 40, required=False)
+    if release_date:
+        try:
+            datetime.strptime(release_date, '%Y-%m-%d')
+        except (TypeError, ValueError) as exc:
+            raise BandDataError('invalid_date') from exc
+    else:
+        release_date = None
+    if con.execute('SELECT 1 FROM songs WHERE id=?', (sid,)).fetchone() is None:
+        raise BandDataError('song_missing')
+    matches = isrc_matches(con, code)
+    if update_id is not None:
+        if not any(m['id'] == update_id for m in matches):
+            raise BandDataError('release_missing')
+        with con:
+            con.execute('UPDATE releases SET song_id=?, distributor=?, release_date=?, isrc=?, upc=? WHERE id=?',
+                        (sid, distributor, release_date, code, upc, update_id))
+        return update_id, False
+    if matches:
+        raise BandDataError('isrc_exists', matches=matches)
+    with con:
+        new_id = con.execute('INSERT INTO releases(song_id,distributor,release_date,isrc,upc) VALUES(?,?,?,?,?)',
+                             (sid, distributor, release_date, code or None, upc)).lastrowid
+    return new_id, True
+
+
+def song_releases(con, sid):
+    releases = [{'id': r[0], 'distributor': r[1], 'release_date': r[2], 'isrc': r[3] or '', 'upc': r[4] or '',
+                 'platforms': []} for r in con.execute(
+        'SELECT id,distributor,release_date,isrc,upc FROM releases WHERE song_id=? ORDER BY id DESC', (sid,))]
+    for release in releases:
+        release['platforms'] = [{'platform': p, 'status': s, 'url': u or ''} for p, s, u in con.execute(
+            'SELECT platform,status,url FROM release_platforms WHERE release_id=? ORDER BY platform', (release['id'],))]
+    return releases
+
+
+def save_release_platform(con, release_id, platform, status, url=''):
+    """Add or update one streaming platform of a release (status stored as the German canonical value)."""
+    if platform not in PLATFORMS:
+        raise BandDataError('invalid_platform')
+    if status not in STATES:
+        raise BandDataError('invalid_status')
+    url = _clean_text(url, 'url', 2000, required=False)
+    if url and not valid_web_link(url):
+        raise BandDataError('invalid_url')
+    if con.execute('SELECT 1 FROM releases WHERE id=?', (release_id,)).fetchone() is None:
+        raise BandDataError('release_missing')
+    with con:
+        con.execute('''INSERT INTO release_platforms(release_id,platform,status,url) VALUES(?,?,?,?)
+            ON CONFLICT(release_id,platform) DO UPDATE SET status=excluded.status,url=excluded.url''',
+                    (release_id, platform, status, url))
+
+
+# ---------------------------------------------------------------------------
 # Bands tab: profile, instruments/hardware and hardware presets (database only).
 # Same rules as the desktop app; shared with the browser GUI (mpw_web.py).
 # ---------------------------------------------------------------------------

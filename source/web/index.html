@@ -12,6 +12,7 @@
   <nav class="tabs" role="tablist">
     <button class="tab active" data-view="songs" role="tab" data-i18n="tab_songs">Songs &amp; Suno</button>
     <button class="tab" data-view="bands" role="tab" data-i18n="tab_bands">Bands</button>
+    <button class="tab" data-view="media" role="tab" data-i18n="tab_media">Medien &amp; Releases</button>
     <button class="tab" data-view="ai" role="tab" data-i18n="tab_ai">AI Prompt Launcher</button>
     <button class="tab" data-view="conn" role="tab" data-i18n="tab_conn">KI-Verbindungen</button>
   </nav>
@@ -124,6 +125,55 @@
         <ul id="band-projects" class="list"></ul>
       </div>
       <datalist id="genre-options"></datalist>
+    </div>
+  </section>
+
+  <!-- Medien & Releases -->
+  <section id="view-media" class="view" hidden>
+    <aside class="sidebar">
+      <select id="mr-band" aria-label="Band"></select>
+      <input id="mr-search" type="search" data-i18n-placeholder="search_placeholder">
+      <ul id="mr-song-list" class="list"></ul>
+    </aside>
+    <div class="editor">
+      <div class="empty" id="mr-empty" data-i18n="no_song">Bitte links einen Song auswählen.</div>
+      <div id="mr-body" hidden>
+        <h1 id="mr-title"></h1>
+        <div class="song-path" id="mr-path"></div>
+        <div class="mr-columns">
+          <div class="mr-col">
+            <h2 data-i18n="media_links">Verlinkte Plattform-Medien</h2>
+            <ul id="mr-links" class="plain-list"></ul>
+            <div class="hw-form">
+              <select id="mr-link-platform"></select>
+              <input id="mr-link-url" maxlength="2000" placeholder="https://…" autocomplete="off">
+              <input id="mr-link-label" maxlength="300" data-i18n-placeholder="media_label">
+              <button id="btn-mr-link" data-i18n="media_add_link">Link speichern</button>
+            </div>
+            <h2 data-i18n="media_files">Mediendateien</h2>
+            <ul id="mr-files" class="list mr-files"></ul>
+            <div id="mr-preview" class="mr-preview" hidden></div>
+            <div class="hint" data-i18n="media_import_hint">Dateien importieren und Audioanalyse: in der Desktop-App.</div>
+          </div>
+          <div class="mr-col">
+            <h2 data-i18n="release_title">Releases</h2>
+            <div class="fields two">
+              <label><span data-i18n="release_distributor">Distributor</span><input id="rl-dist" list="rl-dists" maxlength="200"></label>
+              <label><span data-i18n="release_date">Release-Datum (optional)</span><input id="rl-date" type="date"></label>
+              <label><span>ISRC</span><input id="rl-isrc" maxlength="40" placeholder="DEABC2600001" autocomplete="off"></label>
+              <label><span>UPC/EAN</span><input id="rl-upc" maxlength="40" autocomplete="off"></label>
+            </div>
+            <datalist id="rl-dists"></datalist>
+            <div class="actions wrap">
+              <button id="btn-rl-check" data-i18n="release_check">Release-Checkliste prüfen (ohne Speichern)</button>
+              <button id="btn-rl-save" class="primary" data-i18n="release_save">Release speichern / ISRC abgleichen</button>
+            </div>
+            <div id="rl-message" class="message" hidden></div>
+            <div id="rl-choices" class="actions wrap" hidden></div>
+            <ul id="rl-list" class="plain-list"></ul>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 

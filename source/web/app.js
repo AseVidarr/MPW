@@ -63,6 +63,32 @@ const I18N = {
     band_created: "Band „{name}“ angelegt. Verzeichnis: {folder}",
     band_imported: "Band „{name}“ übernommen. Vorhandenes Verzeichnis: {folder} (nichts verändert).",
     band_prompt_warning: "Der Prompt-Ordner konnte nicht angelegt werden: {detail}",
+    tab_media: "Medien & Releases",
+    media_links: "Verlinkte Plattform-Medien",
+    media_files: "Mediendateien",
+    media_label: "Bezeichnung (optional)",
+    media_add_link: "Link speichern",
+    media_import_hint: "Dateien importieren, Audioanalyse und Medien-Explorer: in der Desktop-App.",
+    media_no_links: "Noch keine Links gespeichert.",
+    media_no_files: "Keine Mediendateien im Projektordner gefunden.",
+    media_no_preview: "keine Vorschau im Browser",
+    media_open: "In neuem Tab öffnen",
+    media_link_added: "Link gespeichert.",
+    release_title: "Releases",
+    release_distributor: "Distributor",
+    release_date: "Release-Datum (optional)",
+    release_check: "Release-Checkliste prüfen (ohne Speichern)",
+    release_save: "Release speichern / ISRC abgleichen",
+    release_none: "Noch keine Veröffentlichungen.",
+    release_platform_save: "Plattform speichern",
+    release_platform_saved: "Plattform „{platform}“ gespeichert.",
+    release_saved: "Release #{id} gespeichert.",
+    err_invalid_url: "Bitte einen gültigen HTTP(S)-Link eingeben.",
+    err_link_exists: "Dieser Link ist bereits gespeichert.",
+    err_invalid_isrc: "Ungültige ISRC.",
+    err_invalid_date: "Ungültiges Datum.",
+    err_release_required: "Song und Distributor sind erforderlich.",
+    err_media_unavailable: "Medienordner konnten nicht gelesen werden: {detail}",
     tab_conn: "KI-Verbindungen",
     conn_manual: "Auf diesem System kann MPW kein Fenster dafür öffnen. Bitte in einem Terminal ausführen:\n{command}",
     conn_copy_failed: "Kopieren in die Zwischenablage nicht möglich. Bitte diesen Text selbst kopieren:",
@@ -184,6 +210,32 @@ const I18N = {
     band_created: "Band “{name}” created. Directory: {folder}",
     band_imported: "Band “{name}” imported. Existing directory: {folder} (nothing changed).",
     band_prompt_warning: "The prompt folder could not be created: {detail}",
+    tab_media: "Media & Releases",
+    media_links: "Linked platform media",
+    media_files: "Media files",
+    media_label: "Label (optional)",
+    media_add_link: "Save link",
+    media_import_hint: "Importing files, audio analysis and media explorer: in the desktop app.",
+    media_no_links: "No links saved yet.",
+    media_no_files: "No media files found in the project folder.",
+    media_no_preview: "no preview in the browser",
+    media_open: "Open in new tab",
+    media_link_added: "Link saved.",
+    release_title: "Releases",
+    release_distributor: "Distributor",
+    release_date: "Release date (optional)",
+    release_check: "Check release checklist (without saving)",
+    release_save: "Save release / match ISRC",
+    release_none: "No releases yet.",
+    release_platform_save: "Save platform",
+    release_platform_saved: "Platform “{platform}” saved.",
+    release_saved: "Release #{id} saved.",
+    err_invalid_url: "Please enter a valid HTTP(S) link.",
+    err_link_exists: "This link is already saved.",
+    err_invalid_isrc: "Invalid ISRC.",
+    err_invalid_date: "Invalid date.",
+    err_release_required: "Song and distributor are required.",
+    err_media_unavailable: "Media folders could not be read: {detail}",
     tab_conn: "AI connections",
     conn_manual: "MPW cannot open a window for this on this system. Please run in a terminal:\n{command}",
     conn_copy_failed: "Copying to the clipboard is not possible. Please copy this text yourself:",
@@ -305,6 +357,32 @@ const I18N = {
     band_created: "Groupe « {name} » créé. Dossier : {folder}",
     band_imported: "Groupe « {name} » importé. Dossier existant : {folder} (rien modifié).",
     band_prompt_warning: "Le dossier des prompts n’a pas pu être créé : {detail}",
+    tab_media: "Médias & sorties",
+    media_links: "Médias de plateforme liés",
+    media_files: "Fichiers médias",
+    media_label: "Libellé (facultatif)",
+    media_add_link: "Enregistrer le lien",
+    media_import_hint: "Import de fichiers, analyse audio et explorateur de médias : dans l’application de bureau.",
+    media_no_links: "Aucun lien enregistré.",
+    media_no_files: "Aucun fichier média dans le dossier du projet.",
+    media_no_preview: "pas d’aperçu dans le navigateur",
+    media_open: "Ouvrir dans un nouvel onglet",
+    media_link_added: "Lien enregistré.",
+    release_title: "Sorties",
+    release_distributor: "Distributeur",
+    release_date: "Date de sortie (facultative)",
+    release_check: "Vérifier la liste de contrôle (sans enregistrer)",
+    release_save: "Enregistrer la sortie / comparer l’ISRC",
+    release_none: "Aucune sortie.",
+    release_platform_save: "Enregistrer la plateforme",
+    release_platform_saved: "Plateforme « {platform} » enregistrée.",
+    release_saved: "Sortie n°{id} enregistrée.",
+    err_invalid_url: "Saisissez un lien HTTP(S) valide.",
+    err_link_exists: "Ce lien est déjà enregistré.",
+    err_invalid_isrc: "ISRC invalide.",
+    err_invalid_date: "Date invalide.",
+    err_release_required: "Le titre et le distributeur sont obligatoires.",
+    err_media_unavailable: "Impossible de lire les dossiers médias : {detail}",
     tab_conn: "Connexions IA",
     conn_manual: "Sur ce système, MPW ne peut pas ouvrir de fenêtre pour cela. Exécutez dans un terminal :\n{command}",
     conn_copy_failed: "Impossible de copier dans le presse-papiers. Copiez ce texte vous-même :",
@@ -426,6 +504,32 @@ const I18N = {
     band_created: "Banda «{name}» creada. Carpeta: {folder}",
     band_imported: "Banda «{name}» importada. Carpeta existente: {folder} (sin cambios).",
     band_prompt_warning: "No se pudo crear la carpeta de prompts: {detail}",
+    tab_media: "Medios y lanzamientos",
+    media_links: "Medios de plataforma enlazados",
+    media_files: "Archivos multimedia",
+    media_label: "Etiqueta (opcional)",
+    media_add_link: "Guardar enlace",
+    media_import_hint: "Importar archivos, análisis de audio y explorador de medios: en la aplicación de escritorio.",
+    media_no_links: "Aún no hay enlaces guardados.",
+    media_no_files: "No hay archivos multimedia en la carpeta del proyecto.",
+    media_no_preview: "sin vista previa en el navegador",
+    media_open: "Abrir en una pestaña nueva",
+    media_link_added: "Enlace guardado.",
+    release_title: "Lanzamientos",
+    release_distributor: "Distribuidor",
+    release_date: "Fecha de lanzamiento (opcional)",
+    release_check: "Comprobar lista de lanzamiento (sin guardar)",
+    release_save: "Guardar lanzamiento / comparar ISRC",
+    release_none: "Aún no hay lanzamientos.",
+    release_platform_save: "Guardar plataforma",
+    release_platform_saved: "Plataforma «{platform}» guardada.",
+    release_saved: "Lanzamiento #{id} guardado.",
+    err_invalid_url: "Introduzca un enlace HTTP(S) válido.",
+    err_link_exists: "Este enlace ya está guardado.",
+    err_invalid_isrc: "ISRC no válido.",
+    err_invalid_date: "Fecha no válida.",
+    err_release_required: "La canción y el distribuidor son obligatorios.",
+    err_media_unavailable: "No se pudieron leer las carpetas multimedia: {detail}",
     tab_conn: "Conexiones de IA",
     conn_manual: "En este sistema MPW no puede abrir una ventana para esto. Ejecute en un terminal:\n{command}",
     conn_copy_failed: "No se puede copiar al portapapeles. Copie usted mismo este texto:",
@@ -547,6 +651,32 @@ const I18N = {
     band_created: "Gruppo «{name}» creato. Cartella: {folder}",
     band_imported: "Gruppo «{name}» importato. Cartella esistente: {folder} (nessuna modifica).",
     band_prompt_warning: "Impossibile creare la cartella dei prompt: {detail}",
+    tab_media: "Media & pubblicazioni",
+    media_links: "Media collegati alle piattaforme",
+    media_files: "File multimediali",
+    media_label: "Etichetta (facoltativa)",
+    media_add_link: "Salva link",
+    media_import_hint: "Importazione file, analisi audio ed esplora media: nell’app desktop.",
+    media_no_links: "Nessun link salvato.",
+    media_no_files: "Nessun file multimediale nella cartella del progetto.",
+    media_no_preview: "nessuna anteprima nel browser",
+    media_open: "Apri in una nuova scheda",
+    media_link_added: "Link salvato.",
+    release_title: "Pubblicazioni",
+    release_distributor: "Distributore",
+    release_date: "Data di uscita (facoltativa)",
+    release_check: "Verifica lista di controllo (senza salvare)",
+    release_save: "Salva pubblicazione / confronta ISRC",
+    release_none: "Nessuna pubblicazione.",
+    release_platform_save: "Salva piattaforma",
+    release_platform_saved: "Piattaforma «{platform}» salvata.",
+    release_saved: "Pubblicazione #{id} salvata.",
+    err_invalid_url: "Inserisci un link HTTP(S) valido.",
+    err_link_exists: "Questo link è già salvato.",
+    err_invalid_isrc: "ISRC non valido.",
+    err_invalid_date: "Data non valida.",
+    err_release_required: "Brano e distributore sono obbligatori.",
+    err_media_unavailable: "Impossibile leggere le cartelle multimediali: {detail}",
     tab_conn: "Connessioni IA",
     conn_manual: "Su questo sistema MPW non può aprire una finestra per questo. Esegui in un terminale:\n{command}",
     conn_copy_failed: "Impossibile copiare negli appunti. Copia tu stesso questo testo:",
@@ -1115,6 +1245,258 @@ $('btn-band-new').addEventListener('click', () => bandAction(showNewBandForm).ca
 $('btn-band-new-cancel').addEventListener('click', hideNewBandForm);
 $('btn-band-create').addEventListener('click', () => bandAction(createBand).catch((error) => newBandMessage(error.message, 'error')));
 $('n-name').addEventListener('keydown', (event) => { if (event.key === 'Enter') $('btn-band-create').click(); });
+
+/* ------------------------------------------------------------------ Medien & Releases (stage 7) */
+
+const mrState = { songs: [], song: null, media: null, rel: null, busy: false };
+
+function fmt(text, values) {
+  for (const [k, v] of Object.entries(values || {})) text = text.split('{' + k + '}').join(String(v));
+  return text;
+}
+
+function mrMessage(id, text, kind) {
+  const box = $(id);
+  box.textContent = text;
+  box.className = 'message' + (kind ? ' ' + kind : '');
+  box.hidden = !text;
+}
+
+// Texts shared with the desktop tabs (served by the core): release edit texts, checklist, status labels.
+function relEdit(index, values) {
+  const all = mrState.rel.edit_texts;
+  return fmt((all[state.lang] || all.de)[index], values);
+}
+
+function relPreflight(key, values) {
+  const table = mrState.rel.preflight_texts[state.lang] || {};
+  return fmt(table[key] || key, values);
+}
+
+function relStatusLabel(status) {
+  const labels = mrState.rel.status_labels[state.lang];
+  const index = mrState.rel.states.indexOf(status);
+  return labels && index >= 0 ? labels[index] : status;
+}
+
+function mrErrorText(error) {
+  const code = error.data && error.data.error;
+  const map = { invalid_url: 'err_invalid_url', link_exists: 'err_link_exists', invalid_isrc: 'err_invalid_isrc',
+                invalid_date: 'err_invalid_date', empty_field: 'err_release_required', too_long: 'err_too_long',
+                song_missing: 'err_missing', link_missing: 'err_missing', release_missing: 'err_missing',
+                media_unavailable: 'err_media_unavailable' };
+  if (code === 'empty_field' && mrState.rel) return relEdit(0);
+  if (code === 'invalid_isrc' && mrState.rel) return relEdit(1);
+  if (map[code]) return t(map[code], { detail: (error.data && error.data.detail) || '' });
+  return error.kind === 'connection' ? error.message : t('error', { detail: error.message });
+}
+
+async function mrAction(fn, messageBox) {
+  if (mrState.busy) return;
+  mrState.busy = true;
+  try { await fn(); } catch (error) { mrMessage(messageBox || 'rl-message', mrErrorText(error), 'error'); }
+  finally { mrState.busy = false; }
+}
+
+async function mrInit() {
+  const bands = await api('/api/bands');
+  const select = $('mr-band');
+  select.replaceChildren(el('option', t('all_bands')));
+  select.firstChild.value = '';
+  for (const band of bands) { const o = el('option', band.name); o.value = band.id; select.append(o); }
+  await mrLoadSongs();
+}
+
+async function mrLoadSongs() {
+  const params = new URLSearchParams();
+  if ($('mr-band').value) params.set('band_id', $('mr-band').value);
+  if ($('mr-search').value.trim()) params.set('q', $('mr-search').value.trim());
+  mrState.songs = await api('/api/songs?' + params.toString());
+  $('mr-song-list').replaceChildren(...mrState.songs.map((song) => {
+    const item = el('li');
+    item.append(el('span', song.title), el('span', song.band + ' · ' + song.project, 'sub'));
+    item.classList.toggle('active', !!mrState.song && mrState.song.id === song.id);
+    item.addEventListener('click', () => mrAction(() => mrSelectSong(song), 'rl-message'));
+    return item;
+  }));
+}
+
+async function mrSelectSong(song) {
+  mrState.song = song;
+  document.querySelectorAll('#mr-song-list li').forEach((li, i) => li.classList.toggle('active', mrState.songs[i] === song));
+  $('mr-title').textContent = song.title;
+  $('mr-path').textContent = song.band + ' / ' + song.project;
+  $('mr-empty').hidden = true;
+  $('mr-body').hidden = false;
+  mrMessage('rl-message', '');
+  $('rl-choices').hidden = true;
+  for (const id of ['rl-dist', 'rl-date', 'rl-isrc', 'rl-upc', 'mr-link-url', 'mr-link-label']) $(id).value = '';
+  $('mr-preview').hidden = true;
+  $('mr-preview').replaceChildren();
+  await Promise.all([mrLoadMedia(), mrLoadReleases()]);
+}
+
+async function mrLoadMedia() {
+  const media = await api('/api/songs/' + mrState.song.id + '/media');
+  mrState.media = media;
+  const platform = $('mr-link-platform');
+  if (!platform.options.length) {
+    platform.replaceChildren(...media.platforms.map((p) => { const o = el('option', p); o.value = p; return o; }));
+  }
+  const links = media.links.map((link) => {
+    const row = el('li', null, 'link-row');
+    const text = el('div', null, 'grow');
+    text.append(el('div', link.platform + (link.label ? ' · ' + link.label : '')));
+    const a = el('a', link.url);
+    a.href = link.url; a.target = '_blank'; a.rel = 'noopener noreferrer';
+    text.append(a);
+    const del = el('button', t('delete'), 'danger');
+    del.addEventListener('click', () => mrAction(() => mrDeleteLink(link), 'rl-message'));
+    row.append(text, del);
+    return row;
+  });
+  $('mr-links').replaceChildren(...(links.length ? links : [el('li', t('media_no_links'), 'hint')]));
+  const files = media.files.map((file) => {
+    const item = el('li');
+    item.append(el('span', file.kind + ' · ' + file.name), el('span', (file.bytes / 1048576).toFixed(1) + ' MB'
+      + (file.preview ? '' : ' · ' + t('media_no_preview')), 'sub'));
+    item.addEventListener('click', () => mrPreview(file, item));
+    return item;
+  });
+  $('mr-files').replaceChildren(...(files.length ? files : [el('li', t('media_no_files'), 'hint')]));
+}
+
+async function mrPreview(file, item) {
+  document.querySelectorAll('#mr-files li').forEach((li) => li.classList.toggle('active', li === item));
+  const box = $('mr-preview');
+  box.replaceChildren(el('div', file.name + ' · ' + (file.bytes / 1048576).toFixed(2) + ' MB', 'hint'));
+  box.hidden = false;
+  if (!file.url) { box.append(el('div', t('media_no_preview'), 'hint')); return; }
+  if (file.preview === 'image') { const img = el('img'); img.src = file.url; img.alt = file.name; box.append(img); }
+  else if (file.preview === 'audio' || file.preview === 'video') {
+    const player = el(file.preview); player.controls = true; player.preload = 'metadata'; player.src = file.url; box.append(player);
+  } else if (file.preview === 'text') {
+    const response = await fetch(file.url, { headers: { Range: 'bytes=0-200000' } });
+    box.append(el('pre', response.ok ? await response.text() : t('media_no_preview')));
+  }
+  if (file.preview === 'pdf' || file.preview === 'video' || file.preview === 'image') {
+    const open = el('a', t('media_open'));
+    open.href = file.url; open.target = '_blank'; open.rel = 'noopener noreferrer';
+    box.append(open);
+  }
+}
+
+async function mrAddLink() {
+  await api('/api/songs/' + mrState.song.id + '/media-links', { method: 'POST',
+    body: { platform: $('mr-link-platform').value, url: $('mr-link-url').value.trim(), label: $('mr-link-label').value } });
+  $('mr-link-url').value = '';
+  $('mr-link-label').value = '';
+  mrMessage('rl-message', t('media_link_added'));
+  await mrLoadMedia();
+}
+
+async function mrDeleteLink(link) {
+  const texts = mrState.media.confirm_texts;
+  if (!confirm((texts[state.lang] || texts.de).delete + '\n\n' + link.url)) return;
+  await api('/api/songs/' + mrState.song.id + '/media-links/' + link.id + '/delete', { method: 'POST', body: { confirm: true } });
+  await mrLoadMedia();
+}
+
+function releaseBody() {
+  return { distributor: $('rl-dist').value, release_date: $('rl-date').value || null,
+           isrc: $('rl-isrc').value, upc: $('rl-upc').value };
+}
+
+async function mrLoadReleases() {
+  const rel = await api('/api/songs/' + mrState.song.id + '/releases');
+  mrState.rel = rel;
+  fillOptions($('rl-dists'), rel.distributors);
+  const items = rel.releases.map((r) => {
+    const item = el('li');
+    item.append(el('div', '#' + r.id + ' · ' + r.distributor + ' · ' + (r.release_date || relEdit(2)) + ' · ISRC: ' + (r.isrc || '–')
+      + (r.upc ? ' · UPC: ' + r.upc : ''), 'release-head'));
+    if (r.platforms.length) {
+      const list = el('ul', null, 'release-platforms');
+      for (const p of r.platforms) {
+        const line = el('li', p.platform + ' · ' + relStatusLabel(p.status) + ' · ');
+        if (p.url) { const a = el('a', p.url); a.href = p.url; a.target = '_blank'; a.rel = 'noopener noreferrer'; line.append(a); }
+        else line.append(relEdit(11));
+        list.append(line);
+      }
+      item.append(list);
+    }
+    const form = el('div', null, 'hw-form release-form');
+    const platform = el('select');
+    for (const name of rel.platforms) { const o = el('option', name); o.value = name; platform.append(o); }
+    const status = el('select');
+    for (const s of rel.states) { const o = el('option', relStatusLabel(s)); o.value = s; status.append(o); }
+    const url = el('input'); url.placeholder = 'https://…'; url.maxLength = 2000;
+    const fill = () => {  // show the stored values of an already listed platform
+      const known = r.platforms.find((p) => p.platform === platform.value);
+      status.value = known ? known.status : rel.states[0];
+      url.value = known ? known.url : '';
+    };
+    platform.addEventListener('change', fill);
+    fill();
+    const save = el('button', t('release_platform_save'));
+    save.addEventListener('click', () => mrAction(async () => {
+      await api('/api/releases/' + r.id + '/platforms', { method: 'POST',
+        body: { platform: platform.value, status: status.value, url: url.value.trim() } });
+      mrMessage('rl-message', t('release_platform_saved', { platform: platform.value }));
+      await mrLoadReleases();
+    }));
+    form.append(platform, status, url, save);
+    item.append(form);
+    return item;
+  });
+  $('rl-list').replaceChildren(...(items.length ? items : [el('li', t('release_none'), 'hint')]));
+}
+
+async function mrCheckRelease() {
+  const result = await api('/api/songs/' + mrState.song.id + '/releases/check', { method: 'POST', body: releaseBody() });
+  const lines = [relPreflight('RELEASE-CHECKLISTE (nur Hinweis, keine Speicherung)'), ''];
+  for (const [kind, key, values] of result.items) {
+    const date = values.date || '';
+    const rest = Object.fromEntries(Object.entries(values).filter(([k]) => k !== 'date'));
+    lines.push((kind === 'ok' ? '✓ ' : '! ') + relPreflight(key, rest) + date);
+  }
+  lines.push('', relPreflight('Zusätzlich vor Veröffentlichung prüfen: finale Audiodatei, Cover, Rechte, Credits, Metadaten und Distributor-Vorgaben.'),
+             relPreflight('MPW führt keine Veröffentlichung und keine externe Kennungsprüfung durch.'));
+  mrMessage('rl-message', lines.join('\n'), result.items.some((i) => i[0] === 'issue') ? 'warn' : '');
+}
+
+async function mrSaveRelease(updateId) {
+  $('rl-choices').hidden = true;
+  const body = releaseBody();
+  if (updateId) Object.assign(body, { update_id: updateId, confirm: true });
+  try {
+    const result = await api('/api/songs/' + mrState.song.id + '/releases', { method: 'POST', body });
+    mrMessage('rl-message', result.created ? t('release_saved', { id: result.id }) : relEdit(10, { rid: result.id }));
+    await mrLoadReleases();
+  } catch (error) {
+    if (!(error.data && error.data.error === 'isrc_exists')) throw error;
+    // Same ISRC already stored: the user picks the record to change and confirms (like the desktop dialog).
+    const matches = error.data.matches || [];
+    mrMessage('rl-message', matches.length > 1 ? relEdit(4) : relEdit(5), 'warn');
+    $('rl-choices').replaceChildren(...matches.map((m) => {
+      const button = el('button', '#' + m.id + ' | ' + m.title + ' | ' + m.distributor + ' | ' + (m.release_date || relEdit(2)));
+      button.addEventListener('click', () => {
+        const text = relEdit(6) + '\n\nISRC: ' + body.isrc + '\n#' + m.id + ' · ' + m.title + ' · ' + m.distributor
+          + '\n\n' + relEdit(7) + '\n' + relEdit(8);
+        if (confirm(text)) mrAction(() => mrSaveRelease(m.id));
+      });
+      return button;
+    }));
+    $('rl-choices').hidden = false;
+  }
+}
+
+$('mr-band').addEventListener('change', () => mrLoadSongs().catch(fatal));
+let mrSearchTimer;
+$('mr-search').addEventListener('input', () => { clearTimeout(mrSearchTimer); mrSearchTimer = setTimeout(() => mrLoadSongs().catch(fatal), 200); });
+$('btn-mr-link').addEventListener('click', () => mrAction(mrAddLink));
+$('btn-rl-check').addEventListener('click', () => mrAction(mrCheckRelease));
+$('btn-rl-save').addEventListener('click', () => mrAction(() => mrSaveRelease(null)));
 
 /* ------------------------------------------------------------------ KI-Verbindungen (stage 6) */
 
@@ -1761,6 +2143,8 @@ function switchView(name) {
   $('view-bands').hidden = name !== 'bands';
   $('view-ai').hidden = name !== 'ai';
   $('view-conn').hidden = name !== 'conn';
+  $('view-media').hidden = name !== 'media';
+  if (name === 'media' && !$('mr-band').options.length) mrInit().catch((error) => mrMessage('rl-message', mrErrorText(error), 'error'));
   if (name === 'conn' && !connState.info) connInit().catch((error) => connMessage(connErrorText(error), 'error'));
   if (name === 'bands' && !$('band-list').children.length) loadBandList().catch(fatal);
   if (name === 'ai' && !aiState.options) aiAction(aiInit);

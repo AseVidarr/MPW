@@ -28,7 +28,7 @@ import webbrowser
 from contextlib import closing
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from urllib.parse import parse_qs, urlparse
+from urllib.parse import parse_qs, quote, urlparse
 
 import mpw_core as ws  # Qt-free MPW core: runs on Windows, macOS and Linux without PySide6
 import mpw_mcp_server as core
@@ -169,7 +169,7 @@ def _write(server, func, *args):
             return func(con, *args)
     except ws.BandDataError as exc:
         status = (404 if exc.code.endswith('_missing') else
-                  409 if exc.code in ('preset_exists', 'band_exists', 'folder_exists') else
+                  409 if exc.code in ('preset_exists', 'band_exists', 'folder_exists', 'link_exists', 'isrc_exists') else
                   500 if exc.code == 'folder_error' else 400)
         raise ApiError(status, exc.code, exc.values) from exc
     except core.ToolError as exc:
@@ -649,7 +649,121 @@ def api_connections_desktop_config(server, query, body):
     return {'text': ws.claude_desktop_config_snippet(ws.mpw_mcp_server_command())}
 
 
+# --------------------------------------------------------------------------- Medien & Releases (stage 7)
+
+MEDIA_ROUTE = re.compile(r'^/media/(\d+)/([0-9a-f]{32})$')
+# Only these formats are delivered to the browser (preview/player); everything else stays desktop-only.
+MEDIA_TYPES = {'.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp',
+               '.bmp': 'image/bmp', '.mp3': 'audio/mpeg', '.wav': 'audio/wav', '.flac': 'audio/flac',
+               '.m4a': 'audio/mp4', '.ogg': 'audio/ogg', '.opus': 'audio/ogg', '.aac': 'audio/aac',
+               '.mp4': 'video/mp4', '.m4v': 'video/mp4', '.webm': 'video/webm', '.mov': 'video/quicktime',
+               '.pdf': 'application/pdf', '.txt': 'text/plain; charset=utf-8', '.md': 'text/plain; charset=utf-8'}
+MEDIA_SECURITY_HEADERS = {'X-Content-Type-Options': 'nosniff', 'Referrer-Policy': 'no-referrer',
+                          'Cache-Control': 'no-store', 'Cross-Origin-Resource-Policy': 'same-origin'}
+
+
+def _media_file_id(server, song_id, path):
+    return hmac.new(server.token.encode(), f'{song_id}:{path}'.encode('utf-8'), 'sha256').hexdigest()[:32]
+
+
+def _song_media_files(server, song_id):
+    root = server.db_path.parent
+    with closing(core.open_read(server.db_path)) as con:
+        files = ws.song_media_files(con, root, song_id, ws.band_root_directory(root))
+    for item in files:
+        item['id'] = _media_file_id(server, song_id, item['path'])
+    return files
+
+
+def api_song_media(server, query, body, song_id):
+    """Platform links and media files of a song (files with a player/preview URL where possible)."""
+    sid = int(song_id)
+    links = _read(server, lambda con, _args: (ws.song_media_links(con, sid) if con.execute(
+        'SELECT 1 FROM songs WHERE id=?', (sid,)).fetchone() else None), {})
+    if links is None:
+        raise ApiError(404, 'song_missing')
+    try:
+        files = _song_media_files(server, sid)
+    except (sqlite3.Error, OSError, ValueError) as exc:
+        raise ApiError(503, 'media_unavailable', {'detail': str(exc)[:200]}) from exc
+    shown = []
+    for item in files:
+        content_type = MEDIA_TYPES.get(Path(item['path']).suffix.lower(), '')
+        preview = ('image' if content_type.startswith('image/') else 'audio' if content_type.startswith('audio/')
+                   else 'video' if content_type.startswith('video/') else 'pdf' if content_type == 'application/pdf'
+                   else 'text' if content_type.startswith('text/') else None)
+        shown.append({'id': item['id'], 'kind': item['kind'], 'label': item['label'], 'name': item['name'],
+                      'bytes': item['bytes'], 'preview': preview,
+                      'url': f'/media/{sid}/{item["id"]}' if preview else None})  # no file paths to the browser
+    return {'links': links, 'files': shown, 'platforms': list(ws.MEDIA_LINK_PLATFORMS),
+            'confirm_texts': ws.MEDIA_CONFIRM_I18N}
+
+
+def api_add_media_link(server, query, body, song_id):
+    link_id = _write(server, ws.add_media_link, int(song_id), _body_text(body, 'platform'),
+                     _body_text(body, 'url'), _body_text(body, 'label'))
+    return {'id': link_id}
+
+
+def api_delete_media_link(server, query, body, song_id, link_id):
+    if not (isinstance(body, dict) and body.get('confirm') is True):
+        raise ApiError(400, 'confirm_required')
+    _write(server, ws.delete_media_link, int(song_id), int(link_id))
+    return {'deleted': True}
+
+
+def api_song_releases(server, query, body, song_id):
+    sid = int(song_id)
+    releases = _read(server, lambda con, _args: (ws.song_releases(con, sid) if con.execute(
+        'SELECT 1 FROM songs WHERE id=?', (sid,)).fetchone() else None), {})
+    if releases is None:
+        raise ApiError(404, 'song_missing')
+    return {'releases': releases, 'distributors': ws.DISTRIBUTORS, 'platforms': ws.PLATFORMS, 'states': ws.STATES,
+            'status_labels': ws.PLATFORM_STATUS_LABELS, 'preflight_texts': ws.RELEASE_PREFLIGHT_I18N,
+            'edit_texts': {'de': ws.RELEASE_EDIT_DE, **ws.RELEASE_EDIT_TEXTS}}
+
+
+def _release_fields(body):
+    if not isinstance(body, dict):
+        raise ApiError(400, 'invalid_body')
+    date = body.get('release_date') or None
+    if date is not None and not isinstance(date, str):
+        raise ApiError(400, 'invalid_field', {'field': 'release_date'})
+    return body.get('distributor', ''), date, body.get('isrc', ''), body.get('upc', '')
+
+
+def api_release_check(server, query, body, song_id):
+    """Advisory checklist only: nothing is saved."""
+    distributor, date, isrc, upc = _release_fields(body)
+    if not all(isinstance(v, str) for v in (distributor, isrc, upc)):
+        raise ApiError(400, 'invalid_field', {'field': 'release'})
+    return {'items': _read(server, lambda con, _args: ws.release_checklist(con, int(song_id), distributor, date, isrc, upc), {})}
+
+
+def api_save_release(server, query, body, song_id):
+    """New release, or – after the user chose and confirmed it – update the release with the same ISRC."""
+    distributor, date, isrc, upc = _release_fields(body)
+    update_id = _optional_int(body, 'update_id')
+    if update_id is not None and body.get('confirm') is not True:
+        raise ApiError(400, 'confirm_required')
+    release_id, created = _write(server, ws.save_release, int(song_id), distributor, date, isrc, upc, update_id)
+    return {'id': release_id, 'created': created}
+
+
+def api_save_release_platform(server, query, body, release_id):
+    _write(server, ws.save_release_platform, int(release_id), _body_text(body, 'platform'),
+           _body_text(body, 'status'), _body_text(body, 'url'))
+    return {'saved': True}
+
+
 ROUTES = [
+    ('GET', re.compile(r'^/api/songs/(\d+)/media$'), api_song_media),
+    ('POST', re.compile(r'^/api/songs/(\d+)/media-links$'), api_add_media_link),
+    ('POST', re.compile(r'^/api/songs/(\d+)/media-links/(\d+)/delete$'), api_delete_media_link),
+    ('GET', re.compile(r'^/api/songs/(\d+)/releases$'), api_song_releases),
+    ('POST', re.compile(r'^/api/songs/(\d+)/releases/check$'), api_release_check),
+    ('POST', re.compile(r'^/api/songs/(\d+)/releases$'), api_save_release),
+    ('POST', re.compile(r'^/api/releases/(\d+)/platforms$'), api_save_release_platform),
     ('GET', re.compile(r'^/api/connections$'), api_connections_info),
     ('POST', re.compile(r'^/api/connections/check$'), api_connections_check),
     ('GET', re.compile(r'^/api/connections/jobs/([0-9a-f]{16})$'), api_connections_job),
@@ -737,6 +851,62 @@ class MPWRequestHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(data)
 
+    def _serve_media(self, song_id, file_id):
+        """Stream one media file of a song (images, audio, video, PDF, text); supports a single Range."""
+        try:
+            entry = next((f for f in _song_media_files(self.server, song_id)
+                          if hmac.compare_digest(f['id'], file_id)), None)
+        except (sqlite3.Error, OSError, ValueError):
+            entry = None
+        content_type = MEDIA_TYPES.get(Path(entry['path']).suffix.lower()) if entry else None
+        if not entry or not content_type:
+            return self._send(404, {'error': 'not_found'})
+        path = Path(entry['path'])
+        try:
+            size = path.stat().st_size
+            stream = path.open('rb')
+        except OSError:
+            return self._send(404, {'error': 'not_found'})
+        with stream:
+            start, end, status = 0, size - 1, 200
+            match = re.fullmatch(r'bytes=(\d*)-(\d*)', self.headers.get('Range', '').strip())
+            if match and size and (match.group(1) or match.group(2)):
+                if match.group(1):
+                    start = int(match.group(1))
+                    end = min(int(match.group(2)), size - 1) if match.group(2) else size - 1
+                else:  # suffix range: the last n bytes
+                    start = max(0, size - int(match.group(2)))
+                if start > end or start >= size:
+                    self.send_response(416)
+                    self.send_header('Content-Range', f'bytes */{size}')
+                    self.send_header('Content-Length', '0')
+                    self.end_headers()
+                    return
+                status = 206
+            self.send_response(status)
+            self.send_header('Content-Type', content_type)
+            self.send_header('Content-Length', str(max(0, end - start + 1)))
+            self.send_header('Accept-Ranges', 'bytes')
+            if status == 206:
+                self.send_header('Content-Range', f'bytes {start}-{end}/{size}')
+            self.send_header('Content-Disposition', "inline; filename*=UTF-8''" + quote(path.name))
+            for key, value in MEDIA_SECURITY_HEADERS.items():
+                self.send_header(key, value)
+            if not content_type.startswith('application/pdf'):  # the browser's PDF viewer must not be sandboxed
+                self.send_header('Content-Security-Policy', "default-src 'none'; sandbox")
+            self.end_headers()
+            stream.seek(start)
+            remaining = end - start + 1
+            try:
+                while remaining > 0:
+                    block = stream.read(min(1024 * 1024, remaining))
+                    if not block:
+                        break
+                    self.wfile.write(block)
+                    remaining -= len(block)
+            except (ConnectionError, OSError):
+                pass  # the player stopped reading (e.g. seek): normal for media
+
     def _host_ok(self):
         port = self.server.port
         return self.headers.get('Host', '') in (f'127.0.0.1:{port}', f'localhost:{port}')
@@ -770,6 +940,9 @@ class MPWRequestHandler(BaseHTTPRequestHandler):
             except OSError:
                 return self._send(500, {'error': 'web_files_missing'})
             return self._send(200, data, CONTENT_TYPES[path.suffix])
+        media = MEDIA_ROUTE.match(parsed.path) if method == 'GET' else None
+        if media:  # the file id itself is the key: an HMAC of the path with this start's secret token
+            return self._serve_media(int(media.group(1)), media.group(2))
         if not parsed.path.startswith('/api/'):
             return self._send(404, {'error': 'not_found'})
         if not self._token_ok():

@@ -275,6 +275,86 @@ class WebServerTests(unittest.TestCase):
         self.assertEqual(self.json_call('POST', '/api/songs/1/prompt-versions', {**body, 'lyrics': ' '})[1]['error'], 'empty_field')
         self.assertEqual(self.json_call('POST', '/api/songs/99/prompt-versions', body)[0], 404)
 
+    # --- stage 7: Medien & Releases ---
+    def test_media_links_add_and_delete_with_confirmation(self):
+        body = {'platform': 'Spotify', 'url': 'https://open.spotify.com/track/x', 'label': 'Single'}
+        status, created = self.json_call('POST', '/api/songs/1/media-links', body)
+        self.assertEqual(status, 200)
+        self.assertEqual(self.json_call('POST', '/api/songs/1/media-links', body)[1]['error'], 'link_exists')
+        for url in ('javascript:alert(1)', 'ftp://x/y', 'https://user:pw@host/x', ''):
+            self.assertEqual(self.json_call('POST', '/api/songs/1/media-links', {**body, 'url': url})[0], 400, url)
+        media = self.json_call('GET', '/api/songs/1/media')[1]
+        self.assertEqual([(l['platform'], l['label']) for l in media['links']], [('Spotify', 'Single')])
+        path = f"/api/songs/1/media-links/{created['id']}/delete"
+        self.assertEqual(self.json_call('POST', path, {})[1]['error'], 'confirm_required')
+        self.assertEqual(self.json_call('POST', '/api/songs/2/media-links/%d/delete' % created['id'], {'confirm': True})[0], 404)
+        self.assertEqual(self.json_call('POST', path, {'confirm': True})[0], 200)
+        self.assertEqual(self.json_call('GET', '/api/songs/1/media')[1]['links'], [])
+
+    def test_media_files_served_only_with_their_id_and_allowed_types(self):
+        project = Path(self.tmp.name) / 'Bands' / 'Iron Delta' / 'Rain Song'
+        (project / 'Audio').mkdir(parents=True)
+        (project / 'Dokumente').mkdir()
+        (project / 'Audio' / 'mix.mp3').write_bytes(b'ID3' + bytes(range(256)) * 4)
+        (project / 'Dokumente' / 'notes.txt').write_text('Notizen', encoding='utf-8')
+        (project / 'Dokumente' / 'page.html').write_text('<script>alert(1)</script>', encoding='utf-8')
+        media = self.json_call('GET', '/api/songs/1/media')[1]
+        files = {f['name']: f for f in media['files']}
+        self.assertEqual(set(files), {'mix.mp3', 'notes.txt', 'page.html'})
+        self.assertNotIn('path', files['mix.mp3'])  # no file system paths to the browser
+        self.assertIsNone(files['page.html']['url'])  # not a previewable type: never delivered
+        url = files['mix.mp3']['url']
+        status, headers, raw = self.call('GET', url, token=False)  # the id itself is the key
+        self.assertEqual((status, headers['Content-Type'], len(raw)), (200, 'audio/mpeg', 3 + 1024))
+        self.assertIn('sandbox', headers['Content-Security-Policy'])
+        request = urllib.request.Request(f'http://127.0.0.1:{self.server.port}{url}', headers={'Range': 'bytes=3-10'})
+        with urllib.request.urlopen(request, timeout=10) as response:
+            self.assertEqual((response.status, response.headers['Content-Range'], response.read()),
+                             (206, 'bytes 3-10/1027', bytes(range(8))))
+        self.assertEqual(self.call('GET', files['notes.txt']['url'], token=False)[2].decode(), 'Notizen')
+        self.assertEqual(self.call('GET', '/media/1/' + '0' * 32, token=False)[0], 404)
+        self.assertEqual(self.call('GET', url.replace('/media/1/', '/media/2/'), token=False)[0], 404)
+        self.assertEqual(self.call('GET', url, token=False, host='evil.example')[0], 403)
+
+    def test_releases_checklist_save_isrc_match_and_platforms(self):
+        info = self.json_call('GET', '/api/songs/1/releases')[1]
+        self.assertEqual(info['releases'], [])
+        self.assertIn('DistroKid', info['distributors'])
+        body = {'distributor': 'DistroKid', 'release_date': '2026-12-24', 'isrc': 'de-abc-26-00001', 'upc': '4006381333931'}
+        items = self.json_call('POST', '/api/songs/1/releases/check', body)[1]['items']
+        self.assertEqual([i[0] for i in items], ['ok'] * 5)
+        self.assertEqual(items[2], ['ok', 'Veröffentlichungsdatum angegeben: ', {'date': '24.12.2026'}])
+        bad = self.json_call('POST', '/api/songs/1/releases/check', {**body, 'isrc': 'X', 'upc': '4006381333932'})[1]['items']
+        self.assertIn(['issue', 'ISRC hat kein gültiges 12-stelliges Format.', {}], bad)
+        self.assertIn(['issue', 'UPC/EAN-Prüfziffer stimmt nicht.', {}], bad)
+        status, saved = self.json_call('POST', '/api/songs/1/releases', body)
+        self.assertEqual((status, saved['created']), (200, True))
+        # same ISRC again: the user must choose the record and confirm the update
+        status, result = self.json_call('POST', '/api/songs/1/releases', {**body, 'distributor': 'TuneCore'})
+        self.assertEqual((status, result['error'], [m['id'] for m in result['matches']]), (409, 'isrc_exists', [saved['id']]))
+        self.assertEqual(self.json_call('POST', '/api/songs/1/releases', {**body, 'update_id': saved['id']})[1]['error'],
+                         'confirm_required')
+        status, updated = self.json_call('POST', '/api/songs/1/releases',
+                                         {**body, 'distributor': 'TuneCore', 'update_id': saved['id'], 'confirm': True})
+        self.assertEqual((status, updated['created']), (200, False))
+        self.assertEqual(self.json_call('POST', '/api/songs/1/releases', {**body, 'isrc': 'ABC'})[1]['error'], 'invalid_isrc')
+        self.assertEqual(self.json_call('POST', '/api/songs/1/releases', {**body, 'release_date': '24.12.2026', 'isrc': ''})[1]['error'],
+                         'invalid_date')
+        self.assertEqual(self.json_call('POST', '/api/songs/1/releases', {**body, 'distributor': ' ', 'isrc': ''})[1]['error'],
+                         'empty_field')
+        path = f"/api/releases/{saved['id']}/platforms"
+        self.assertEqual(self.json_call('POST', path, {'platform': 'Spotify', 'status': 'Eingereicht', 'url': ''})[0], 200)
+        self.assertEqual(self.json_call('POST', path, {'platform': 'Spotify', 'status': 'Veröffentlicht',
+                                                       'url': 'https://open.spotify.com/x'})[0], 200)
+        self.assertEqual(self.json_call('POST', path, {'platform': 'Myspace', 'status': 'Geplant', 'url': ''})[1]['error'],
+                         'invalid_platform')
+        self.assertEqual(self.json_call('POST', path, {'platform': 'Spotify', 'status': 'Published', 'url': ''})[1]['error'],
+                         'invalid_status')
+        releases = self.json_call('GET', '/api/songs/1/releases')[1]['releases']
+        self.assertEqual((releases[0]['distributor'], releases[0]['isrc'], releases[0]['platforms']),
+                         ('TuneCore', 'DEABC2600001', [{'platform': 'Spotify', 'status': 'Veröffentlicht',
+                                                        'url': 'https://open.spotify.com/x'}]))
+
     # --- stage 6: KI-Verbindungen (no real CLI commands: every helper is replaced) ---
     def patch_ws(self, **replacements):
         for name, value in replacements.items():

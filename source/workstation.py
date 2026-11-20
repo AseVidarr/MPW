@@ -14351,13 +14351,7 @@ th{{background-color:#eef1f4;color:#17212b;font-weight:bold;}}
             self.delete_media_link()
 
     # Alpha 21 Preview 15: confirmation texts for media-link deletion and HTTPS import.
-    MEDIA_CONFIRM_I18N = {
-        'de': {'delete': 'Soll dieser Plattform-Link aus dem Song entfernt werden?\nDie Mediendatei auf der Plattform bleibt unverändert.', 'import': 'Nur eigene oder freigegebene Dateien herunterladen.\nDatei importieren (maximal 200 MB)?'},
-        'en': {'delete': 'Remove this platform link from the song?\nThe media file on the platform will remain unchanged.', 'import': 'Only download files you own or are authorized to use.\nImport the file (maximum 200 MB)?'},
-        'fr': {'delete': 'Supprimer ce lien de plateforme du titre ?\nLe fichier multimédia sur la plateforme restera inchangé.', 'import': 'Téléchargez uniquement les fichiers qui vous appartiennent ou pour lesquels vous avez une autorisation.\nImporter le fichier (200 Mo maximum) ?'},
-        'es': {'delete': '¿Eliminar este enlace de plataforma de la canción?\nEl archivo multimedia en la plataforma no se modificará.', 'import': 'Descargue solo archivos propios o autorizados.\n¿Importar el archivo (máximo 200 MB)?'},
-        'it': {'delete': 'Rimuovere questo collegamento alla piattaforma dal brano?\nIl file multimediale sulla piattaforma rimarrà invariato.', 'import': 'Scaricare solo file propri o per cui si dispone di autorizzazione.\nImportare il file (massimo 200 MB)?'},
-    }
+    MEDIA_CONFIRM_I18N = mpw_core.MEDIA_CONFIRM_I18N  # shared with the browser GUI
 
     def media_confirmation_text(self, key):
         language = self.effective_language()
@@ -14823,7 +14817,7 @@ th{{background-color:#eef1f4;color:#17212b;font-weight:bold;}}
             self.error('Datei konnte nicht mit der Standardanwendung geöffnet werden.')
 
     # Alpha 21 Preview 27: read-only release preflight report localization.
-    RELEASE_PREFLIGHT_I18N = {'en': {'Song auswählen.': 'Select a song.', 'Song ausgewählt.': 'Song selected.', 'Distributor angegeben.': 'Distributor specified.', 'Distributor fehlt.': 'Distributor missing.', 'Veröffentlichungsdatum angegeben: ': 'Release date specified: ', 'Ungültiges Veröffentlichungsdatum.': 'Invalid release date.', 'Veröffentlichungsdatum noch nicht festgelegt (optional bei Planung).': 'Release date not set yet (optional during planning).', 'ISRC fehlt; vor Distributor-Abgabe prüfen.': 'ISRC missing; check before submitting to distributor.', 'ISRC hat kein gültiges 12-stelliges Format.': 'ISRC must have a valid 12-character format.', 'ISRC-Format plausibel (keine Registrierungsprüfung).': 'ISRC format plausible (registration not verified).', 'ISRC bereits in {matches} Release-Datensatz/Datensätzen vorhanden: vor dem Speichern Zuordnung prüfen.': 'ISRC already used in {matches} release record(s); check assignment before saving.', 'UPC/EAN fehlt; für die Distribution ggf. erforderlich.': 'UPC/EAN missing; may be required for distribution.', 'UPC/EAN muss 12 oder 13 Ziffern enthalten.': 'UPC/EAN must contain 12 or 13 digits.', 'UPC/EAN-Prüfziffer korrekt (keine Registrierungsprüfung).': 'UPC/EAN check digit correct (registration not verified).', 'UPC/EAN-Prüfziffer stimmt nicht.': 'UPC/EAN check digit incorrect.', 'RELEASE-CHECKLISTE (nur Hinweis, keine Speicherung)': 'RELEASE CHECKLIST (advisory only, not saved)', 'Zusätzlich vor Veröffentlichung prüfen: finale Audiodatei, Cover, Rechte, Credits, Metadaten und Distributor-Vorgaben.': 'Also check before release: final audio file, cover, rights, credits, metadata and distributor requirements.', 'MPW führt keine Veröffentlichung und keine externe Kennungsprüfung durch.': 'MPW does not publish releases or externally verify identifiers.'}, 'fr': {'Song auswählen.': 'Sélectionnez un titre.', 'Song ausgewählt.': 'Titre sélectionné.', 'Distributor angegeben.': 'Distributeur renseigné.', 'Distributor fehlt.': 'Distributeur manquant.', 'Veröffentlichungsdatum angegeben: ': 'Date de sortie indiquée : ', 'Ungültiges Veröffentlichungsdatum.': 'Date de sortie invalide.', 'Veröffentlichungsdatum noch nicht festgelegt (optional bei Planung).': 'Date de sortie non définie (facultatif pendant la préparation).', 'ISRC fehlt; vor Distributor-Abgabe prüfen.': 'ISRC manquant ; vérifier avant la livraison au distributeur.', 'ISRC hat kein gültiges 12-stelliges Format.': 'Le format ISRC à 12 caractères est invalide.', 'ISRC-Format plausibel (keine Registrierungsprüfung).': 'Format ISRC plausible (enregistrement non vérifié).', 'ISRC bereits in {matches} Release-Datensatz/Datensätzen vorhanden: vor dem Speichern Zuordnung prüfen.': 'ISRC déjà présent dans {matches} fiche(s) de sortie ; vérifier avant enregistrement.', 'UPC/EAN fehlt; für die Distribution ggf. erforderlich.': 'UPC/EAN manquant ; peut être exigé pour la distribution.', 'UPC/EAN muss 12 oder 13 Ziffern enthalten.': 'UPC/EAN doit comporter 12 ou 13 chiffres.', 'UPC/EAN-Prüfziffer korrekt (keine Registrierungsprüfung).': 'Chiffre de contrôle UPC/EAN correct (enregistrement non vérifié).', 'UPC/EAN-Prüfziffer stimmt nicht.': 'Chiffre de contrôle UPC/EAN incorrect.', 'RELEASE-CHECKLISTE (nur Hinweis, keine Speicherung)': 'LISTE DE CONTRÔLE SORTIE (indicative, non enregistrée)', 'Zusätzlich vor Veröffentlichung prüfen: finale Audiodatei, Cover, Rechte, Credits, Metadaten und Distributor-Vorgaben.': 'Avant la sortie, vérifier aussi : audio final, pochette, droits, crédits, métadonnées et exigences du distributeur.', 'MPW führt keine Veröffentlichung und keine externe Kennungsprüfung durch.': 'MPW ne publie pas de titres et ne vérifie pas les identifiants auprès de services externes.'}, 'es': {'Song auswählen.': 'Seleccione una canción.', 'Song ausgewählt.': 'Canción seleccionada.', 'Distributor angegeben.': 'Distribuidor indicado.', 'Distributor fehlt.': 'Falta el distribuidor.', 'Veröffentlichungsdatum angegeben: ': 'Fecha de lanzamiento indicada: ', 'Ungültiges Veröffentlichungsdatum.': 'Fecha de lanzamiento no válida.', 'Veröffentlichungsdatum noch nicht festgelegt (optional bei Planung).': 'Fecha de lanzamiento aún no definida (opcional durante la planificación).', 'ISRC fehlt; vor Distributor-Abgabe prüfen.': 'Falta el ISRC; compruébelo antes de enviarlo al distribuidor.', 'ISRC hat kein gültiges 12-stelliges Format.': 'El ISRC no tiene un formato válido de 12 caracteres.', 'ISRC-Format plausibel (keine Registrierungsprüfung).': 'Formato ISRC plausible (registro no verificado).', 'ISRC bereits in {matches} Release-Datensatz/Datensätzen vorhanden: vor dem Speichern Zuordnung prüfen.': 'El ISRC ya figura en {matches} lanzamiento(s); compruebe la asignación antes de guardar.', 'UPC/EAN fehlt; für die Distribution ggf. erforderlich.': 'Falta el UPC/EAN; puede ser necesario para distribuir.', 'UPC/EAN muss 12 oder 13 Ziffern enthalten.': 'El UPC/EAN debe contener 12 o 13 dígitos.', 'UPC/EAN-Prüfziffer korrekt (keine Registrierungsprüfung).': 'Dígito de control UPC/EAN correcto (registro no verificado).', 'UPC/EAN-Prüfziffer stimmt nicht.': 'Dígito de control UPC/EAN incorrecto.', 'RELEASE-CHECKLISTE (nur Hinweis, keine Speicherung)': 'LISTA DE COMPROBACIÓN DEL LANZAMIENTO (orientativa, no se guarda)', 'Zusätzlich vor Veröffentlichung prüfen: finale Audiodatei, Cover, Rechte, Credits, Metadaten und Distributor-Vorgaben.': 'Antes de publicar, compruebe también: audio final, portada, derechos, créditos, metadatos y requisitos del distribuidor.', 'MPW führt keine Veröffentlichung und keine externe Kennungsprüfung durch.': 'MPW no publica lanzamientos ni verifica identificadores externamente.'}, 'it': {'Song auswählen.': 'Seleziona un brano.', 'Song ausgewählt.': 'Brano selezionato.', 'Distributor angegeben.': 'Distributore indicato.', 'Distributor fehlt.': 'Distributore mancante.', 'Veröffentlichungsdatum angegeben: ': 'Data di uscita indicata: ', 'Ungültiges Veröffentlichungsdatum.': 'Data di uscita non valida.', 'Veröffentlichungsdatum noch nicht festgelegt (optional bei Planung).': 'Data di uscita non ancora impostata (facoltativa in fase di pianificazione).', 'ISRC fehlt; vor Distributor-Abgabe prüfen.': 'ISRC mancante; verificare prima della consegna al distributore.', 'ISRC hat kein gültiges 12-stelliges Format.': 'ISRC non valido: formato richiesto di 12 caratteri.', 'ISRC-Format plausibel (keine Registrierungsprüfung).': 'Formato ISRC plausibile (registrazione non verificata).', 'ISRC bereits in {matches} Release-Datensatz/Datensätzen vorhanden: vor dem Speichern Zuordnung prüfen.': 'ISRC già presente in {matches} pubblicazione/i; controllare prima di salvare.', 'UPC/EAN fehlt; für die Distribution ggf. erforderlich.': 'UPC/EAN mancante; potrebbe essere richiesto per la distribuzione.', 'UPC/EAN muss 12 oder 13 Ziffern enthalten.': 'UPC/EAN deve contenere 12 o 13 cifre.', 'UPC/EAN-Prüfziffer korrekt (keine Registrierungsprüfung).': 'Cifra di controllo UPC/EAN corretta (registrazione non verificata).', 'UPC/EAN-Prüfziffer stimmt nicht.': 'Cifra di controllo UPC/EAN errata.', 'RELEASE-CHECKLISTE (nur Hinweis, keine Speicherung)': 'LISTA DI CONTROLLO PUBBLICAZIONE (solo indicativa, non salvata)', 'Zusätzlich vor Veröffentlichung prüfen: finale Audiodatei, Cover, Rechte, Credits, Metadaten und Distributor-Vorgaben.': 'Prima della pubblicazione verificare anche: audio finale, copertina, diritti, crediti, metadati e requisiti del distributore.', 'MPW führt keine Veröffentlichung und keine externe Kennungsprüfung durch.': 'MPW non pubblica brani né verifica gli identificativi tramite servizi esterni.'}}
+    RELEASE_PREFLIGHT_I18N = mpw_core.RELEASE_PREFLIGHT_I18N  # shared with the browser GUI
 
     def check_release_readiness(self):
         """Read-only, advisory preflight; no database writes or external calls."""
@@ -14831,51 +14825,15 @@ th{{background-color:#eef1f4;color:#17212b;font-weight:bold;}}
         catalog = self.RELEASE_PREFLIGHT_I18N.get(language, {})
         def rt(value, **values):
             return catalog.get(value, value).format(**values)
-        issues = []
-        passed = []
-        sid = self.release_song.currentData()
-        if sid is None:
-            issues.append(rt('Song auswählen.'))
-        else:
-            passed.append(rt('Song ausgewählt.'))
-        if self.release_dist.currentText().strip():
-            passed.append(rt('Distributor angegeben.'))
-        else:
-            issues.append(rt('Distributor fehlt.'))
-        if self.release_date_enabled.isChecked():
-            d = self.release_date.date()
-            if d.isValid():
-                passed.append(rt('Veröffentlichungsdatum angegeben: ') + d.toString('dd.MM.yyyy'))
-            else:
-                issues.append(rt('Ungültiges Veröffentlichungsdatum.'))
-        else:
-            issues.append(rt('Veröffentlichungsdatum noch nicht festgelegt (optional bei Planung).'))
-        raw_isrc = self.release_isrc.text().strip()
-        isrc = re.sub(r'[\s-]+', '', raw_isrc).upper()
-        if not isrc:
-            issues.append(rt('ISRC fehlt; vor Distributor-Abgabe prüfen.'))
-        elif not re.fullmatch(r'[A-Z]{2}[A-Z0-9]{3}[0-9]{7}', isrc):
-            issues.append(rt('ISRC hat kein gültiges 12-stelliges Format.'))
-        else:
-            passed.append(rt('ISRC-Format plausibel (keine Registrierungsprüfung).'))
-            matches = self.con.execute(
-                "SELECT COUNT(*) FROM releases WHERE UPPER(REPLACE(REPLACE(TRIM(COALESCE(isrc,'')), '-', ''), ' ', '')) = ?",
-                (isrc,)).fetchone()[0]
-            if matches:
-                issues.append(rt('ISRC bereits in {matches} Release-Datensatz/Datensätzen vorhanden: vor dem Speichern Zuordnung prüfen.', matches=matches))
-        upc = self.release_upc.text().strip()
-        if not upc:
-            issues.append(rt('UPC/EAN fehlt; für die Distribution ggf. erforderlich.'))
-        elif not upc.isascii() or not upc.isdecimal() or len(upc) not in (12, 13):
-            issues.append(rt('UPC/EAN muss 12 oder 13 Ziffern enthalten.'))
-        else:
-            digits = [int(c) for c in upc]
-            checksum = (10 - sum(d * (3 if (len(digits) - 1 - i) % 2 else 1)
-                                 for i, d in enumerate(digits[:-1])) % 10) % 10
-            if checksum == digits[-1]:
-                passed.append(rt('UPC/EAN-Prüfziffer korrekt (keine Registrierungsprüfung).'))
-            else:
-                issues.append(rt('UPC/EAN-Prüfziffer stimmt nicht.'))
+        # Same rules as the browser GUI (mpw_core.release_checklist).
+        d = self.release_date.date()
+        date = (d.toString('yyyy-MM-dd') if d.isValid() else 'invalid') if self.release_date_enabled.isChecked() else None
+        passed, issues = [], []
+        for state, key, values in mpw_core.release_checklist(
+                self.con, self.release_song.currentData(), self.release_dist.currentText(), date,
+                self.release_isrc.text(), self.release_upc.text()):
+            text = rt(key, **{k: v for k, v in values.items() if k != 'date'}) + values.get('date', '')
+            (passed if state == 'ok' else issues).append(text)
         lines = [rt('RELEASE-CHECKLISTE (nur Hinweis, keine Speicherung)'), '']
         lines += ['✓ ' + x for x in passed]
         lines += ['! ' + x for x in issues]
@@ -14884,13 +14842,8 @@ th{{background-color:#eef1f4;color:#17212b;font-weight:bold;}}
         self.release_check_result.setPlainText('\n'.join(lines))
 
     # Alpha 21 Preview 28: localized release editing and platform validation.
-    RELEASE_EDIT_TEXTS = {
-        'en': ('Song and distributor are required.', 'Invalid ISRC. Expected 12 characters, e.g. DEABC2600001.', 'without date', 'ISRC match – select record', 'This ISRC appears more than once. Which record should be changed?', 'Change record', 'Change this record – Yes or No?', 'Yes: Update the existing record.', 'No: Leave it unchanged.', 'Record updated', 'Record #{rid} was updated.', 'no link', 'Select a release first.', 'Enter a valid HTTP(S) link.'),
-        'fr': ('Le titre et le distributeur sont obligatoires.', 'ISRC invalide. 12 caractères attendus, par ex. DEABC2600001.', 'sans date', 'Correspondance ISRC – choisir une fiche', 'Cet ISRC existe plusieurs fois. Quelle fiche modifier ?', 'Modifier la fiche', 'Modifier cette fiche – Oui ou Non ?', 'Oui : mettre à jour la fiche existante.', 'Non : ne rien modifier.', 'Fiche mise à jour', 'La fiche n°{rid} a été mise à jour.', 'aucun lien', 'Sélectionnez d’abord une sortie.', 'Saisissez un lien HTTP(S) valide.'),
-        'es': ('La canción y el distribuidor son obligatorios.', 'ISRC no válido. Se esperan 12 caracteres, p. ej. DEABC2600001.', 'sin fecha', 'Coincidencia de ISRC – seleccionar registro', 'Este ISRC aparece varias veces. ¿Qué registro desea modificar?', 'Modificar registro', '¿Modificar este registro – Sí o No?', 'Sí: actualizar el registro existente.', 'No: no realizar cambios.', 'Registro actualizado', 'Se actualizó el registro #{rid}.', 'sin enlace', 'Seleccione primero un lanzamiento.', 'Introduzca un enlace HTTP(S) válido.'),
-        'it': ('Brano e distributore sono obbligatori.', 'ISRC non valido. Sono richiesti 12 caratteri, ad es. DEABC2600001.', 'senza data', 'Corrispondenza ISRC – seleziona record', 'Questo ISRC è presente più volte. Quale record modificare?', 'Modifica record', 'Modificare questo record – Sì o No?', 'Sì: aggiorna il record esistente.', 'No: non apportare modifiche.', 'Record aggiornato', 'Il record #{rid} è stato aggiornato.', 'nessun link', 'Seleziona prima una pubblicazione.', 'Inserisci un link HTTP(S) valido.'),
-    }
-    RELEASE_EDIT_DE = ('Song und Distributor sind erforderlich.', 'Ungültige ISRC. Erwartet werden 12 Zeichen, z. B. DEABC2600001.', 'ohne Datum', 'ISRC-Abgleich – Datensatz auswählen', 'Diese ISRC ist mehrfach vorhanden. Welcher Datensatz soll geändert werden?', 'Datensatz ändern', 'Datensatz ändern – Ja oder Nein?', 'Ja: Vorhandenen Datensatz aktualisieren.', 'Nein: Keine Änderung vornehmen.', 'Datensatz aktualisiert', 'Datensatz #{rid} wurde aktualisiert.', 'kein Link', 'Zuerst ein Release auswählen.', 'Bitte einen gültigen HTTP(S)-Link angeben.')
+    RELEASE_EDIT_TEXTS = mpw_core.RELEASE_EDIT_TEXTS  # shared with the browser GUI
+    RELEASE_EDIT_DE = mpw_core.RELEASE_EDIT_DE  # shared with the browser GUI
 
     def release_edit_text(self, index, **values):
         lang = self.effective_language()
@@ -14975,12 +14928,7 @@ th{{background-color:#eef1f4;color:#17212b;font-weight:bold;}}
         return item.data(Qt.ItemDataRole.UserRole) if item else None
 
     # Alpha 21 Preview 30: localized status labels with canonical persisted state values.
-    PLATFORM_STATUS_LABELS = {
-        'en': ('Planned', 'Submitted', 'Under review', 'Published', 'Failed'),
-        'fr': ('Planifié', 'Soumis', 'En cours de vérification', 'Publié', 'Échec'),
-        'es': ('Planificado', 'Enviado', 'En revisión', 'Publicado', 'Fallido'),
-        'it': ('Pianificato', 'Inviato', 'In verifica', 'Pubblicato', 'Non riuscito'),
-    }
+    PLATFORM_STATUS_LABELS = mpw_core.PLATFORM_STATUS_LABELS  # shared with the browser GUI
 
     def refresh_platform_status_choices(self):
         """Refresh visible status labels without changing selected canonical value."""
