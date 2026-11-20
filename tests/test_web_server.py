@@ -275,6 +275,82 @@ class WebServerTests(unittest.TestCase):
         self.assertEqual(self.json_call('POST', '/api/songs/1/prompt-versions', {**body, 'lyrics': ' '})[1]['error'], 'empty_field')
         self.assertEqual(self.json_call('POST', '/api/songs/99/prompt-versions', body)[0], 404)
 
+    # --- stage 5: An Suno senden (no Claude Code, no credits: the send is replaced) ---
+    def fake_suno(self, clips=None, change=None, error=None):
+        sent = []
+        originals = (self.ws.call_suno_via_claude, self.ws.resolve_cli_executable)
+
+        def fake(command, arguments):
+            sent.append(arguments)
+            if error:
+                raise error
+            given = dict(arguments, **(change or {}))
+            return {'mcp_status': 'connected', 'create_inputs': [given], 'create_result': None, 'errors': [],
+                    'wait_result': {'clips': clips if clips is not None else [
+                        {'id': 'c1', 'title': 'Rain Song', 'status': 'streaming', 'song_url': 'https://suno.com/song/c1'},
+                        {'id': 'c2', 'title': 'Rain Song', 'status': 'streaming', 'song_url': 'javascript:alert(1)'}]}}
+        self.ws.call_suno_via_claude = fake
+        self.ws.resolve_cli_executable = lambda provider, command: 'claude.exe'
+        self.addCleanup(setattr, self.ws, 'call_suno_via_claude', originals[0])
+        self.addCleanup(setattr, self.ws, 'resolve_cli_executable', originals[1])
+        return sent
+
+    def test_suno_info_lists_saved_prompts(self):
+        with closing(sqlite3.connect(self.db)) as con, con:
+            con.execute("INSERT INTO prompt_versions(song_id,provider,model,style,lyrics,brief) VALUES (1,'Claude','m','v-style','v-lyrics','')")
+        info = self.json_call('GET', '/api/songs/1/suno')[1]
+        self.assertEqual(info['title'], 'Rain Song')
+        self.assertEqual([(c['version_id'], c['style']) for c in info['choices']], [(None, 'alt'), (1, 'v-style')])
+        self.assertEqual(set(info['texts']), {'de', 'en', 'fr', 'es', 'it'})
+        self.assertEqual(self.json_call('GET', '/api/songs/99/suno')[0], 404)
+
+    def test_suno_send_uses_saved_prompt_needs_confirmation_and_saves_links(self):
+        sent = self.fake_suno()
+        body = {'version_id': None, 'title': ' Rain Song ', 'style': 'FROM BROWSER', 'lyrics': 'FROM BROWSER'}
+        self.assertEqual(self.json_call('POST', '/api/songs/1/suno/send', body)[1]['error'], 'confirm_required')
+        self.assertEqual(sent, [])  # nothing sent without the explicit yes
+        status, started = self.json_call('POST', '/api/songs/1/suno/send', {**body, 'confirm': True})
+        self.assertEqual(status, 200)
+        job = self.wait_job(started['job'])
+        # the saved prompt from the database is sent, never text supplied by the browser
+        self.assertEqual((sent[0]['title'], sent[0]['style'], sent[0]['lyrics']), ('Rain Song', 'alt', '[Verse]\nalt'))
+        self.assertTrue(sent[0]['idempotency_key'].startswith('mpw-'))
+        self.assertEqual((job['outcome'], job['values'], job['notes']), ('done', {'count': 2}, []))
+        self.assertEqual([c['url'] for c in job['clips']], ['https://suno.com/song/c1', ''])  # non-Suno link dropped
+        self.assertNotIn('_private', job)
+        # links: only from this server's finished job, for this song
+        self.assertEqual(self.json_call('POST', '/api/songs/2/suno/links', {'job': started['job']})[0], 400)
+        self.assertEqual(self.json_call('POST', '/api/songs/1/suno/links', {'job': '0123456789abcdef'})[0], 404)
+        self.assertEqual(self.json_call('POST', '/api/songs/1/suno/links', {'job': started['job'], 'lang': 'en'})[1]['added'], 1)
+        self.assertEqual(self.json_call('POST', '/api/songs/1/suno/links', {'job': started['job']})[1]['added'], 0)  # kept, not doubled
+        with closing(sqlite3.connect(self.db)) as con:
+            self.assertEqual(con.execute('SELECT platform,url,label FROM media_links').fetchall(),
+                             [('Suno', 'https://suno.com/song/c1', 'Suno – Rain Song (1/1)')])
+
+    def test_suno_send_reports_problems(self):
+        sent = self.fake_suno(change={'lyrics': 'geändert'})
+        job = self.wait_job(self.json_call('POST', '/api/songs/1/suno/send', {'title': 'X', 'confirm': True})[1]['job'])
+        self.assertEqual(job['notes'], ['mismatch'])
+        self.assertEqual(self.json_call('POST', '/api/songs/1/suno/send', {'version_id': 7, 'title': 'X', 'confirm': True})[1]['error'],
+                         'version_missing')
+        self.assertEqual(self.json_call('POST', '/api/songs/1/suno/send', {'title': 'x' * 257, 'confirm': True})[1]['error'],
+                         'suno_too_long')
+        with closing(sqlite3.connect(self.db)) as con, con:
+            con.execute("UPDATE songs SET lyrics='' WHERE id=1")
+        self.assertEqual(self.json_call('POST', '/api/songs/1/suno/send', {'title': 'X', 'confirm': True})[1]['error'], 'suno_empty')
+        self.assertEqual(len(sent), 1)
+        with closing(sqlite3.connect(self.db)) as con, con:
+            con.execute("UPDATE songs SET lyrics='[Verse]\nneu' WHERE id=1")
+        self.fake_suno(error=self.ws.ProviderError('cli_timeout', 'Claude', detail='600'))
+        job = self.wait_job(self.json_call('POST', '/api/songs/1/suno/send', {'title': 'X', 'confirm': True})[1]['job'])
+        self.assertEqual((job['outcome'], job['values']), ('timeout', {'minutes': 10}))
+        original = self.ws.resolve_cli_executable
+        self.ws.resolve_cli_executable = lambda provider, command: (_ for _ in ()).throw(
+            self.ws.ProviderError('cli_missing', 'Claude', detail='claude'))
+        self.addCleanup(setattr, self.ws, 'resolve_cli_executable', original)
+        status, result = self.json_call('POST', '/api/songs/1/suno/send', {'title': 'X', 'confirm': True})
+        self.assertEqual((status, result['kind']), (400, 'cli_missing'))
+
     # --- stage 3: create bands (folder logic like the desktop app) ---
     def test_create_band_makes_folder_prompt_folder_and_row(self):
         bands_dir = Path(self.tmp.name) / 'Bands'

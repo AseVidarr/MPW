@@ -45,6 +45,7 @@
         <div class="actions">
           <button id="btn-save" class="primary" data-i18n="save">Song speichern</button>
           <button id="btn-revert" data-i18n="revert">Änderungen verwerfen</button>
+          <button id="btn-suno" data-i18n="suno_button">An Suno senden (MCP) …</button>
           <span id="dirty" class="dirty" hidden data-i18n="unsaved">Ungespeicherte Änderungen</span>
         </div>
         <div id="message" class="message" hidden></div>
@@ -182,6 +183,29 @@
     </aside>
   </section>
 </main>
+
+<!-- An Suno senden (MCP): texts come from the shared core (same as the desktop dialog) -->
+<dialog id="suno-dialog" class="dialog">
+  <h2 id="suno-head"></h2>
+  <div class="fields two">
+    <label><span id="suno-l-prompt"></span><select id="suno-choice"></select></label>
+    <label><span id="suno-l-title"></span><input id="suno-song-title" maxlength="256" autocomplete="off"></label>
+  </div>
+  <div id="suno-unsaved" class="message warn" hidden></div>
+  <div class="texts suno-texts">
+    <div class="textbox"><span id="suno-l-style"></span><pre id="suno-style"></pre></div>
+    <div class="textbox"><span id="suno-l-lyrics"></span><pre id="suno-lyrics"></pre></div>
+  </div>
+  <div class="hint" id="suno-info"></div>
+  <div id="suno-status" class="message" hidden></div>
+  <ul id="suno-results" class="suno-results" hidden></ul>
+  <div class="actions">
+    <button id="btn-suno-send" class="primary"></button>
+    <button id="btn-suno-links" hidden></button>
+    <span class="spacer"></span>
+    <button id="btn-suno-close"></button>
+  </div>
+</dialog>
 
 <footer class="footer" data-i18n="footer">Lokal auf diesem PC · dieselben Daten wie die installierte MPW</footer>
 <script src="app.js"></script>

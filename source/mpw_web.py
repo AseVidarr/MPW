@@ -275,26 +275,32 @@ class AiJobs:
         self.lock = threading.Lock()
         self.jobs = {}
 
-    def start(self, provider, func, secret=''):
+    def start(self, provider, func, secret='', finish=None, private=None):
+        """``finish`` turns the worker's answer into the job result (default: split Style/Lyrics).
+        ``private`` is kept server-side only (never returned by get)."""
         with self.lock:
             if any(job['status'] == 'running' for job in self.jobs.values()):
                 raise ApiError(409, 'ai_busy')
             job_id = secrets.token_hex(8)
-            self.jobs[job_id] = {'status': 'running', 'provider': provider}
+            self.jobs[job_id] = {'status': 'running', 'provider': provider, '_private': private or {}}
             finished = [k for k, job in self.jobs.items() if job['status'] != 'running']
             for old in finished[:max(0, len(self.jobs) - AI_JOBS_KEPT)]:
                 del self.jobs[old]
-        threading.Thread(target=self._run, args=(job_id, provider, func, secret), daemon=True).start()
+        threading.Thread(target=self._run, args=(job_id, provider, func, secret, finish or self._split),
+                         daemon=True).start()
         return job_id
 
-    def _run(self, job_id, provider, func, secret):
+    @staticmethod
+    def _split(answer):
         try:
-            answer = func()
-            try:
-                style, lyrics = ws.extract_prompt(answer)
-                result = {'status': 'done', 'style': style, 'lyrics': lyrics}
-            except ValueError:
-                result = {'status': 'failed', 'error': {'kind': 'split', 'code': '', 'detail': ''}}
+            style, lyrics = ws.extract_prompt(answer)
+            return {'status': 'done', 'style': style, 'lyrics': lyrics}
+        except ValueError:
+            return {'status': 'failed', 'error': {'kind': 'split', 'code': '', 'detail': ''}}
+
+    def _run(self, job_id, provider, func, secret, finish):
+        try:
+            result = finish(func())
         except ws.ProviderError as exc:
             result = {'status': 'failed', 'error': {'kind': exc.kind, 'code': exc.code, 'detail': exc.detail}}
         except Exception as exc:  # never let a worker thread take the server down
@@ -307,7 +313,12 @@ class AiJobs:
     def get(self, job_id):
         with self.lock:
             job = self.jobs.get(job_id)
-            return dict(job) if job else None
+            return {k: v for k, v in job.items() if k != '_private'} if job else None
+
+    def private(self, job_id):
+        with self.lock:
+            job = self.jobs.get(job_id)
+            return (job['status'], job['_private'], job.get('clips') or []) if job else None
 
 
 def _ai_provider(body):
@@ -468,7 +479,92 @@ def api_save_prompt_version(server, query, body, song_id):
     return _write(server, save, int(song_id))
 
 
+# --------------------------------------------------------------------------- An Suno senden (stage 5)
+
+SUNO_URL_PATTERN = re.compile(r'^https://([a-z0-9-]+\.)*suno\.(com|ai)/', re.I)
+
+
+def api_suno_info(server, query, body, song_id):
+    """Saved prompts of the song (active prompt + versions) and the texts of the send dialog."""
+    sid = int(song_id)
+
+    def read(con, _args):
+        row = con.execute('SELECT title FROM songs WHERE id=?', (sid,)).fetchone()
+        if row is None:
+            raise ApiError(404, 'song_missing')
+        return {'title': row[0] or '', 'choices': ws.suno_prompt_choices(con, sid), 'limits': ws.SUNO_LIMITS,
+                'texts': ws.SUNO_SEND_TEXTS, 'error_texts': ws.AI_ERROR_TEXTS}
+    return _read(server, read, {})
+
+
+def api_suno_send(server, query, body, song_id):
+    """Send a *saved* prompt (read here from the database, never taken from the browser) to Suno.
+
+    Spends Suno credits, so it needs ``confirm: true``; only one AI/Suno request runs at a time.
+    """
+    if not (isinstance(body, dict) and body.get('confirm') is True):
+        raise ApiError(400, 'confirm_required')
+    sid = int(song_id)
+    version_id = _optional_int(body, 'version_id')
+    title = _body_text(body, 'title')
+    if not isinstance(title, str):
+        raise ApiError(400, 'invalid_field', {'field': 'title'})
+    choices = _read(server, lambda con, _args: ws.suno_prompt_choices(con, sid), {})
+    if not choices:
+        raise ApiError(404, 'song_missing')
+    choice = next((c for c in choices if c['version_id'] == version_id), None)
+    if choice is None:
+        raise ApiError(404, 'version_missing')
+    arguments = ws.suno_create_arguments(title, choice['style'], choice['lyrics'])
+    problem = ws.suno_send_problem(arguments)
+    if problem:
+        raise ApiError(400, 'suno_' + problem)
+    try:  # report a missing Claude Code at once
+        ws.resolve_cli_executable('Claude', 'claude')
+    except ws.ProviderError as exc:
+        raise _provider_error(exc) from exc
+
+    def finish(result):
+        outcome = ws.suno_send_outcome(result, arguments)
+        clips = [{**clip, 'url': clip['url'] if SUNO_URL_PATTERN.match(clip['url'] or '') else ''}
+                 for clip in outcome['clips']]  # only real Suno links become clickable/storable
+        return {'status': 'done', 'outcome': outcome['outcome'], 'values': outcome['values'],
+                'notes': outcome['notes'], 'clips': clips}
+
+    def run():
+        try:
+            return ws.call_suno_via_claude('claude', arguments)
+        except ws.ProviderError as exc:  # shown as the dialog's own error texts
+            return {'provider_error': (exc.kind, exc.code, exc.detail)}
+    job = server.ai_jobs.start('Claude', run, finish=finish,
+                               private={'song_id': sid, 'title': arguments['title'], 'kind': 'suno'})
+    return {'job': job, 'title': arguments['title'], 'style': len(arguments.get('style', '')),
+            'lyrics': len(arguments['lyrics'])}
+
+
+def api_suno_links(server, query, body, song_id):
+    """Store the links of a finished send with the song (only links Suno returned to this server)."""
+    job_id = _body_text(body, 'job')
+    found = server.ai_jobs.private(job_id) if isinstance(job_id, str) else None
+    if found is None:
+        raise ApiError(404, 'job_missing')
+    status, private, clips = found
+    if status != 'done' or private.get('kind') != 'suno' or private.get('song_id') != int(song_id):
+        raise ApiError(400, 'invalid_field', {'field': 'job'})
+    labels = ws.SUNO_SEND_TEXTS.get(ui_language_or(body), ws.SUNO_SEND_TEXTS['en'])['link_label']
+    added = _write(server, ws.save_suno_links, int(song_id), private['title'], clips, labels)
+    return {'added': added}
+
+
+def ui_language_or(body):
+    lang = body.get('lang') if isinstance(body, dict) else None
+    return lang if lang in LANGUAGES else 'de'
+
+
 ROUTES = [
+    ('GET', re.compile(r'^/api/songs/(\d+)/suno$'), api_suno_info),
+    ('POST', re.compile(r'^/api/songs/(\d+)/suno/send$'), api_suno_send),
+    ('POST', re.compile(r'^/api/songs/(\d+)/suno/links$'), api_suno_links),
     ('GET', re.compile(r'^/api/ai/options$'), api_ai_options),
     ('GET', re.compile(r'^/api/ai/targets$'), api_ai_targets),
     ('GET', re.compile(r'^/api/ai/jobs/([0-9a-f]{16})$'), api_ai_job),

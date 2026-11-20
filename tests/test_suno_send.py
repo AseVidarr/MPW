@@ -15,7 +15,8 @@ CORE = Path(__file__).resolve().parents[1] / 'source' / 'mpw_core.py'  # Qt-free
 TEXT = CORE.read_text(encoding='utf-8') + '\n' + SOURCE.read_text(encoding='utf-8')
 TREE = ast.parse(TEXT)
 NAMES = ('ProviderError', '_cli_detail', 'suno_create_arguments', 'suno_send_instruction', '_json_or_text',
-         'parse_suno_stream', 'suno_clips', 'suno_send_matches', 'call_suno_via_claude', 'cli_environment')
+         'parse_suno_stream', 'suno_clips', 'suno_send_matches', 'call_suno_via_claude', 'cli_environment',
+         'suno_send_outcome', 'suno_send_problem')
 CONSTANTS = ('SUNO_MCP_URL', 'SUNO_MCP_CONFIG', 'SUNO_CREATE_TOOL', 'SUNO_WAIT_TOOL', 'SUNO_SEND_TIMEOUT_SECONDS',
              'SUNO_LIMITS')
 
@@ -114,6 +115,21 @@ class StreamParsing(unittest.TestCase):
         self.assertEqual(parsed['final_error'], 'error_during_execution')
         self.assertEqual(FN['suno_clips'](parsed), [])
 
+    def test_outcome_shared_by_desktop_and_browser(self):
+        outcome = FN['suno_send_outcome']
+        done = outcome(FN['parse_suno_stream'](stream(ARGS, CREATE, WAIT)), ARGS)
+        self.assertEqual((done['outcome'], done['values'], done['notes'], len(done['clips'])), ('done', {'count': 2}, [], 2))
+        changed = outcome(FN['parse_suno_stream'](stream(dict(ARGS, lyrics='x'), CREATE, WAIT, extra_create=ARGS)), ARGS)
+        self.assertEqual(changed['notes'], ['mismatch', 'multiple'])
+        self.assertEqual(outcome({'mcp_status': 'needs-auth'}, ARGS)['outcome'], 'not_connected')
+        self.assertEqual(outcome({'create_inputs': []}, ARGS)['outcome'], 'not_sent')
+        self.assertEqual(outcome({'create_inputs': [], 'errors': ['HTTP 402']}, ARGS)['values'], {'detail': 'HTTP 402'})
+        self.assertEqual(outcome({'provider_error': ('cli_timeout', '', '600')}, ARGS)['values'], {'minutes': 10})
+        self.assertEqual(outcome({'provider_error': ('cli_missing', '', 'claude')}, ARGS)['outcome'], 'provider_error')
+        self.assertIsNone(FN['suno_send_problem'](ARGS))
+        self.assertEqual(FN['suno_send_problem'](dict(ARGS, lyrics='')), 'empty')
+        self.assertEqual(FN['suno_send_problem'](dict(ARGS, style='x' * 1001)), 'too_long')
+
     def test_clips_fallback_to_create_result(self):
         parsed = {'wait_result': None, 'create_result': {'clip_ids': ['a', 'b'], 'title': 'X', 'status': 'queued'}}
         self.assertEqual([c['id'] for c in FN['suno_clips'](parsed)], ['a', 'b'])
@@ -170,9 +186,10 @@ class CliCall(unittest.TestCase):
 
 class TextsAndWiring(unittest.TestCase):
     def test_all_languages_complete(self):
-        cls = next(n for n in TREE.body if isinstance(n, ast.ClassDef) and n.name == 'Workstation')
-        node = next(n for n in cls.body if isinstance(n, ast.Assign) and getattr(n.targets[0], 'id', '') == 'SUNO_SEND_TEXTS')
+        # shared texts live in the core (desktop dialog and browser GUI)
+        node = next(n for n in TREE.body if isinstance(n, ast.Assign) and getattr(n.targets[0], 'id', '') == 'SUNO_SEND_TEXTS')
         texts = ast.literal_eval(node.value)
+        self.assertIn('SUNO_SEND_TEXTS = mpw_core.SUNO_SEND_TEXTS', TEXT)
         self.assertEqual(set(texts), {'de', 'en', 'fr', 'es', 'it'})
         fmt = string.Formatter()
         for lang, items in texts.items():

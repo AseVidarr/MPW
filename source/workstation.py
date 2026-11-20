@@ -9392,163 +9392,7 @@ th{{background-color:#eef1f4;color:#17212b;font-weight:bold;}}
     # ------------------------------------------------------------------
     # Songs & Suno › An Suno senden (MCP)
     # ------------------------------------------------------------------
-    SUNO_SEND_TEXTS = {
-        'de': {
-            'button': 'An Suno senden (MCP) …',
-            'tooltip': 'Einen gespeicherten Prompt dieses Songs über Claude Code und Sunos MCP-Server an Suno senden.',
-            'title': 'An Suno senden – {song}',
-            'prompt_label': 'Gespeicherter Prompt:',
-            'active': 'Aktiver Song-Prompt (gespeichert)',
-            'version': 'Version #{id} · {provider} · {created}',
-            'title_label': 'Songtitel bei Suno:',
-            'style_label': 'Style ({count}/1.000)',
-            'lyrics_label': 'Lyrics ({count}/5.000)',
-            'info': 'Claude Code überträgt den Prompt unverändert an Sunos MCP-Server (audio-create, Custom-Modus). Suno erstellt dabei 2 Songs und verbraucht Credits deines Suno-Kontos. Voraussetzung: Claude Code angemeldet und Suno verbunden (Konfiguration › KI-Verbindungen).',
-            'unsaved': '⚠ Im Editor gibt es ungespeicherte Änderungen. Gesendet wird der gespeicherte Stand.',
-            'btn_send': 'An Suno senden …',
-            'btn_save_links': 'Links beim Song speichern',
-            'btn_close': 'Schließen',
-            'confirm': 'Jetzt an Suno senden?\n\nTitel: {title}\nStyle: {style} Zeichen · Lyrics: {lyrics} Zeichen\n\nSuno erstellt 2 Songs und verbraucht dafür Credits deines Suno-Kontos.',
-            'no_song': 'Bitte zuerst einen Song auswählen.',
-            'empty': 'Dieser Prompt hat keine Lyrics. Für Sunos Custom-Modus sind Lyrics nötig.',
-            'too_long': 'Der Prompt überschreitet Sunos Grenzen (Titel 256, Style 1.000, Lyrics 5.000 Zeichen).',
-            'sending': '… wird an Suno gesendet. Das kann einige Minuten dauern.',
-            'done': '✔ Suno hat {count} Song(s) erstellt:',
-            'no_clips': 'Suno hat den Auftrag angenommen, aber keine Song-Links zurückgegeben. Bitte in deiner Suno-Bibliothek nachsehen.',
-            'mismatch': '⚠ Claude hat den Prompt nicht exakt so übertragen wie in MPW gespeichert. Bitte den Song in Suno prüfen.',
-            'multiple': '⚠ Claude hat audio-create mehrfach aufgerufen. Mit demselben Auftragsschlüssel berechnet Suno nicht doppelt; bitte trotzdem die Bibliothek prüfen.',
-            'not_connected': 'Suno ist in Claude Code nicht verbunden (Status: {status}). Unter Konfiguration › KI-Verbindungen „Suno eintragen …“ bzw. „Bei Suno anmelden …“ nutzen.',
-            'not_sent': 'Claude hat audio-create nicht aufgerufen. Es wurde nichts erstellt.',
-            'error': 'Senden an Suno fehlgeschlagen:\n{detail}',
-            'timeout': 'Keine Rückmeldung innerhalb von {minutes} Minuten. Suno hat die Songs eventuell trotzdem erstellt – bitte in deiner Suno-Bibliothek nachsehen.',
-            'links_saved': '{count} Link(s) beim Song gespeichert (Medien & Player).',
-            'link_label': 'Suno – {title} ({index}/{count})',
-        },
-        'en': {
-            'button': 'Send to Suno (MCP) …',
-            'tooltip': 'Send a saved prompt of this song to Suno via Claude Code and Suno’s MCP server.',
-            'title': 'Send to Suno – {song}',
-            'prompt_label': 'Saved prompt:',
-            'active': 'Active song prompt (saved)',
-            'version': 'Version #{id} · {provider} · {created}',
-            'title_label': 'Song title at Suno:',
-            'style_label': 'Style ({count}/1,000)',
-            'lyrics_label': 'Lyrics ({count}/5,000)',
-            'info': 'Claude Code sends the prompt unchanged to Suno’s MCP server (audio-create, custom mode). Suno creates 2 songs and uses credits from your Suno account. Requires Claude Code signed in and Suno connected (Configuration › AI connections).',
-            'unsaved': '⚠ The editor has unsaved changes. The saved version will be sent.',
-            'btn_send': 'Send to Suno …',
-            'btn_save_links': 'Save links with the song',
-            'btn_close': 'Close',
-            'confirm': 'Send to Suno now?\n\nTitle: {title}\nStyle: {style} characters · Lyrics: {lyrics} characters\n\nSuno creates 2 songs and uses credits from your Suno account.',
-            'no_song': 'Please select a song first.',
-            'empty': 'This prompt has no lyrics. Suno’s custom mode needs lyrics.',
-            'too_long': 'The prompt exceeds Suno’s limits (title 256, style 1,000, lyrics 5,000 characters).',
-            'sending': '… sending to Suno. This can take a few minutes.',
-            'done': '✔ Suno created {count} song(s):',
-            'no_clips': 'Suno accepted the request but returned no song links. Please check your Suno library.',
-            'mismatch': '⚠ Claude did not send the prompt exactly as saved in MPW. Please check the song in Suno.',
-            'multiple': '⚠ Claude called audio-create more than once. With the same request key Suno does not charge twice; please still check your library.',
-            'not_connected': 'Suno is not connected in Claude Code (status: {status}). Use “Add Suno …” or “Sign in to Suno …” under Configuration › AI connections.',
-            'not_sent': 'Claude did not call audio-create. Nothing was created.',
-            'error': 'Sending to Suno failed:\n{detail}',
-            'timeout': 'No answer within {minutes} minutes. Suno may still have created the songs – please check your Suno library.',
-            'links_saved': '{count} link(s) saved with the song (Media & Player).',
-            'link_label': 'Suno – {title} ({index}/{count})',
-        },
-        'fr': {
-            'button': 'Envoyer à Suno (MCP) …',
-            'tooltip': 'Envoyer un prompt enregistré de ce morceau à Suno via Claude Code et le serveur MCP de Suno.',
-            'title': 'Envoyer à Suno – {song}',
-            'prompt_label': 'Prompt enregistré :',
-            'active': 'Prompt actif du morceau (enregistré)',
-            'version': 'Version n° {id} · {provider} · {created}',
-            'title_label': 'Titre chez Suno :',
-            'style_label': 'Style ({count}/1 000)',
-            'lyrics_label': 'Paroles ({count}/5 000)',
-            'info': 'Claude Code transmet le prompt sans modification au serveur MCP de Suno (audio-create, mode personnalisé). Suno crée 2 morceaux et consomme des crédits de votre compte Suno. Prérequis : Claude Code connecté et Suno relié (Configuration › Connexions IA).',
-            'unsaved': '⚠ L’éditeur contient des modifications non enregistrées. C’est la version enregistrée qui est envoyée.',
-            'btn_send': 'Envoyer à Suno …',
-            'btn_save_links': 'Enregistrer les liens avec le morceau',
-            'btn_close': 'Fermer',
-            'confirm': 'Envoyer à Suno maintenant ?\n\nTitre : {title}\nStyle : {style} caractères · Paroles : {lyrics} caractères\n\nSuno crée 2 morceaux et consomme des crédits de votre compte Suno.',
-            'no_song': 'Veuillez d’abord sélectionner un morceau.',
-            'empty': 'Ce prompt n’a pas de paroles. Le mode personnalisé de Suno en exige.',
-            'too_long': 'Le prompt dépasse les limites de Suno (titre 256, style 1 000, paroles 5 000 caractères).',
-            'sending': '… envoi à Suno. Cela peut prendre quelques minutes.',
-            'done': '✔ Suno a créé {count} morceau(x) :',
-            'no_clips': 'Suno a accepté la demande mais n’a renvoyé aucun lien. Veuillez vérifier votre bibliothèque Suno.',
-            'mismatch': '⚠ Claude n’a pas transmis le prompt exactement comme enregistré dans MPW. Vérifiez le morceau dans Suno.',
-            'multiple': '⚠ Claude a appelé audio-create plusieurs fois. Avec la même clé de requête, Suno ne facture pas deux fois ; vérifiez tout de même la bibliothèque.',
-            'not_connected': 'Suno n’est pas relié dans Claude Code (état : {status}). Utilisez « Ajouter Suno … » ou « Se connecter à Suno … » sous Configuration › Connexions IA.',
-            'not_sent': 'Claude n’a pas appelé audio-create. Rien n’a été créé.',
-            'error': 'L’envoi à Suno a échoué :\n{detail}',
-            'timeout': 'Aucune réponse en {minutes} minutes. Suno a peut-être quand même créé les morceaux – vérifiez votre bibliothèque Suno.',
-            'links_saved': '{count} lien(s) enregistré(s) avec le morceau (Médias & lecteur).',
-            'link_label': 'Suno – {title} ({index}/{count})',
-        },
-        'es': {
-            'button': 'Enviar a Suno (MCP) …',
-            'tooltip': 'Enviar un prompt guardado de esta canción a Suno mediante Claude Code y el servidor MCP de Suno.',
-            'title': 'Enviar a Suno – {song}',
-            'prompt_label': 'Prompt guardado:',
-            'active': 'Prompt activo de la canción (guardado)',
-            'version': 'Versión n.º {id} · {provider} · {created}',
-            'title_label': 'Título en Suno:',
-            'style_label': 'Style ({count}/1.000)',
-            'lyrics_label': 'Letra ({count}/5.000)',
-            'info': 'Claude Code envía el prompt sin cambios al servidor MCP de Suno (audio-create, modo personalizado). Suno crea 2 canciones y consume créditos de su cuenta de Suno. Requisito: Claude Code con sesión iniciada y Suno conectado (Configuración › Conexiones de IA).',
-            'unsaved': '⚠ El editor tiene cambios sin guardar. Se envía la versión guardada.',
-            'btn_send': 'Enviar a Suno …',
-            'btn_save_links': 'Guardar enlaces en la canción',
-            'btn_close': 'Cerrar',
-            'confirm': '¿Enviar a Suno ahora?\n\nTítulo: {title}\nStyle: {style} caracteres · Letra: {lyrics} caracteres\n\nSuno crea 2 canciones y consume créditos de su cuenta de Suno.',
-            'no_song': 'Primero seleccione una canción.',
-            'empty': 'Este prompt no tiene letra. El modo personalizado de Suno la necesita.',
-            'too_long': 'El prompt supera los límites de Suno (título 256, style 1.000, letra 5.000 caracteres).',
-            'sending': '… enviando a Suno. Puede tardar unos minutos.',
-            'done': '✔ Suno creó {count} canción(es):',
-            'no_clips': 'Suno aceptó la solicitud pero no devolvió enlaces. Revise su biblioteca de Suno.',
-            'mismatch': '⚠ Claude no envió el prompt exactamente como está guardado en MPW. Revise la canción en Suno.',
-            'multiple': '⚠ Claude llamó a audio-create varias veces. Con la misma clave de solicitud Suno no cobra dos veces; aun así revise la biblioteca.',
-            'not_connected': 'Suno no está conectado en Claude Code (estado: {status}). Use «Añadir Suno …» o «Iniciar sesión en Suno …» en Configuración › Conexiones de IA.',
-            'not_sent': 'Claude no llamó a audio-create. No se creó nada.',
-            'error': 'El envío a Suno falló:\n{detail}',
-            'timeout': 'Sin respuesta en {minutes} minutos. Puede que Suno haya creado las canciones igualmente: revise su biblioteca de Suno.',
-            'links_saved': '{count} enlace(s) guardado(s) en la canción (Medios y reproductor).',
-            'link_label': 'Suno – {title} ({index}/{count})',
-        },
-        'it': {
-            'button': 'Invia a Suno (MCP) …',
-            'tooltip': 'Invia un prompt salvato di questo brano a Suno tramite Claude Code e il server MCP di Suno.',
-            'title': 'Invia a Suno – {song}',
-            'prompt_label': 'Prompt salvato:',
-            'active': 'Prompt attivo del brano (salvato)',
-            'version': 'Versione n. {id} · {provider} · {created}',
-            'title_label': 'Titolo su Suno:',
-            'style_label': 'Style ({count}/1.000)',
-            'lyrics_label': 'Testo ({count}/5.000)',
-            'info': 'Claude Code invia il prompt senza modifiche al server MCP di Suno (audio-create, modalità personalizzata). Suno crea 2 brani e consuma crediti del tuo account Suno. Requisito: Claude Code con accesso eseguito e Suno connesso (Configurazione › Connessioni IA).',
-            'unsaved': '⚠ L’editor contiene modifiche non salvate. Viene inviata la versione salvata.',
-            'btn_send': 'Invia a Suno …',
-            'btn_save_links': 'Salva i link nel brano',
-            'btn_close': 'Chiudi',
-            'confirm': 'Inviare ora a Suno?\n\nTitolo: {title}\nStyle: {style} caratteri · Testo: {lyrics} caratteri\n\nSuno crea 2 brani e consuma crediti del tuo account Suno.',
-            'no_song': 'Seleziona prima un brano.',
-            'empty': 'Questo prompt non ha testo. La modalità personalizzata di Suno lo richiede.',
-            'too_long': 'Il prompt supera i limiti di Suno (titolo 256, style 1.000, testo 5.000 caratteri).',
-            'sending': '… invio a Suno in corso. Può richiedere alcuni minuti.',
-            'done': '✔ Suno ha creato {count} brano/i:',
-            'no_clips': 'Suno ha accettato la richiesta ma non ha restituito link. Controlla la tua libreria Suno.',
-            'mismatch': '⚠ Claude non ha inviato il prompt esattamente come salvato in MPW. Controlla il brano in Suno.',
-            'multiple': '⚠ Claude ha chiamato audio-create più volte. Con la stessa chiave di richiesta Suno non addebita due volte; controlla comunque la libreria.',
-            'not_connected': 'Suno non è connesso in Claude Code (stato: {status}). Usa «Aggiungi Suno …» o «Accedi a Suno …» in Configurazione › Connessioni IA.',
-            'not_sent': 'Claude non ha chiamato audio-create. Non è stato creato nulla.',
-            'error': 'Invio a Suno non riuscito:\n{detail}',
-            'timeout': 'Nessuna risposta entro {minutes} minuti. Suno potrebbe aver comunque creato i brani: controlla la tua libreria Suno.',
-            'links_saved': '{count} link salvato/i nel brano (Media & Player).',
-            'link_label': 'Suno – {title} ({index}/{count})',
-        },
-    }
+    SUNO_SEND_TEXTS = mpw_core.SUNO_SEND_TEXTS  # shared with the browser GUI
 
     DETAILED_TAB_GUIDES['Songs & Suno'].append(
         ('Suno', 'An Suno senden (MCP) …',
@@ -9593,13 +9437,9 @@ th{{background-color:#eef1f4;color:#17212b;font-weight:bold;}}
 
     def suno_prompt_choices(self, sid):
         """[(label, (style, lyrics))]: the saved active prompt first, then saved versions (newest first)."""
-        row = self.con.execute('SELECT style,lyrics FROM songs WHERE id=?', (sid,)).fetchone()
-        choices = [(self.suno_send_text('active'), (row[0] or '', row[1] or ''))] if row else []
-        for vid, provider, created, style, lyrics in self.con.execute(
-                'SELECT id,provider,created_at,style,lyrics FROM prompt_versions WHERE song_id=? ORDER BY id DESC', (sid,)):
-            choices.append((self.suno_send_text('version', id=vid, provider=provider, created=created),
-                            (style or '', lyrics or '')))
-        return choices
+        return [(self.suno_send_text('active') if c['version_id'] is None else
+                 self.suno_send_text('version', id=c['version_id'], provider=c['provider'], created=c['created']),
+                 (c['style'], c['lyrics'])) for c in mpw_core.suno_prompt_choices(self.con, sid)]
 
     def open_suno_send_dialog(self):
         sid = self.song_select.currentData()
@@ -9656,10 +9496,9 @@ th{{background-color:#eef1f4;color:#17212b;font-weight:bold;}}
         def do_send():
             style, lyrics = choice.currentData() or ('', '')
             arguments = suno_create_arguments(title_edit.text(), style, lyrics)
-            if not arguments.get('lyrics'):
-                return self.error(t('empty'))
-            if any(len(arguments.get(k, '')) > limit for k, limit in SUNO_LIMITS.items()):
-                return self.error(t('too_long'))
+            problem = mpw_core.suno_send_problem(arguments)
+            if problem:
+                return self.error(t(problem))
             if QMessageBox.question(dialog, dialog.windowTitle(),
                                     t('confirm', title=arguments['title'] or '–', style=len(arguments.get('style', '')),
                                       lyrics=len(arguments['lyrics'])),
@@ -9711,38 +9550,18 @@ th{{background-color:#eef1f4;color:#17212b;font-weight:bold;}}
     def suno_send_report(self, result, arguments):
         """(text for the status line, clips) for a finished SunoSendJob."""
         t = self.suno_send_text
-        if result.get('provider_error'):
-            kind, code, detail = result['provider_error']
-            if kind == 'cli_timeout':
-                return t('timeout', minutes=SUNO_SEND_TIMEOUT_SECONDS // 60), []
-            return t('error', detail=self.ai_api_error_text(kind, 'Claude', code, detail)[0]), []
-        if result.get('mcp_status') not in (None, 'connected'):
-            return t('not_connected', status=result['mcp_status']), []
-        sent = result.get('create_inputs') or []
-        if not sent:
-            detail = '\n'.join(result.get('errors') or []) or result.get('final_error') or result.get('stderr') or ''
-            return (t('error', detail=detail) if detail else t('not_sent')), []
-        notes = []
-        if not all(suno_send_matches(item, arguments) for item in sent):
-            notes.append(t('mismatch'))
-        if len(sent) > 1:
-            notes.append(t('multiple'))
-        clips = suno_clips(result)
-        if result.get('errors') and not clips:
-            return t('error', detail='\n'.join(result['errors'])), []
-        head = t('done', count=len(clips)) if clips else t('no_clips')
-        return '\n'.join([head, *notes]), clips
+        outcome = mpw_core.suno_send_outcome(result, arguments)  # same rules as the browser GUI
+        values = outcome['values']
+        if outcome['outcome'] == 'provider_error':
+            return t('error', detail=self.ai_api_error_text(values['kind'], 'Claude', values['code'], values['detail'])[0]), []
+        if outcome['outcome'] in ('timeout', 'not_connected', 'error', 'not_sent'):
+            return t(outcome['outcome'], **values) if outcome['outcome'] != 'not_sent' else t('not_sent'), []
+        head = t('done', count=values['count']) if outcome['outcome'] == 'done' else t('no_clips')
+        return '\n'.join([head, *(t(note) for note in outcome['notes'])]), outcome['clips']
 
     def save_suno_links(self, sid, title, clips):
         """Store the Suno song links with the song (Medien & Player); existing links are kept."""
-        with_url = [clip for clip in clips if clip.get('url')]
-        added = 0
-        with self.con:
-            for index, clip in enumerate(with_url, 1):
-                label = self.suno_send_text('link_label', title=clip.get('title') or title, index=index, count=len(with_url))
-                cursor = self.con.execute('INSERT OR IGNORE INTO media_links(song_id,platform,url,label) VALUES(?,?,?,?)',
-                                          (sid, 'Suno', clip['url'], label))
-                added += cursor.rowcount
+        added = mpw_core.save_suno_links(self.con, sid, title, clips, self.suno_send_text('link_label'))
         if hasattr(self, 'refresh_media'):
             self.refresh_media()
         return added

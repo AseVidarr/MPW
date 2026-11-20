@@ -88,6 +88,17 @@ button.danger:hover:not(:disabled) { background: #7f3a3a; }
 #ai-paste-box { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 6px 10px; }
 #ai-paste-box summary { cursor: pointer; color: var(--muted); }
 #ai-paste-box textarea { width: 100%; margin: 8px 0; resize: vertical; font-family: Consolas, "Cascadia Mono", monospace; font-size: 12px; }
+.dialog { width: min(900px, 94vw); max-height: 92vh; background: var(--panel); color: var(--text);
+  border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px; }
+.dialog[open] { display: flex; flex-direction: column; gap: 10px; }
+.dialog::backdrop { background: rgba(0, 0, 0, .55); }
+.fields.two { grid-template-columns: 1fr 1fr; }
+.suno-texts { min-height: 220px; max-height: 42vh; }
+.suno-texts pre { flex: 1; margin: 0; overflow: auto; white-space: pre-wrap; background: var(--panel2); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 8px; font-family: Consolas, "Cascadia Mono", monospace; font-size: 12px; color: var(--text); }
+.suno-results { margin: 0; padding-left: 20px; }
+.suno-results a { color: #8cc4ff; }
+.spacer { flex: 1; }
 .footer { padding: 4px 16px; color: var(--muted); font-size: 11px; background: var(--panel); border-top: 1px solid var(--border); }
 
 @media (max-width: 1100px) {

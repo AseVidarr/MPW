@@ -63,6 +63,7 @@ const I18N = {
     band_created: "Band „{name}“ angelegt. Verzeichnis: {folder}",
     band_imported: "Band „{name}“ übernommen. Vorhandenes Verzeichnis: {folder} (nichts verändert).",
     band_prompt_warning: "Der Prompt-Ordner konnte nicht angelegt werden: {detail}",
+    suno_button: "An Suno senden (MCP) …",
     tab_ai: "AI Prompt Launcher",
     band: "Band",
     ai_target: "Ziel-Song / Projekt",
@@ -180,6 +181,7 @@ const I18N = {
     band_created: "Band “{name}” created. Directory: {folder}",
     band_imported: "Band “{name}” imported. Existing directory: {folder} (nothing changed).",
     band_prompt_warning: "The prompt folder could not be created: {detail}",
+    suno_button: "Send to Suno (MCP) …",
     tab_ai: "AI Prompt Launcher",
     band: "Band",
     ai_target: "Target song / project",
@@ -297,6 +299,7 @@ const I18N = {
     band_created: "Groupe « {name} » créé. Dossier : {folder}",
     band_imported: "Groupe « {name} » importé. Dossier existant : {folder} (rien modifié).",
     band_prompt_warning: "Le dossier des prompts n’a pas pu être créé : {detail}",
+    suno_button: "Envoyer à Suno (MCP) …",
     tab_ai: "AI Prompt Launcher",
     band: "Groupe",
     ai_target: "Chanson / projet cible",
@@ -414,6 +417,7 @@ const I18N = {
     band_created: "Banda «{name}» creada. Carpeta: {folder}",
     band_imported: "Banda «{name}» importada. Carpeta existente: {folder} (sin cambios).",
     band_prompt_warning: "No se pudo crear la carpeta de prompts: {detail}",
+    suno_button: "Enviar a Suno (MCP) …",
     tab_ai: "AI Prompt Launcher",
     band: "Banda",
     ai_target: "Canción / proyecto de destino",
@@ -531,6 +535,7 @@ const I18N = {
     band_created: "Gruppo «{name}» creato. Cartella: {folder}",
     band_imported: "Gruppo «{name}» importato. Cartella esistente: {folder} (nessuna modifica).",
     band_prompt_warning: "Impossibile creare la cartella dei prompt: {detail}",
+    suno_button: "Invia a Suno (MCP) …",
     tab_ai: "AI Prompt Launcher",
     band: "Gruppo",
     ai_target: "Brano / progetto di destinazione",
@@ -1095,6 +1100,184 @@ $('btn-band-new').addEventListener('click', () => bandAction(showNewBandForm).ca
 $('btn-band-new-cancel').addEventListener('click', hideNewBandForm);
 $('btn-band-create').addEventListener('click', () => bandAction(createBand).catch((error) => newBandMessage(error.message, 'error')));
 $('n-name').addEventListener('keydown', (event) => { if (event.key === 'Enter') $('btn-band-create').click(); });
+
+/* ------------------------------------------------------------------ An Suno senden (stage 5) */
+
+// Only saved prompts are sent: the server reads the chosen prompt from the database itself.
+const sunoState = { info: null, songId: null, job: null, running: false, linksSaved: false };
+
+function sunoText(key, values) {
+  const all = sunoState.info.texts;
+  let text = (all[state.lang] || all.en)[key] || key;
+  for (const [k, v] of Object.entries(values || {})) text = text.split('{' + k + '}').join(String(v));
+  return text;
+}
+
+function sunoStatus(text, kind) {
+  const box = $('suno-status');
+  box.textContent = text;
+  box.className = 'message' + (kind ? ' ' + kind : '');
+  box.hidden = !text;
+}
+
+function sunoChoice() {
+  const index = Number($('suno-choice').value);
+  return sunoState.info.choices[index] || null;
+}
+
+function showSunoChoice() {
+  const choice = sunoChoice();
+  const style = choice ? choice.style : '';
+  const lyrics = choice ? choice.lyrics : '';
+  $('suno-style').textContent = style;
+  $('suno-lyrics').textContent = lyrics;
+  $('suno-l-style').textContent = sunoText('style_label', { count: style.trim().length });
+  $('suno-l-lyrics').textContent = sunoText('lyrics_label', { count: lyrics.trim().length });
+}
+
+function updateSunoButtons() {
+  $('btn-suno-send').disabled = sunoState.running;
+  $('suno-choice').disabled = sunoState.running;
+  $('suno-song-title').disabled = sunoState.running;
+}
+
+async function openSunoDialog() {
+  if (!state.song) return;
+  const songId = state.song.id;
+  const sameRunning = sunoState.running && sunoState.songId === songId;
+  if (!sameRunning) {
+    const info = await api('/api/songs/' + songId + '/suno');
+    Object.assign(sunoState, { info, songId, job: null, linksSaved: false });
+    $('suno-head').textContent = sunoText('title', { song: info.title });
+    $('suno-l-prompt').textContent = sunoText('prompt_label');
+    $('suno-l-title').textContent = sunoText('title_label');
+    $('suno-info').textContent = sunoText('info');
+    $('btn-suno-send').textContent = sunoText('btn_send');
+    $('btn-suno-links').textContent = sunoText('btn_save_links');
+    $('btn-suno-close').textContent = sunoText('btn_close');
+    $('suno-choice').replaceChildren(...info.choices.map((c, i) => {
+      const label = c.version_id === null ? sunoText('active')
+        : sunoText('version', { id: c.version_id, provider: c.provider, created: c.created });
+      const option = el('option', label); option.value = i; return option;
+    }));
+    $('suno-song-title').value = info.title;
+    sunoStatus('');
+    $('suno-results').hidden = true;
+    $('btn-suno-links').hidden = true;
+    showSunoChoice();
+  }
+  // the editor may differ from what is saved: only the saved state is sent
+  $('suno-unsaved').textContent = sunoText('unsaved');
+  $('suno-unsaved').hidden = !isDirty();
+  updateSunoButtons();
+  $('suno-dialog').showModal();
+}
+
+function sunoProviderError(values) {
+  const all = sunoState.info.error_texts;
+  const texts = all[state.lang] || all.en;
+  let text = (texts[values.kind] || texts.unexpected).split('{provider}').join('Claude')
+    .split('{code}').join(values.code || '?').split('{model}').join('');
+  if (values.detail && !['timeout', 'truncated', 'empty', 'cli_timeout'].includes(values.kind)) text += '\n\n' + texts.detail + ' ' + values.detail;
+  return text;
+}
+
+function showSunoResult(job) {
+  const values = job.values || {};
+  let text;
+  if (job.outcome === 'provider_error') text = sunoText('error', { detail: sunoProviderError(values) });
+  else if (job.outcome === 'done') text = sunoText('done', { count: values.count });
+  else text = sunoText(job.outcome, values);
+  text = [text, ...(job.notes || []).map((note) => sunoText(note))].join('\n');
+  const ok = job.outcome === 'done' || job.outcome === 'no_clips';
+  sunoStatus(text, ok ? ((job.notes || []).length || job.outcome === 'no_clips' ? 'warn' : '') : 'error');
+  const clips = job.clips || [];
+  $('suno-results').replaceChildren(...clips.map((clip) => {
+    const item = el('li', (clip.title || $('suno-song-title').value || clip.id) + ' (' + clip.status + ')');
+    if (clip.url && /^https:\/\//.test(clip.url)) {  // server only passes real Suno https links
+      const link = el('a', clip.url);
+      link.href = clip.url; link.target = '_blank'; link.rel = 'noopener noreferrer';
+      item.append(' – ', link);
+    }
+    return item;
+  }));
+  $('suno-results').hidden = !clips.length;
+  $('btn-suno-links').hidden = !clips.some((clip) => clip.url);
+  $('btn-suno-links').disabled = sunoState.linksSaved;
+}
+
+async function sendToSuno() {
+  const choice = sunoChoice();
+  if (!choice) return;
+  const title = $('suno-song-title').value.trim();
+  const lyrics = choice.lyrics.trim();
+  const style = choice.style.trim();
+  if (!lyrics) { sunoStatus(sunoText('empty'), 'error'); return; }
+  const limits = sunoState.info.limits;
+  if (title.length > limits.title || style.length > limits.style || lyrics.length > limits.lyrics) {
+    sunoStatus(sunoText('too_long'), 'error'); return;
+  }
+  // Suno creates 2 songs and spends credits: only after an explicit yes
+  if (!confirm(sunoText('confirm', { title: title || '–', style: style.length, lyrics: lyrics.length }))) return;
+  sunoState.running = true;
+  sunoState.linksSaved = false;
+  updateSunoButtons();
+  $('suno-results').hidden = true;
+  $('btn-suno-links').hidden = true;
+  const songId = sunoState.songId;
+  try {
+    const started = await api('/api/songs/' + songId + '/suno/send', { method: 'POST',
+      body: { version_id: choice.version_id, title, confirm: true } });
+    sunoState.job = started.job;
+    const began = Date.now();
+    let failures = 0;
+    for (;;) {
+      sunoStatus(sunoText('sending') + ' (' + Math.round((Date.now() - began) / 1000) + ' s)', 'warn');
+      await sleep(2000);
+      let job;
+      try {
+        job = await api('/api/ai/jobs/' + started.job);
+        failures = 0;
+      } catch (error) {
+        if (error.kind !== 'connection' || ++failures > 5) throw error;
+        continue;
+      }
+      if (job.status === 'running') continue;
+      if (job.status === 'failed') sunoStatus(sunoText('error', { detail: sunoProviderError(job.error) }), 'error');
+      else showSunoResult(job);
+      return;
+    }
+  } catch (error) {
+    const data = error.data || {};
+    if (data.error === 'provider') sunoStatus(sunoText('error', { detail: sunoProviderError(data) }), 'error');
+    else if (data.error === 'ai_busy') sunoStatus(t('ai_err_busy'), 'error');
+    else if (data.error === 'suno_empty') sunoStatus(sunoText('empty'), 'error');
+    else if (data.error === 'suno_too_long') sunoStatus(sunoText('too_long'), 'error');
+    else sunoStatus(error.kind === 'connection' ? error.message : t('error', { detail: error.message }), 'error');
+  } finally {
+    sunoState.running = false;
+    updateSunoButtons();
+  }
+}
+
+async function saveSunoLinks() {
+  if (!sunoState.job || sunoState.linksSaved) return;
+  try {
+    const result = await api('/api/songs/' + sunoState.songId + '/suno/links', { method: 'POST',
+      body: { job: sunoState.job, lang: state.lang } });
+    sunoState.linksSaved = true;
+    $('btn-suno-links').disabled = true;
+    sunoStatus($('suno-status').textContent + '\n' + sunoText('links_saved', { count: result.added }), $('suno-status').className.replace('message', '').trim());
+  } catch (error) {
+    sunoStatus(t('error', { detail: error.message }), 'error');
+  }
+}
+
+$('btn-suno').addEventListener('click', () => openSunoDialog().catch((error) => showMessage(t('error', { detail: error.message }), 'error')));
+$('suno-choice').addEventListener('change', showSunoChoice);
+$('btn-suno-send').addEventListener('click', () => { if (!sunoState.running) sendToSuno(); });
+$('btn-suno-links').addEventListener('click', saveSunoLinks);
+$('btn-suno-close').addEventListener('click', () => $('suno-dialog').close());
 
 /* ------------------------------------------------------------------ AI Prompt Launcher (stage 4) */
 
