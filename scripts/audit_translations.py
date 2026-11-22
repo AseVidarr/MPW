@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Read-only static translation coverage audit for MPW."""
 import ast, collections, pathlib
-p=pathlib.Path(__file__).parent/'source'/'workstation.py'
+p=pathlib.Path(__file__).resolve().parent.parent/'source'/'workstation.py'
 tree=ast.parse(p.read_text(encoding='utf-8'))
 assignments={}
 for node in ast.walk(tree):

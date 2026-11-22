@@ -20,6 +20,7 @@ Die Browser-Oberfläche läuft **nur auf deinem Computer** (127.0.0.1) und nutzt
 - `source/mpw_web.py`, `source/web/` – Browser-Oberfläche
 - `source/mpw_mcp_server.py` – MCP-Server für KI-Programme
 - `tests/` – automatische Tests · `scripts/` – Build- und Startskripte · `installer/` – PyInstaller/Inno Setup
+- `docs/historie/` – Änderungsnotizen der bisherigen Versionen und Hotfixes · `RELEASE_NOTES.md` – aktuelle Versionshinweise
 
 ## Bauen und Testen
 
